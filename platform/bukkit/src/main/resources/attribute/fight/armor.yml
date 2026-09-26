@@ -1,0 +1,15 @@
+armor:
+  names: ["护甲"]
+  reader: default
+  handler: 'attribute/fight/armor'
+  priority: 250
+  always-run: true
+  triggers: defense
+
+sunder-armor:
+  names: ["破甲几率"]
+  reader: default
+
+see-through:
+  names: ["护甲穿透"]
+  reader: default

@@ -1,0 +1,22 @@
+crit:
+  names: ["暴击几率"]
+  reader: default
+  handler: 'attribute/fight/crit'
+  priority: 300
+  triggers: attack
+
+crit-resist:
+  names: ["暴击抵抗"]
+  reader: default
+
+crit-rate:
+  names: ["暴伤倍率"]
+  reader: default
+
+crit-damage-resist:
+  names: ["暴伤抵抗"]
+  reader: default
+
+crit-dodge:
+  names: ["暴击闪避"]
+  reader: default

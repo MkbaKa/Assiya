@@ -1,0 +1,11 @@
+name: ${name}
+main: github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
+version: ${version}
+
+authors:
+  - 'Mkbakaa'
+
+depend:
+  - 'PlaceholderAPI'
+
+api-version: 1.13

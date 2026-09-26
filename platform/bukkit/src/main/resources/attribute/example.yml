@@ -1,0 +1,47 @@
+# 属性示例
+# 索引名
+example:
+  # 实际读取时判定的属性名
+  # 可以是多个
+  names: ['测试属性', '第二个名字']
+  # 或者这样写
+#  names:
+#    - '测试属性'
+#    - '第二个名字'
+  # 读取规则
+  # 见 reader/default.yml
+  reader: default
+  # 后续节点不写就不会有任何执行逻辑
+  # 只作为名字读取
+  #
+  # 实现逻辑的脚本位置
+  # 位置会基于 scripts 目录进行偏移
+  # 比如这个例子里的实际脚本位置是:
+  # plugins/Assiya/scripts/damage/attack.xxx 文件
+  # 脚本的后缀不重要 无论是 js 还是 groovy 都不用写
+  handler: 'attribute/fight/attack'
+  # 触发优先级
+  # 同触发器从小到大执行
+  # 如果优先级相同则按索引名排序
+  priority: 114514
+  # 触发类型
+  # attack 即自身持有属性作为攻击方时触发
+  # triggers: attack
+  # 同一属性允许多种触发情况
+  # 像这样写 会让 attack 与 kill 都去执行 handler 对应的脚本
+  # triggers: ['attack', 'kill']
+  # 不过以上两种方式是快速创建用的简单配置
+  # 完整配置长这样 可以分别给每种触发单独调整
+  triggers:
+    attack:
+      priority: 114514
+      always-run: false
+      handler: 'attribute/fight/attack'
+    kill:
+      always-run: false
+      # 这里与 attack 相同优先级不会冲突
+      # 因为 kill 与 attack 不在同一条触发路线上
+      # 如果将下面两条注释掉不指定 会自动继承根节点的相关设置
+      # 即 example 里的 priority 114514 + handler attribute/fight/attack
+      # priority: 1919810
+      # handler: 'attribute/fight/kill'

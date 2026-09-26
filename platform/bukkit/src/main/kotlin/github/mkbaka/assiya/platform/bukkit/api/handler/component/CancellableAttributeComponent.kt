@@ -1,0 +1,29 @@
+package github.mkbaka.assiya.platform.bukkit.api.handler.component
+
+import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
+
+/**
+ * 由先执行属性控制后续属性的执行状态
+ * 列表中的属性会被跳过执行
+ *
+ * @param [cancelled]
+ */
+class CancellableAttributeComponent(
+    private val cancelled: MutableSet<String> = hashSetOf()
+) : ProcessorComponent {
+
+    override val key: ProcessorComponent.Key<*> = Key
+
+    fun isCancelled(attribute: String) = attribute in cancelled
+
+    fun setCancelled(attribute: String, bool: Boolean) {
+        if (bool) {
+            cancelled.add(attribute)
+        } else {
+            cancelled.remove(attribute)
+        }
+    }
+
+    companion object Key : ProcessorComponent.Key<CancellableAttributeComponent>
+
+}

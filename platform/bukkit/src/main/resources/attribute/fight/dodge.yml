@@ -1,0 +1,10 @@
+dodge:
+  names: ["闪避几率"]
+  reader: default
+  handler: 'attribute/fight/dodge'
+  priority: 0
+  triggers: defense
+
+hit:
+  names: ["命中几率"]
+  reader: default

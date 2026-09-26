@@ -1,0 +1,10 @@
+lightning:
+  names: ["雷击几率"]
+  reader: default
+  handler: 'attribute/fight/lightning'
+  priority: 150
+  triggers: attack
+
+lightning-damage:
+  names: ["雷击伤害"]
+  reader: default

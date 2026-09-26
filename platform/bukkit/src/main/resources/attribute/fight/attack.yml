@@ -1,0 +1,41 @@
+physical-attack:
+  names: ["物理伤害", "攻击力"]
+  reader: default
+  handler: 'attribute/fight/attack'
+  priority: 100
+  triggers: attack
+
+pvp-attack:
+  names: ["PVP伤害"]
+  reader: default
+  handler: 'attribute/fight/pvp-attack'
+  priority: 110
+  triggers: attack
+
+pve-attack:
+  names: ["PVE伤害"]
+  reader: default
+  handler: 'attribute/fight/pve-attack'
+  priority: 120
+  triggers: attack
+
+physical-defense:
+  names: [ "物理防御", "防御力" ]
+  reader: default
+  handler: 'attribute/fight/defense'
+  priority: 200
+  triggers: defense
+
+pvp-defense:
+  names: ["PVP防御"]
+  reader: default
+  handler: 'attribute/fight/pvp-defense'
+  priority: 210
+  triggers: defense
+
+pve-defense:
+  names: ["PVE防御"]
+  reader: default
+  handler: 'attribute/fight/pve-defense'
+  priority: 220
+  triggers: defense

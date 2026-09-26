@@ -1,0 +1,24 @@
+# 暴击公式
+#   可用变量:
+#      <damage>  -  当前总伤害
+#      <rate>  -  暴击倍率
+#      <resist>  -  暴伤抵抗
+crit: 'max(0, <damage> * (<rate> - <resist>) / 100)'
+
+# 雷击公式
+#   可用变量:
+#      <damage>  -  雷击伤害
+lightning: '<damage>'
+
+# 吸血公式
+#   可用变量:
+#      <damage>  -  当前总伤害
+#      <rate>  -  吸血倍率
+vampire: '<damage> * <rate> / 100'
+
+# 护甲公式
+#   可用变量:
+#      <damage>  -  当前总伤害
+#      <armor>  -  受击者护甲
+#      <penetration>  -  攻击者护甲穿透
+armor: '<damage> * (<armor> - <penetration>) / 100'

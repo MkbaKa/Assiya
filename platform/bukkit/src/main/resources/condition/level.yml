@@ -1,0 +1,9 @@
+# 索引名
+level-require:
+  # 识别名
+  names: ["等级需求", "Lv."]
+  # 读取规则
+  reader: default
+  # 实现逻辑的脚本位置
+  # 具体信息见 attribute/fight/attack.yml
+  handler: 'condition/level-require'

@@ -1,0 +1,48 @@
+# 索引名
+default:
+  # 需要捕获的值
+  # key   是用于访问值时的捕获名
+  # value 为重复读取时的合并行为
+  captures:
+    # 这里的 value 是一个自定义的名字
+    # add 代表重复读取时 两个值会相加
+    value: add
+    percent: add
+    min: add
+    max: add
+  # 实际取值时的正则表达式
+  # 上面声明的 captures 可以在这里以 <key> 的形式作为占位符
+  # 同时存在一个内部占位符 {name} 代表实际执行规则的属性名
+  # 实际读取时会从上往下挨个判断 所以可能重叠的规则要把容易匹配的放在后面
+  patterns:
+    # 范围数值  "物理伤害: 100-200"
+    - '{name}.*?<min>-<max>'
+    # 百分比    "物理伤害: 50%"
+    - '{name}.*?<percent>%'
+    # 普通数值  "物理伤害: 100"
+    - '{name}.*?<value>'
+  # 提前对读取后的值做一些运算 方便执行时/papi变量直接拿出结果
+  # 这里可以使用 captures 里的捕获名称
+  placeholders:
+    random: 'random(<min>, <max>)'
+    rate: '<percent> / 100'
+    # 可以使用上面的计算结果
+    total: '(<value> + <random>) * (1 + <rate>)'
+
+# 罗马数字的读取示例
+roman:
+  captures:
+    # 完整的捕获组声明
+    # 上面那个是简单版的
+    value:
+      # 合并方式
+      op: add
+      # 读取格式
+      # 决定读取出来的文本该怎么转换成属性值
+      # 这里的 roman 就是罗马数字  上面那种直接 value: add 的是默认值 decimal
+      # 罗马数字在解析后会转换成对应的数字
+      # 比如 V 对应数字 5
+      format: roman
+  patterns:
+    # "力量: V"
+    - '{name}.*?<value>'

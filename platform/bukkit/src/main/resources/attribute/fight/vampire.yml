@@ -1,0 +1,18 @@
+vampire:
+  names: ["吸血几率"]
+  reader: default
+  handler: 'attribute/fight/vampire'
+  priority: 160
+  triggers: attack
+
+vampire-rate:
+  names: ["吸血倍率"]
+  reader: default
+
+vampire-resist:
+  names: ["吸血抵抗"]
+  reader: default
+
+vampire-dodge:
+  names: ["吸血闪避"]
+  reader: default

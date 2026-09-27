@@ -2,11 +2,29 @@ package github.mkbaka.assiya.platform.bukkit.internal.registry
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
+import java.util.concurrent.atomic.AtomicBoolean
 
 object AttributeRegistration {
 
     private var batchDepth = 0
     private var dirty = false
+
+    private val refreshEnabled = AtomicBoolean(false)
+
+    /**
+     * 见 [HandlerRegistry]#index
+     */
+    fun begin() {
+        refreshEnabled.set(false)
+    }
+
+    fun complete() {
+        try {
+            AttributeRegistry.refresh()
+        } finally {
+            refreshEnabled.set(true)
+        }
+    }
 
     fun register(attribute: Attribute) {
         AttributeRegistry.register(attribute)
@@ -48,6 +66,7 @@ object AttributeRegistration {
     }
 
     private fun changed() {
+        if (!refreshEnabled.get()) return
         if (batchDepth == 0) {
             AttributeRegistry.refresh()
         } else {
@@ -69,7 +88,7 @@ object AttributeRegistration {
 
         try {
             HandlerRegistry.complete()
-            if (dirty) {
+            if (dirty && refreshEnabled.get()) {
                 AttributeRegistry.refresh()
             }
         } finally {

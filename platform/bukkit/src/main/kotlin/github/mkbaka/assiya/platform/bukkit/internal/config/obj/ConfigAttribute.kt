@@ -4,6 +4,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.WrappedAttribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerHandler
@@ -14,6 +15,7 @@ class ConfigAttribute(
     override val id: String,
     reader: ReaderComponent?,
     triggers: Map<Trigger, ConfigTrigger>,
+    options: OptionsComponent?
 ) : Attribute {
 
     override val components: Map<AttributeComponent.Key<*>, AttributeComponent>
@@ -35,6 +37,7 @@ class ConfigAttribute(
                 }
             )
         }
+        if (options != null) components += options
         this.components = components.associateBy { it.key }
     }
 

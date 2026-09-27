@@ -1,10 +1,12 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigAttribute
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
@@ -12,9 +14,13 @@ import github.mkbaka.assiya.platform.bukkit.internal.registry.TriggerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.bukkitksp.annotation.CustomTask
 
-object AttributeConfigManager : ConfigSectionManager<Attribute>("attribute") {
+object AttributeConfigManager {
 
-    override fun defaultResources(): List<String> {
+    private val attributes = hashMapOf<String, Attribute>()
+
+    val size: Int get() = attributes.size
+
+    private fun defaultResources(): List<String> {
         return listOf(
             "attribute/example.yml",
             "attribute/misc.yml",
@@ -28,16 +34,22 @@ object AttributeConfigManager : ConfigSectionManager<Attribute>("attribute") {
     }
 
     @CustomTask(taskId = "reload", priority = 30)
-    override fun reload() {
+    fun reload() {
         AttributeRegistration.batch {
-            for (attribute in values) {
+            for (attribute in attributes.values) {
                 attribute.unregister()
             }
-            super.reload()
+            attributes.clear()
+            ConfigLoader.load("attribute", defaultResources()) { id, root ->
+                val node = root.getNode(id) ?: error("Attribute $id must be a configuration section")
+                val attribute = parseAttribute(id, node)
+                attribute.register()
+                attributes[id] = attribute
+            }
         }
     }
 
-    override fun convert(id: String, value: ConfigNode): Attribute {
+    private fun parseAttribute(id: String, value: ConfigNode): Attribute {
         val readerName = value.getString("reader")
         val reader = if (readerName == null) {
             null
@@ -53,9 +65,9 @@ object AttributeConfigManager : ConfigSectionManager<Attribute>("attribute") {
 
         val triggers = readTriggers(id, value)
 
-        val attribute = ConfigAttribute(id, reader, triggers)
-        attribute.register()
-        return attribute
+        val options = value.getNode("options")?.let(::OptionsComponent)
+
+        return ConfigAttribute(id, reader, triggers, options)
     }
 
     private fun readTriggerNodes(id: String, obj: Any?): List<Pair<String, ConfigNode?>> {

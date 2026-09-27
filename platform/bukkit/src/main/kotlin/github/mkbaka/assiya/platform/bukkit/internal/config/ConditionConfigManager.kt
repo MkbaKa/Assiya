@@ -2,27 +2,38 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigCondition
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 
 import github.mkbaka.bukkitksp.annotation.CustomTask
 
-object ConditionConfigManager : ConfigSectionManager<Condition>("condition") {
+object ConditionConfigManager {
 
-    override fun defaultResources(): List<String> {
+    private val conditions = hashMapOf<String, Condition>()
+
+    val size: Int get() = conditions.size
+
+    private fun defaultResources(): List<String> {
         return listOf("condition/level.yml")
     }
 
     @CustomTask(taskId = "reload", priority = 20)
-    override fun reload() {
-        for (condition in values) {
+    fun reload() {
+        for (condition in conditions.values) {
             ConditionRegistry.unregister(condition)
         }
-        super.reload()
+        conditions.clear()
+        ConfigLoader.load("condition", defaultResources()) { id, root ->
+            val node = root.getNode(id) ?: error("Condition $id must be a configuration section")
+            val condition = parseCondition(id, node)
+            ConditionRegistry.register(condition)
+            conditions[id] = condition
+        }
     }
 
-    override fun convert(id: String, node: ConfigNode): Condition {
+    private fun parseCondition(id: String, node: ConfigNode): Condition {
         val names = node.getStrings("names")
 
         val readerName = node.getString("reader")
@@ -40,11 +51,7 @@ object ConditionConfigManager : ConfigSectionManager<Condition>("condition") {
             )
         }
 
-        val condition = ConfigCondition(id = id, names = names, reader = readerName, handler = handler)
-
-        ConditionRegistry.register(condition)
-
-        return condition
+        return ConfigCondition(id = id, names = names, reader = readerName, handler = handler)
     }
 
 }

@@ -4,6 +4,10 @@ vampire:
   handler: 'attribute/fight/vampire'
   priority: 160
   triggers: attack
+  # 自定义选项
+  options:
+    # 若为 true 则吸血时会增加对应的伤害
+    extra-damage: false
 
 vampire-rate:
   names: ["吸血倍率"]

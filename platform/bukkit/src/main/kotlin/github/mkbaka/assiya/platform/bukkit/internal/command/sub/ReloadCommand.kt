@@ -5,6 +5,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callAsy
 import github.mkbaka.bukkitksp.annotation.CustomField
 import org.bukkit.command.CommandSender
 import pers.neige.colonel.literal
+import kotlin.time.measureTime
 
 object ReloadCommand {
 
@@ -14,11 +15,15 @@ object ReloadCommand {
             val sender = context.source ?: return@setNullExecutor
 
             callAsync {
-                if (!Config.reload()) {
+                measureTime {
+                    if (!Config.reload()) {
 //                    MessageType.RELOAD_IN_PROGRESS.sendTo(sender)
-                    return@callAsync
+                        return@callAsync
+                    }
+                }.also { used ->
+                    sender.sendMessage("reload used ${used.inWholeMilliseconds} ms.")
                 }
-                sender.sendMessage("reload")
+
 //                MessageType.RELOAD_SUCCESS.sendTo(sender) { vars ->
 //                    vars["scripts"] = ScriptManager.size.toString()
 //                    vars["readers"] = ReaderRegistry.values.size.toString()

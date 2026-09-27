@@ -8,11 +8,32 @@ interface ConfigNode {
 
     fun get(key: String): Any?
 
+    fun contains(key: String): Boolean = get(key) != null
+
     fun getNode(key: String): ConfigNode? = of(get(key))
 
     fun getString(key: String, def: String? = null): String? {
         return get(key)?.toString() ?: def
     }
+
+    fun getString(key: String): String? = getString(key, null)
+
+    fun getInt(key: String): Int = getInt(key, 0)
+
+    fun getLong(key: String): Long = getLong(key, 0L)
+
+    fun getLong(key: String, def: Long): Long {
+        val value = get(key) ?: return def
+        if (value is Number) return value.toLong()
+        return value.toString().toLongOrNull()
+            ?: throw NumberFormatException("node $key is not a number: $value")
+    }
+
+    fun getDouble(key: String): Double = getDouble(key, 0.0)
+
+    fun getBoolean(key: String): Boolean = getBoolean(key, false)
+
+    fun getStringList(key: String): List<String> = getStrings(key)
 
     fun getInt(key: String, def: Int): Int {
         val value = get(key) ?: return def

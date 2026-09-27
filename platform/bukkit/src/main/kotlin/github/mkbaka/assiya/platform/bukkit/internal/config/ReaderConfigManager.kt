@@ -7,6 +7,7 @@ import github.mkbaka.assiya.common.parser.rule.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.reader.Placeholder
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigReader
 import github.mkbaka.assiya.platform.bukkit.internal.formula.Formula
 import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
@@ -15,23 +16,31 @@ import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ValueRegistry
 import github.mkbaka.bukkitksp.annotation.CustomTask
 
-internal object ReaderConfigManager : ConfigSectionManager<Reader>(
-    "reader"
-) {
+internal object ReaderConfigManager {
 
-    override fun defaultResources(): List<String> {
+    private val readers = hashMapOf<String, Reader>()
+
+    val size: Int get() = readers.size
+
+    private fun defaultResources(): List<String> {
         return listOf("reader/default.yml")
     }
 
     @CustomTask(taskId = "reload", priority = 10)
-    override fun reload() {
-        for (reader in values) {
+    fun reload() {
+        for (reader in readers.values) {
             ReaderRegistry.unregister(reader)
         }
-        super.reload()
+        readers.clear()
+        ConfigLoader.load("reader", defaultResources()) { id, root ->
+            val node = root.getNode(id) ?: error("Reader $id must be a configuration section")
+            val reader = parseReader(id, node)
+            ReaderRegistry.register(reader)
+            readers[id] = reader
+        }
     }
 
-    override fun convert(id: String, node: ConfigNode): Reader {
+    private fun parseReader(id: String, node: ConfigNode): Reader {
         val section = node.getNode("captures")
             ?: error("Reader $id is missing captures")
 
@@ -48,7 +57,7 @@ internal object ReaderConfigManager : ConfigSectionManager<Reader>(
             capture = Capture.of(captures),
             patterns = patterns,
             placeholders = parsePlaceholders(id, node.getNode("placeholders"), captures)
-        ).also { it.register() }
+        )
     }
 
     private fun parsePlaceholders(

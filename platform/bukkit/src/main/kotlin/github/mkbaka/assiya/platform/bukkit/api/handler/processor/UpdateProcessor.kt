@@ -3,7 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.api.handler.processor
 import github.mkbaka.assiya.common.engine.AttributeUpdateContext
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
-import github.mkbaka.assiya.platform.bukkit.api.handler.DefaultAttributeComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.DefaultAttributeContainer
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
@@ -36,7 +36,7 @@ class UpdateProcessor(
         ): UpdateProcessor {
             return UpdateProcessor(context) { pcb ->
                 pcb += Processor.defaults()
-                pcb += TriggerComponent(entity, snapshot, DefaultAttributeComponent(context.workingState))
+                pcb += TriggerComponent(entity, snapshot, DefaultAttributeContainer(context.workingState))
             }
         }
 

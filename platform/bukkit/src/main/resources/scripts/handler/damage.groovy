@@ -2,17 +2,16 @@ package scripts.handler
 
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
+import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
 import github.mkbaka.assiya.platform.bukkit.internal.metadata.MetadataRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSession
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.EntityUtilsKt
 import groovy.transform.CompileStatic
-import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Projectile
@@ -29,7 +28,7 @@ class Damage {
     private static final String FORCE_METADATA_KEY = "Assiya:force"
 
     static void onEnable() {
-        new ScriptListener<ProjectileLaunchEvent>(ProjectileLaunchEvent)
+        ScriptListener.create(ProjectileLaunchEvent)
                 .setEventPriority(EventPriority.HIGHEST)
                 .setIgnoreCancelled(true)
                 .setHandler { ProjectileLaunchEvent event ->
@@ -42,7 +41,7 @@ class Damage {
                 }
                 .register()
 
-        new ScriptListener<EntityShootBowEvent>(EntityShootBowEvent)
+        ScriptListener.create(EntityShootBowEvent)
                 .setEventPriority(EventPriority.HIGHEST)
                 .setIgnoreCancelled(true)
                 .setHandler { EntityShootBowEvent event ->
@@ -50,7 +49,7 @@ class Damage {
                 }
                 .register()
 
-        new ScriptListener<EntityDamageByEntityEvent>(EntityDamageByEntityEvent)
+        ScriptListener.create(EntityDamageByEntityEvent)
                 .setEventPriority(EventPriority.HIGHEST)
                 .setIgnoreCancelled(true)
                 .setHandler { EntityDamageByEntityEvent event ->
@@ -67,8 +66,7 @@ class Damage {
         if (!(event.entity instanceof LivingEntity)) return
 
         // 避免递归
-        AttributeSession damagerSession = AssiyaAPI.getSession(event.damager)
-        if (damagerSession != null && damagerSession.damageProcessorStack.current != null) return
+        if (DamageMetaStack.getCurrent(event.damager.uniqueId) != null) return
 
         LivingEntity defender = (LivingEntity) event.entity
         DamageProcessor processor
@@ -92,8 +90,9 @@ class Damage {
 
             processor = DamageProcessor.ofProjectile(
                     projectile, defender, snapshot(projectile), snapshot(defender), shooterComponent, force
-            ) { DamageProcessor damage ->
-                damage.getComponent(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
+            ) { ProcessorComponentBuilder builder ->
+                builder += new TriggerByEventComponent(event)
+                builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
             }
         } else {
             // 正常攻击伤害
@@ -102,8 +101,9 @@ class Damage {
             LivingEntity attacker = (LivingEntity) event.damager
             processor = DamageProcessor.of(
                     attacker, defender, snapshot(attacker), snapshot(defender)
-            ) { DamageProcessor damage ->
-                damage.getComponent(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
+            ) { ProcessorComponentBuilder builder ->
+                builder += new TriggerByEventComponent(event)
+                builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
             }
         }
 

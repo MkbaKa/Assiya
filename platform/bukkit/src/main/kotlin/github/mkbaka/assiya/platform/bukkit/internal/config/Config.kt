@@ -9,7 +9,7 @@ import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal object Config {
+object Config {
 
     private val reloading = AtomicBoolean(false)
 

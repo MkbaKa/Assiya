@@ -115,18 +115,6 @@ object EquipmentPipeline {
             return
         }
 
-        // 入队与缓存更新之间没有挂起点.
         session.submitPatches(patches)
-
-        for (sourceId in inputs.keys) {
-            val parsed = parsedSources[sourceId]
-
-            // TODO cached 似乎从来没用过
-            if (parsed == null) {
-                session.cached.remove(sourceId)
-            } else {
-                session.cached[sourceId] = parsed
-            }
-        }
     }
 }

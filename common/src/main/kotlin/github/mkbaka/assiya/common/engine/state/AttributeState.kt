@@ -24,6 +24,8 @@ class AttributeState<T : Any>(
 
     operator fun contains(info: AttributeSourceInfo): Boolean = contributors.containsKey(info.sourceId)
 
+    fun sourceIds(): List<String> = contributors.keys.toList()
+
     fun remove(sourceId: String) = contributors.remove(sourceId) != null
 
     fun isEmpty() = contributors.isEmpty()

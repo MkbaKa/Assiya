@@ -1,11 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.attribute
 
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import org.bukkit.entity.Entity
 
 /**

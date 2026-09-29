@@ -29,10 +29,6 @@ class AttributeSession(
     val snapshot: AttributeEngineSnapshot
         get() = engine.snapshot()
 
-    val damageProcessorStack = DamageProcessorStack()
-
-    internal val cached = ConcurrentHashMap<String, AttributeParsedSource>()
-
     fun submitSnapshot(snapshot: AttributeEngineSnapshot) {
         val patches = arrayListOf<AttributeSourcePatch>()
         for ((sourceId, source) in snapshot.sources) {
@@ -62,41 +58,10 @@ class AttributeSession(
         )
     }
 
-//    // 自定义数据
-    // TODO impl
-//    private val data = ConcurrentHashMap<String, DataEntry>()
-//
-//    fun setData(key: String, value: Any?) {
-//        data[key] = DataEntry(value, -1)
-//    }
-//
-//    fun setData(key: String, value: Any?, durationMS: Long) {
-//        data[key] = DataEntry(value, System.currentTimeMillis() + durationMS)
-//    }
-//
-//    fun getData(key: String): Any? {
-//        val entry = data[key] ?: return null
-//        if (entry.expireAt != -1L && System.currentTimeMillis() > entry.expireAt) {
-//            data.remove(key, entry)
-//            return null
-//        }
-//        return entry.value
-//    }
-//
-//    fun removeData(key: String) {
-//        data.remove(key)
-//    }
-
     override fun close() {
         if (isClosed) return
         isClosed = true
-        cached.clear()
         engine.close()
     }
-
-//    private class DataEntry(
-//        val value: Any?,
-//        val expireAt: Long,
-//    )
 
 }

@@ -72,6 +72,9 @@ class ScriptListener<T : Event>(
             }
         }
 
+        @JvmStatic
+        fun <T : Event> create(event: Class<T>) = ScriptListener(event)
+
     }
 
 }

@@ -3,7 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.api.handler
 import github.mkbaka.assiya.common.base.Status
 
 // 供 processor 在执行属性时对快照做临时更改
-interface AttributeComponent {
+interface AttributeContainer {
 
     fun addAttribute(
         attributeId: String,

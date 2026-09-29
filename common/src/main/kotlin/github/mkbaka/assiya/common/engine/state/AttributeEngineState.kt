@@ -11,7 +11,7 @@ import github.mkbaka.assiya.common.source.AttributeValue
  */
 class AttributeEngineState {
 
-    private var sequence = 0L
+    var sequence = 0L
 
     val sourceIndex: Map<String, AttributeSourceInfo>
         field = linkedMapOf()
@@ -109,9 +109,7 @@ class AttributeEngineState {
     @Suppress("UNCHECKED_CAST")
     private fun <T : Any> setAttr(source: AttributeSourceInfo, attribute: AttributeValue<T>) {
         val state = attributeIndex.computeIfAbsent(attribute.attributeId) {
-            AttributeState<T>(
-                attribute.capture
-            )
+            AttributeState(attribute.capture)
         } as AttributeState<T>
         state.put(source, attribute.status)
     }
@@ -123,13 +121,6 @@ class AttributeEngineState {
             attributeIndex.remove(attributeId)
         }
     }
-
-    // TODO 什么鬼玩意
-    fun advanceSequence(minimum: Long) {
-        sequence = maxOf(sequence, minimum)
-    }
-
-    fun currentSequence(): Long = sequence
 
     data class AttributeSourceDiff(
         val affectedAttributes: Set<String>,

@@ -3,6 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.config.obj
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.WrappedAttribute
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.FilterComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
@@ -15,7 +16,8 @@ class ConfigAttribute(
     override val id: String,
     reader: ReaderComponent?,
     triggers: Map<Trigger, ConfigTrigger>,
-    options: OptionsComponent?
+    options: OptionsComponent? = null,
+    filter: FilterComponent? = null
 ) : Attribute {
 
     override val components: Map<AttributeComponent.Key<*>, AttributeComponent>
@@ -29,7 +31,9 @@ class ConfigAttribute(
             components += HandlerComponent(
                 triggers.mapValues { (trigger, config) ->
                     TriggerHandler(config.settings) { processor ->
-
+                        if (this[FilterComponent.Key]?.test(processor) == true) {
+                            return@TriggerHandler
+                        }
 
                         val handler = config.settings.handler!!
                         ScriptManager.invoke(handler, trigger.function, WrappedAttribute(this), processor)
@@ -38,6 +42,7 @@ class ConfigAttribute(
             )
         }
         if (options != null) components += options
+        if (filter != null) components += filter
         this.components = components.associateBy { it.key }
     }
 

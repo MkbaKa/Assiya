@@ -16,8 +16,9 @@ class CancellableAttributeComponent(
 
     fun isCancelled(attribute: String) = attribute in cancelled
 
-    fun setCancelled(attribute: String, bool: Boolean) {
-        if (bool) {
+    @JvmOverloads
+    fun setCancelled(attribute: String, cancel: Boolean = true) {
+        if (cancel) {
             cancelled.add(attribute)
         } else {
             cancelled.remove(attribute)

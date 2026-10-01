@@ -91,7 +91,7 @@ class Damage {
             processor = DamageProcessor.ofProjectile(
                     projectile, defender, snapshot(projectile), snapshot(defender), shooterComponent, force
             ) { ProcessorComponentBuilder builder ->
-                builder += new TriggerByEventComponent(event)
+                builder.add(new TriggerByEventComponent(event))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
             }
         } else {
@@ -99,10 +99,10 @@ class Damage {
             if (!(event.damager instanceof LivingEntity)) return
 
             LivingEntity attacker = (LivingEntity) event.damager
-            processor = DamageProcessor.of(
+            processor = DamageProcessor.ofAttack(
                     attacker, defender, snapshot(attacker), snapshot(defender)
             ) { ProcessorComponentBuilder builder ->
-                builder += new TriggerByEventComponent(event)
+                builder.add(new TriggerByEventComponent(event))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
             }
         }

@@ -60,7 +60,7 @@ class DamageProcessor(
         }
 
         @JvmStatic
-        fun of(
+        fun ofAttack(
             attacker: Entity,
             defender: LivingEntity,
             attackerSnapshot: AttributeEngineSnapshot,

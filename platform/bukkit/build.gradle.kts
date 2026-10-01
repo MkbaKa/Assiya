@@ -42,6 +42,16 @@ dependencies {
     implementation("pers.neige.colonel:colonel-bukkit:+")
 }
 
+val compact by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    isTransitive = false
+}
+
+dependencies {
+    compact(project(":platform:bukkit:compact-mythicmobs-v4"))
+    compact(project(":platform:bukkit:compact-mythicmobs-v5"))
+}
 
 ksp {
     arg("bukkitksp.generatedPackage", "github.mkbaka.assiya.platform.bukkit.internal")
@@ -90,6 +100,8 @@ tasks {
     }
 
     shadowJar {
+        dependsOn(compact)
+        from({ compact.map { zipTree(it) } })
         archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
 

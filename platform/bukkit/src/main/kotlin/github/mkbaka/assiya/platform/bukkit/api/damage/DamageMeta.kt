@@ -5,16 +5,17 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultiple
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
-import org.bukkit.scheduler.BukkitTask
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
 
-/** 独立伤害任务, 在主线程调用. */
 class DamageMeta(
     val processor: DamageProcessor
 ) {
@@ -29,13 +30,25 @@ class DamageMeta(
     var postDamage: Consumer<DamageMeta>? = null
 
     fun doDamage() {
+        execute { processor.process() }
+    }
+
+    fun doDamage(value: Double) {
+        execute {
+            val damage = processor.getComponent(DamageMultipleComponent)
+            damage.clear()
+            damage.setDamage("vanilla", value)
+        }
+    }
+
+    private inline fun execute(prepare: () -> Unit) {
         val trigger = processor.getComponent(TriggerComponent).entity
         val target = processor.getComponent(TargetComponent).entity
         val uuid = trigger.uniqueId
 
         DamageMetaStack.push(uuid, this)
         try {
-            processor.process()
+            prepare()
             if (processor[CancellableComponent]?.isCancelled == true) return
             if (preDamage?.test(this) == true) return
 
@@ -73,16 +86,19 @@ class DamageMeta(
         }
     }
 
-    fun repeat(count: Int, periodTicks: Long, delayTicks: Long = 0) {
-        var executed = 0
-        var task: BukkitTask? = null
-        task = SchedulerUtils.callSyncTimer(delayTicks, periodTicks) {
-            if (executed++ >= count || !processor.getComponent(TargetComponent).entity.isValid) {
-                task?.cancel()
-                return@callSyncTimer
-            }
+    fun repeat(count: Int, periodTicks: Long) {
+        launch(
+            context = BukkitCoroutine.coroutineContext[BukkitDispatchers]!!.sync
+        ) {
+            repeat(count) {
+                val cancel = !processor.getComponent(TargetComponent).entity.isValid
+                if (cancel) {
+                    return@launch
+                }
 
-            doDamage()
+                doDamage()
+                delayTicks(periodTicks)
+            }
         }
     }
 

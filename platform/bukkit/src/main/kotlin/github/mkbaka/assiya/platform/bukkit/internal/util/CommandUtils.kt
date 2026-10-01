@@ -13,7 +13,6 @@ object CommandUtils {
             .apply { isAccessible = true }
     }
 
-    /** Paper 公开了 Server#getCommandMap (1.12.2 起可用), 其余服务端反射 SimplePluginManager. */
     private val commandMap by lazy {
         if (isPaper) {
             Bukkit.getServer().commandMap
@@ -24,12 +23,10 @@ object CommandUtils {
         }
     }
 
-    /** 反射构造 PluginCommand — Bukkit 不公开其构造器, 运行期注册命令的唯一入口. */
     fun newPluginCommand(name: String, owner: Plugin): PluginCommand {
         return pluginCommandConstructor.newInstance(name, owner)
     }
 
-    /** 注册进服务端命令表; fallbackPrefix 用于命令名冲突时的 'prefix:name' 兜底别名. */
     fun registerCommand(fallbackPrefix: String, command: PluginCommand) {
         commandMap.register(fallbackPrefix, command)
     }

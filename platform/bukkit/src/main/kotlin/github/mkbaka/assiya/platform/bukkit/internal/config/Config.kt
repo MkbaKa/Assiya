@@ -1,7 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
-import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
+import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx

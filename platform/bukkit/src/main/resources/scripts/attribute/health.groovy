@@ -18,6 +18,9 @@ class Health {
     private static final String MODIFIER_NAME = 'assiya:max-health'
     private static final UUID MODIFIER_UUID = UUID.nameUUIDFromBytes(MODIFIER_NAME.getBytes())
 
+    /**
+     * TODO fix 玩家进入服务器后会触发两次 update 调查原因
+     */
     static void onUpdate(Attribute attribute, UpdateProcessor processor) {
         TriggerComponent trigger = processor.get(TriggerComponent.@Key)
         if (trigger == null) return

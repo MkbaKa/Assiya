@@ -13,6 +13,10 @@ class DamageMultipleComponent(
 
     fun getDamage(id: String) = components[id]?.value
 
+    fun clear() {
+        components.clear()
+    }
+
     fun setDamage(id: String, value: Double) {
         components.computeIfAbsent(id) { DamageComponent(id, 0.0) }.value = value
     }

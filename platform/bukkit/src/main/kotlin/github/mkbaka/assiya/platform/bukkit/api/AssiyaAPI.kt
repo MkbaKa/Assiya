@@ -14,6 +14,9 @@ import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
+/**
+ * TODO refactor
+ */
 object AssiyaAPI {
 
     @JvmStatic
@@ -70,7 +73,6 @@ object AssiyaAPI {
         AttributeReadPipeline.evaluate(entity, parsed)
     }
 
-    /** 完成表示解析和命令入队完成, 不表示 Refresh 已被执行. */
     @JvmStatic
     fun submitAsync(
         entity: Entity,
@@ -78,15 +80,13 @@ object AssiyaAPI {
         parsed: AttributeParsedSource,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle
-    ): CompletableFuture<Void?> = BukkitCoroutine.future {
+    ): CompletableFuture<Unit> = BukkitCoroutine.future {
         AttributeReadPipeline.submit(
             AttributeSessionRegistry[entity]!!,
             entity, sourceId, parsed, priority, lifeCycle
         )
-        null
     }
 
-    /** 完成表示解析和命令入队完成, 不表示 Refresh 已被执行. */
     @JvmStatic
     fun parseAndSubmitAsync(
         entity: Entity,
@@ -94,7 +94,7 @@ object AssiyaAPI {
         lines: List<String>,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle
-    ): CompletableFuture<Void?> = BukkitCoroutine.future {
+    ): CompletableFuture<Unit> = BukkitCoroutine.future {
         val session = AttributeSessionRegistry[entity]!!
         val parsed = AttributeReadPipeline.parse(
             listOf(AttributeReadPipeline.text(lines))
@@ -102,10 +102,8 @@ object AssiyaAPI {
         AttributeReadPipeline.submit(
             session, entity, sourceId, parsed, priority, lifeCycle
         )
-        null
     }
 
-    /** 完成表示解析和命令入队完成, 不表示 Refresh 已被执行. */
     @JvmStatic
     fun parseAndSubmitAsync(
         entity: Entity,
@@ -113,13 +111,12 @@ object AssiyaAPI {
         item: ItemStack,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle
-    ): CompletableFuture<Void?> = BukkitCoroutine.future {
+    ): CompletableFuture<Unit> = BukkitCoroutine.future {
         val session = AttributeSessionRegistry[entity]!!
         val parsed = AttributeReadPipeline.parse(item)
         AttributeReadPipeline.submit(
             session, entity, sourceId, parsed, priority, lifeCycle
         )
-        null
     }
 
 }

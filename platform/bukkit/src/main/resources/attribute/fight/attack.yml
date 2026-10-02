@@ -4,6 +4,11 @@ physical-attack:
   handler: 'attribute/fight/attack'
   priority: 100
   triggers: attack
+  options:
+    # attacker 是攻击方的消息提示
+    attacker: '你对 {entity} 造成了 {damage} 点伤害.'
+    # entity 是受击方的消息提示
+    entity: '{attacker} 对你造成了 {damage} 点伤害.'
 
 pvp-attack:
   names: ["PVP伤害"]

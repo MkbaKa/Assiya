@@ -4,6 +4,9 @@ crit:
   handler: 'attribute/fight/crit'
   priority: 300
   triggers: attack
+  options:
+    attacker: '暴击! 对 {entity} 额外造成 {extra} 点暴击伤害, 总伤害 {damage}.'
+    entity: '暴击! {attacker} 对你额外造成 {extra} 点暴击伤害, 总伤害 {damage}.'
 
 crit-resist:
   names: ["暴击抵抗"]

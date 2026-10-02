@@ -2,14 +2,12 @@ package scripts.attribute.fight
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
-import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
+import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
-import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
 
@@ -50,14 +48,7 @@ class Vampire {
         }
 
         processor.get(CallbackComponent.@Key)?.callback {
-            String value = StringUtils.format(heal, 2)
-            if (extraDamage) {
-                ScriptTools.getAttacker(processor)?.sendMessage("吸血! 吸取 ${value} 点生命力, 并对 ${target.entity.name} 额外造成等量伤害!")
-                target.entity.sendMessage("吸血! ${attacker.entity.name} 吸取 ${value} 点生命力, 并对你额外造成等量伤害!")
-            } else {
-                ScriptTools.getAttacker(processor)?.sendMessage("吸血! 本次吸血量 ${value} 点生命力!")
-                target.entity.sendMessage("吸血! ${attacker.entity.name} 触发了 ${value} 点吸血!")
-            }
+            ScriptTools.sendCombatMessage(attribute, processor, [damage: damage.totalDamage, heal: heal])
         }
     }
 }

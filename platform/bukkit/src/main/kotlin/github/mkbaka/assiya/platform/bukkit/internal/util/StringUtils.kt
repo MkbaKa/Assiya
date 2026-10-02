@@ -9,14 +9,18 @@ object StringUtils {
     @JvmStatic
     fun Number.format(digits: Int): String = BigDecimal(toString()).setScale(digits, RoundingMode.HALF_UP).toString()
 
+    @JvmStatic
     fun String.colored(): String {
         return ChatColor.translateAlternateColorCodes('&', this)
     }
 
+    @JvmStatic
     fun String.uncolored(): String {
         return ChatColor.stripColor(this)!!
     }
 
+    @JvmStatic
+    @JvmOverloads
     fun String.replaceVariables(
         variables: Map<String, String>,
         prefix: Char = '{',

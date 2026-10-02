@@ -4,6 +4,9 @@ dodge:
   handler: 'attribute/fight/dodge'
   priority: 0
   triggers: defense
+  options:
+    attacker: '{entity} 闪避了你的攻击.'
+    entity: '你避开了 {attacker} 的攻击.'
 
 hit:
   names: ["命中几率"]

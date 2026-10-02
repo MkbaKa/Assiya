@@ -4,6 +4,9 @@ lightning:
   handler: 'attribute/fight/lightning'
   priority: 150
   triggers: attack
+  options:
+    attacker: '雷击! 额外造成 {extra} 点雷击伤害!'
+    entity: '雷击! 对方对你额外造成 {extra} 点雷击伤害!'
 
 lightning-damage:
   names: ["雷击伤害"]

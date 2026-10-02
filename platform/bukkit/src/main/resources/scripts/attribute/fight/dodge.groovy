@@ -23,6 +23,5 @@ static void onDefense(Attribute attribute, Processor processor) {
 
     processor.getComponent(CancellableComponent.@Key).setCancelled(true)
 
-    ScriptTools.getAttacker(processor)?.sendMessage("${defender.entity.name} 闪避了你的攻击.")
-    defender.entity.sendMessage("你避开了 ${attacker.entity.name} 的攻击.")
+    ScriptTools.sendCombatMessage(attribute, processor)
 }

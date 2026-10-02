@@ -8,6 +8,8 @@ vampire:
   options:
     # 若为 true 则吸血时会增加对应的伤害
     extra-damage: false
+    attacker: '吸血! 本次吸血量 {heal} 点生命力!'
+    entity: '吸血! {attacker} 触发了 {heal} 点吸血!'
 
 vampire-rate:
   names: ["吸血倍率"]

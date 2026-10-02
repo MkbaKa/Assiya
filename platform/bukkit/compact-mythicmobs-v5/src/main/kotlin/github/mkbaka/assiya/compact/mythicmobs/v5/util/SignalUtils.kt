@@ -49,7 +49,7 @@ object SignalUtils {
     ): SkillMetadata {
         val meta = SkillMetadataImpl(SkillTriggers.SIGNAL, activeMob, trigger)
 
-        meta.setEntityTargets(hashSetOf(trigger))
+        meta.entityTargets = hashSetOf(trigger)
 
         val caller = CancellableCaller()
 

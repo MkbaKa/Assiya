@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5
 
 import github.mkbaka.assiya.compact.mythicmobs.v5.generated.registerEntries
+import github.mkbaka.assiya.compact.mythicmobs.v5.placeholder.MythicPlaceholders
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.MythicMobAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.MythicMobsCompatibility
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.on
@@ -47,6 +48,7 @@ class MythicMobs5Hook : MythicMobsCompatibility, Listener {
     }
 
     override fun register() {
+        MythicPlaceholders.register()
         on<MythicConditionLoadEvent>(executor = ::onCondition)
         on<MythicMechanicLoadEvent>(executor = ::onMechanic)
         on<MythicMobSpawnEvent>(priority = EventPriority.MONITOR, executor = ::onSpawn)
@@ -77,6 +79,7 @@ class MythicMobs5Hook : MythicMobsCompatibility, Listener {
     }
 
     fun onReload(event: MythicReloadedEvent) {
+        MythicPlaceholders.register()
         MythicMobAttributes.clear()
     }
 

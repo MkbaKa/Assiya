@@ -5,33 +5,49 @@ import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import java.io.File
 import javax.script.Compilable
+import javax.script.CompiledScript
 import javax.script.Invocable
 import javax.script.ScriptEngine
+import javax.script.SimpleBindings
 import github.mkbaka.assiya.libs.nashorn.api.scripting.NashornScriptEngineFactory as RelocatedFactory
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory as BuiltinFactory
 
-internal object NashornEngineAdapter : ScriptEngineAdapter {
+object NashornEngineAdapter : ScriptEngineAdapter {
 
     private val ENGINE_ARGS = arrayOf("--language=es6", "-scripting", "--optimistic-types")
 
-    private val newEngine: ((Array<String>, ClassLoader) -> ScriptEngine)? by lazy {
-        try {
-            val builtinPresent = try {
-                Class.forName("jdk.nashorn.api.scripting.NashornScriptEngineFactory")
-                true
-            } catch (e: ClassNotFoundException) {
-                false
-            }
-            if (builtinPresent) BuiltinNashorn::newEngine else RelocatedNashorn::newEngine
-        } catch (e: Throwable) {
-            logEx(e, "Nashorn script engine is unavailable, scripts will not be loaded")
+    private val newEngine: ((Array<String>, ClassLoader) -> ScriptEngine) by lazy {
+        val builtinPresent = try {
+            Class.forName("jdk.nashorn.api.scripting.NashornScriptEngineFactory")
+            true
+        } catch (e: ClassNotFoundException) {
+            false
+        }
+        if (builtinPresent) BuiltinNashorn::newEngine else RelocatedNashorn::newEngine
+    }
+
+    val globalEngine = newEngine(arrayOf("--global-per-engine", *ENGINE_ARGS), this::class.java.classLoader)
+
+    fun eval(expression: String, args: Map<String, Any>): Any? {
+        return try {
+            globalEngine.eval(expression, SimpleBindings(args))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun eval(script: CompiledScript, args: Map<String, Any>): Any? {
+        return try {
+            script.eval(SimpleBindings(args))
+        } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
 
     override fun compile(id: String, file: File): Script {
-        val factory = checkNotNull(newEngine) { "Nashorn script engine is unavailable" }
-        val engine = factory(ENGINE_ARGS, javaClass.classLoader)
+        val engine = newEngine(ENGINE_ARGS, javaClass.classLoader)
         file.reader(Charsets.UTF_8).use { reader ->
             (engine as Compilable).compile(reader).eval()
         }

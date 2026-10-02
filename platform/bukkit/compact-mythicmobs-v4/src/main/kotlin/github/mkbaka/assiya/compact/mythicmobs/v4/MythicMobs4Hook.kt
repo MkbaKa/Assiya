@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.compact.mythicmobs.v4
 
 import github.mkbaka.assiya.compact.mythicmobs.v4.generated.registerEntries
+import github.mkbaka.assiya.compact.mythicmobs.v4.placeholder.MythicPlaceholders
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.MythicMobAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.MythicMobsCompatibility
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.on
@@ -45,6 +46,7 @@ class MythicMobs4Hook : MythicMobsCompatibility {
     }
 
     override fun register() {
+        MythicPlaceholders.register()
         on<MythicConditionLoadEvent>(priority = EventPriority.MONITOR, executor = ::onCondition)
         on<MythicMechanicLoadEvent>(priority = EventPriority.MONITOR, executor = ::onMechanic)
         on<MythicMobSpawnEvent>(priority = EventPriority.MONITOR, executor = ::onSpawn)
@@ -75,6 +77,7 @@ class MythicMobs4Hook : MythicMobsCompatibility {
     }
 
     fun onReload(event: MythicReloadedEvent) {
+        MythicPlaceholders.register()
         MythicMobAttributes.clear()
     }
 

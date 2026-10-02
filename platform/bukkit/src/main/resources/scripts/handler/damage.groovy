@@ -36,7 +36,7 @@ class Damage {
                     ProjectileSource shooter = projectile.shooter
                     if (!(shooter instanceof LivingEntity)) return
 
-                    AttributeEngineSnapshot shooterSnapshot = snapshot((LivingEntity) shooter)
+                    AttributeEngineSnapshot shooterSnapshot = AssiyaAPI.getSnapshot((LivingEntity) shooter)
                     AssiyaAPI.getSessionOrCreate(projectile).submitSnapshot(shooterSnapshot)
                 }
                 .register()
@@ -86,10 +86,10 @@ class Damage {
             Float force = MetadataRegistry.getMetadata(projectile.uniqueId, FORCE_METADATA_KEY)
             if (force == null) force = 1.0f
 
-            TriggerComponent shooterComponent = new TriggerComponent((LivingEntity) shooter, snapshot((LivingEntity) shooter))
+            TriggerComponent shooterComponent = new TriggerComponent((LivingEntity) shooter, AssiyaAPI.getSnapshot((LivingEntity) shooter))
 
             processor = DamageProcessor.ofProjectile(
-                    projectile, defender, snapshot(projectile), snapshot(defender), shooterComponent, force
+                    projectile, defender, AssiyaAPI.getSnapshot(projectile), AssiyaAPI.getSnapshot(defender), shooterComponent, force
             ) { ProcessorComponentBuilder builder ->
                 builder.add(new TriggerByEventComponent(event))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
@@ -100,7 +100,7 @@ class Damage {
 
             LivingEntity attacker = (LivingEntity) event.damager
             processor = DamageProcessor.ofAttack(
-                    attacker, defender, snapshot(attacker), snapshot(defender)
+                    attacker, defender, AssiyaAPI.getSnapshot(attacker), AssiyaAPI.getSnapshot(defender)
             ) { ProcessorComponentBuilder builder ->
                 builder.add(new TriggerByEventComponent(event))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
@@ -118,11 +118,6 @@ class Damage {
 
         // 应用伤害
         event.damage = processor.getComponent(DamageMultipleComponent.@Key).totalDamage
-    }
-
-    private static AttributeEngineSnapshot snapshot(Entity entity) {
-        AttributeEngineSnapshot snapshot = AssiyaAPI.getSession(entity.uniqueId)?.snapshot
-        return snapshot != null ? snapshot : AttributeEngineSnapshot.EMPTY
     }
 
 }

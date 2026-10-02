@@ -18,6 +18,10 @@ data class Status<T : Any> private constructor(
 
     operator fun get(captureId: String): T? = values[captureId]
 
+    fun copy(): Status<T> {
+        return of(values)
+    }
+
     companion object {
 
         fun <T : Any> empty(): Status<T> = Status(emptyMap())

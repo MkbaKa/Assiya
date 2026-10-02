@@ -16,6 +16,11 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
 
+/**
+ * 唤起一次经 Assiya 处理的伤害
+ *
+ * @param [processor] 上下文
+ */
 class DamageMeta(
     val processor: DamageProcessor
 ) {
@@ -33,15 +38,7 @@ class DamageMeta(
         execute { processor.process() }
     }
 
-    fun doDamage(value: Double) {
-        execute {
-            val damage = processor.getComponent(DamageMultipleComponent)
-            damage.clear()
-            damage.setDamage("vanilla", value)
-        }
-    }
-
-    private inline fun execute(prepare: () -> Unit) {
+    private fun execute(prepare: () -> Unit) {
         val trigger = processor.getComponent(TriggerComponent).entity
         val target = processor.getComponent(TargetComponent).entity
         val uuid = trigger.uniqueId

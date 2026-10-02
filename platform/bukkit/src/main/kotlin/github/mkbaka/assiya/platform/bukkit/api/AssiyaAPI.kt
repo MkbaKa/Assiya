@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api
 
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeValue
@@ -29,6 +30,24 @@ object AssiyaAPI {
     fun getSessionOrCreate(entity: Entity): AttributeSession {
         return AttributeSessionRegistry.getOrCreate(entity)
     }
+
+    @JvmStatic
+    fun getSnapshot(entity: Entity): AttributeEngineSnapshot {
+        return getSession(entity)?.snapshot ?: AttributeEngineSnapshot.EMPTY
+    }
+
+    @JvmStatic
+    fun parseSync(entity: Entity, lines: List<String>): List<AttributeValue<*>> {
+        val parsed = AttributeReadPipeline.parseSync(
+            listOf(AttributeReadPipeline.text(lines))
+        )
+
+        return AttributeReadPipeline.evaluateSync(entity, parsed)
+    }
+
+
+
+
 
     @JvmStatic
     fun parseSync(lines: List<String>): AttributeParsedSource =

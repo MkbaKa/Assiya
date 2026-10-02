@@ -21,6 +21,11 @@ object AttributeRegistry : Registry<Attribute>("属性"), AttributeParser {
     @Volatile
     private var parser: AttributeParser = compile(emptyList(), emptyList())
 
+    @Volatile
+    private var attributesByName: Map<String, Attribute> = emptyMap()
+
+    fun findByName(name: String): Attribute? = attributesByName[name]
+
     override fun parse(parts: List<AttributeSourcePart>): AttributeParsedSource {
         return parser.parse(parts)
     }
@@ -34,10 +39,18 @@ object AttributeRegistry : Registry<Attribute>("属性"), AttributeParser {
     }
 
     fun refresh() {
-        parser = compile(
-            attributes = values.toList(),
+        val attributes = values.toList()
+        val nextParser = compile(
+            attributes = attributes,
             conditions = ConditionRegistry.values.toList()
         )
+        val names = hashMapOf<String, Attribute>()
+        for (attribute in attributes) {
+            val reader = attribute[ReaderComponent] ?: continue
+            for (name in reader.names) names.putIfAbsent(name, attribute)
+        }
+        attributesByName = names
+        parser = nextParser
     }
 
     fun compile(attributes: List<Attribute>, conditions: List<Condition>): AttributeParser {

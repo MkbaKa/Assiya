@@ -16,3 +16,13 @@ val UUID.entityOrNull: Entity?
 
 val UUID.entity: Entity
     get() = entityOrNull!!
+
+fun entityOf(input: Any): Entity? {
+    return when (input) {
+        is Entity -> input
+        is String -> Bukkit.getPlayerExact(input)
+        is UUID -> input.playerOrNull ?: input.entityOrNull
+
+        else -> error("Unexpected entity type in $input")
+    }
+}

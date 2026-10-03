@@ -13,6 +13,8 @@ import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTi
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -102,4 +104,19 @@ class DamageMeta(
         }
     }
 
+    companion object {
+
+        fun fixedDamage(
+            attacker: Entity,
+            defender: LivingEntity,
+            damage: Double
+        ): DamageMeta {
+            val processor = DamageProcessor.of(attacker, defender) { pcb ->
+                pcb[DamageMultipleComponent.Key]!!.setDamage("vanilla", damage)
+            }
+
+            return DamageMeta(processor)
+        }
+
+    }
 }

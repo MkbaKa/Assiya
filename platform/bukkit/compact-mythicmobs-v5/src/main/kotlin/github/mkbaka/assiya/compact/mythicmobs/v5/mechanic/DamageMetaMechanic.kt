@@ -1,11 +1,14 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5.mechanic
 
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.compact.mythicmobs.v5.handler.component.TriggerBySkillComponent
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.DamageMetadataFactory
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.SignalUtils
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.Utils
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
+import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeSnapshotBuilder
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
@@ -76,17 +79,30 @@ class DamageMetaMechanic(
         val parsed = Utils.parseAllEntries(variables, meta, ae)
         val attributes = Utils.parseAttributes(attacker, parsed)
 
+        val baseSnapshot = if (isClear.get(meta, ae).toBoolean()) {
+            AttributeEngineSnapshot.EMPTY
+        } else {
+            AssiyaAPI.getSnapshot(attacker)
+        }
+        val snapshotBuilder = AttributeSnapshotBuilder(baseSnapshot)
+        val overwrite = overwrite.get(meta, ae).toBoolean()
+        for ((id, status) in attributes) {
+            if (overwrite) {
+                snapshotBuilder.setAttribute(id, status)
+            } else {
+                snapshotBuilder.addAttribute(id, status)
+            }
+        }
+
         // 上下文
-        val processor = DamageProcessor.of(
+        val processor = DamageProcessor.ofSnapshot(
             attacker = attacker,
             defender = target,
-            attackerSnapshot = AssiyaAPI.getSnapshot(attacker),
-            defenderSnapshot = AssiyaAPI.getSnapshot(target),
-            attributes = attributes,
-            clear = isClear.get(meta, ae).toBoolean(),
-            overwrite = overwrite.get(meta, ae).toBoolean(),
-            disabledAttributes = disableAttribute?.split(",") ?: emptyList()
+            attackerSnapshot = snapshotBuilder.build()
         ) { pcb ->
+            for (id in disableAttribute?.split(",").orEmpty()) {
+                pcb[CancellableAttributeComponent]!!.setCancelled(id)
+            }
             pcb[CustomDataComponent.Key]?.putAll(parsed)
             pcb += TriggerBySkillComponent(meta)
         }

@@ -1,8 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.processor
 
-import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
-import github.mkbaka.assiya.platform.bukkit.api.handler.DefaultAttributeContainer
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
@@ -36,59 +35,46 @@ class DamageProcessor(
     companion object {
 
         @JvmStatic
-        @JvmOverloads
         fun of(
             attacker: Entity,
             defender: LivingEntity,
-            attackerSnapshot: AttributeEngineSnapshot,
-            defenderSnapshot: AttributeEngineSnapshot,
-            attributes: Map<String, Status<Any>> = emptyMap(),
-            clear: Boolean = false,
-            overwrite: Boolean = false,
-            disabledAttributes: Collection<String> = emptyList(),
-            builder: Consumer<ProcessorComponentBuilder>? = null
+            builder: Consumer<ProcessorComponentBuilder>?
         ): DamageProcessor {
-            val container = DefaultAttributeContainer.of(attackerSnapshot, attributes, clear, overwrite)
-            return DamageProcessor { pcb ->
-                pcb += Processor.defaults()
-                pcb += TriggerComponent(attacker, attackerSnapshot, container)
-                pcb += TargetComponent(defender, defenderSnapshot)
-                pcb += DamageMultipleComponent()
-                for (id in disabledAttributes) {
-                    pcb[CancellableAttributeComponent]!!.setCancelled(id)
-                }
-                builder?.accept(pcb)
-            }
+            return ofSnapshot(attacker, defender, builder = builder)
         }
 
         @JvmStatic
-        fun ofAttack(
+        @JvmOverloads
+        fun ofSnapshot(
             attacker: Entity,
             defender: LivingEntity,
-            attackerSnapshot: AttributeEngineSnapshot,
-            defenderSnapshot: AttributeEngineSnapshot,
-            builder: Consumer<ProcessorComponentBuilder>?
+            attackerSnapshot: AttributeEngineSnapshot = AssiyaAPI.getSnapshot(attacker),
+            defenderSnapshot: AttributeEngineSnapshot = AssiyaAPI.getSnapshot(defender),
+            builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageProcessor {
-            return of(attacker, defender, attackerSnapshot, defenderSnapshot, builder = builder)
+            return DamageProcessor { pcb ->
+                pcb += Processor.defaults()
+                pcb += TriggerComponent(attacker, attackerSnapshot)
+                pcb += TargetComponent(defender, defenderSnapshot)
+                pcb += DamageMultipleComponent()
+                builder?.accept(pcb)
+            }
         }
 
         @JvmStatic
         fun ofProjectile(
             projectile: Entity,
             defender: LivingEntity,
-            projectileSnapshot: AttributeEngineSnapshot,
-            defenderSnapshot: AttributeEngineSnapshot,
-            shooter: TriggerComponent,
+            shooter: Entity,
             force: Float,
             builder: Consumer<ProcessorComponentBuilder>?
         ): DamageProcessor {
-            return DamageProcessor { pcb ->
-                pcb += Processor.defaults()
-                val trigger = TriggerComponent(projectile, projectileSnapshot)
-                pcb += trigger
-                pcb += TargetComponent(defender, defenderSnapshot)
-                pcb += ProjectileComponent(shooter, trigger, force)
-                pcb += DamageMultipleComponent()
+            return of(projectile, defender) { pcb ->
+                pcb += ProjectileComponent(
+                    TriggerComponent(shooter, AssiyaAPI.getSnapshot(shooter)),
+                    pcb[TriggerComponent.Key]!!,
+                    force
+                )
                 builder?.accept(pcb)
             }
         }

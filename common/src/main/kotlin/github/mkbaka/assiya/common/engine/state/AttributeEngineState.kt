@@ -71,7 +71,15 @@ class AttributeEngineState {
         return AttributeSourceRemoveResult(true, affected)
     }
 
-    private fun replace(
+    fun removeAttributeContribution(sourceId: String, attributeId: String) {
+        val source = sourceIndex[sourceId] ?: return
+        sourceIndex[sourceId] = source.copy(
+            attributes = source.attributes.filterNot { it.attributeId == attributeId }
+        )
+        removeAttr(attributeId, sourceId)
+    }
+
+    fun replace(
         sourceId: String,
         priority: Int,
         attributes: List<AttributeValue<*>>
@@ -90,7 +98,7 @@ class AttributeEngineState {
             sourceId = sourceId,
             priority = priority,
             sequence = ++sequence,
-            attributes = attributes.toList()
+            attributes = attributes
         )
 
         sourceIndex[sourceId] = source
@@ -138,15 +146,11 @@ class AttributeEngineState {
             val state = AttributeEngineState()
 
             for ((sourceId, source) in snapshot.sources) {
-                val copied = source.copy(
-                    attributes = source.attributes.toList()
-                )
+                state.sourceIndex[sourceId] = source
+                state.sequence = maxOf(state.sequence, source.sequence)
 
-                state.sourceIndex[sourceId] = copied
-                state.sequence = maxOf(state.sequence, copied.sequence)
-
-                for (attribute in copied.attributes) {
-                    state.setAttr(copied, attribute)
+                for (attribute in source.attributes) {
+                    state.setAttr(source, attribute)
                 }
             }
 

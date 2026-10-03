@@ -6,13 +6,11 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilde
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
 import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
 import github.mkbaka.assiya.platform.bukkit.internal.metadata.MetadataRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
 import groovy.transform.CompileStatic
-import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Projectile
 import org.bukkit.event.EventPriority
@@ -86,10 +84,8 @@ class Damage {
             Float force = MetadataRegistry.getMetadata(projectile.uniqueId, FORCE_METADATA_KEY)
             if (force == null) force = 1.0f
 
-            TriggerComponent shooterComponent = new TriggerComponent((LivingEntity) shooter, AssiyaAPI.getSnapshot((LivingEntity) shooter))
-
             processor = DamageProcessor.ofProjectile(
-                    projectile, defender, AssiyaAPI.getSnapshot(projectile), AssiyaAPI.getSnapshot(defender), shooterComponent, force
+                    projectile, defender, shooter, force
             ) { ProcessorComponentBuilder builder ->
                 builder.add(new TriggerByEventComponent(event))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
@@ -99,9 +95,7 @@ class Damage {
             if (!(event.damager instanceof LivingEntity)) return
 
             LivingEntity attacker = (LivingEntity) event.damager
-            processor = DamageProcessor.ofAttack(
-                    attacker, defender, AssiyaAPI.getSnapshot(attacker), AssiyaAPI.getSnapshot(defender)
-            ) { ProcessorComponentBuilder builder ->
+            processor = DamageProcessor.of(attacker, defender) { ProcessorComponentBuilder builder ->
                 builder.add(new TriggerByEventComponent(event))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
             }

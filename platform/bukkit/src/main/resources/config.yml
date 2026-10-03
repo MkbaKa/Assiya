@@ -34,3 +34,16 @@ formats:
     C: 100
     D: 500
     M: 1000
+
+# 默认拥有的属性
+# 删掉对应的 player 或者 entity 代表不给
+default-attributes:
+  # 优先级
+  priority: 80
+  # 玩家
+  player:
+    - '生命上限 100'
+  # 非玩家实体
+  # mm 怪会同时获得这些和他配置里的 attributes
+  entity:
+    - '生命上限 20'

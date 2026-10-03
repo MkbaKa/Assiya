@@ -6,8 +6,6 @@ import github.mkbaka.assiya.common.parser.part.TextAttributeSourcePart
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
-import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSession
@@ -15,11 +13,10 @@ import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsy
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withSync
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.uncolored
 import github.mkbaka.assiya.platform.bukkit.internal.util.isAir
-import kotlinx.coroutines.withContext
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 
-internal object AttributeReadPipeline {
+object AttributeReadPipeline {
 
     fun text(lines: List<String>): TextAttributeSourcePart {
         return TextAttributeSourcePart(lines.map { it.uncolored() })
@@ -31,24 +28,36 @@ internal object AttributeReadPipeline {
         val lore = item.itemMeta?.lore.orEmpty()
         if (lore.isEmpty()) return emptyList()
 
+        // TODO nbt parse
+
         return listOf(text(lore))
     }
 
-    fun parseSync(
+    fun parsePartsSync(
         parts: List<AttributeSourcePart>
     ): AttributeParsedSource = AttributeRegistry.parse(parts)
 
-    suspend fun parse(
+    fun parseSync(attributes: List<String>): AttributeParsedSource {
+        return AttributeRegistry.parse(listOf(text(attributes)))
+    }
+
+    suspend fun parseParts(
         parts: List<AttributeSourcePart>
-    ): AttributeParsedSource = withAsync {
-        parseSync(parts)
-    }
+    ): AttributeParsedSource = withAsync { parsePartsSync(parts) }
 
-    suspend fun parse(item: ItemStack): AttributeParsedSource {
-        val parts = withSync { extract(item) }
-        return parse(parts)
-    }
+    suspend fun parse(
+        attributes: List<String>
+    ): AttributeParsedSource = withAsync { parseSync(attributes) }
 
+//    suspend fun parse(item: ItemStack): AttributeParsedSource {
+//        val parts = withSync { extract(item) }
+//        return parse(parts)
+//    }
+
+    /**
+     * TODO 设计不足
+     *      parse 后的结果一定要 evaluate 才能变成可提交的 value
+     */
     fun evaluateSync(
         entity: Entity,
         parsed: AttributeParsedSource

@@ -19,8 +19,8 @@ class DefaultConfigNode(
         if (!content.contains(key)) return defaults.get(key)
         val value = content.get(key)
         val child = ConfigNode.of(value) ?: return value
-        val fallback = defaults.getNode(key) ?: return value
-        return DefaultConfigNode(child, fallback)
+        val default = defaults.getNode(key) ?: return value
+        return DefaultConfigNode(child, default)
     }
 
 }

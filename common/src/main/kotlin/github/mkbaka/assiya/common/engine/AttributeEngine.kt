@@ -11,7 +11,7 @@ import java.lang.AutoCloseable
 interface AttributeEngine : AutoCloseable {
 
     /**
-     * 将命令入队. 来源操作暂存至 Refresh, Batch 只保证连续执行.
+     * 推送命令
      */
     fun push(vararg action: AttributeEngineAction)
 

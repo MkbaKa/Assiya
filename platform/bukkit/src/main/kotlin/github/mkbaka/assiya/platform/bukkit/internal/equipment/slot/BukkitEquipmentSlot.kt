@@ -20,7 +20,7 @@ enum class BukkitEquipmentSlot(
     FEET(EquipmentSlot.FEET, "feet", EntityEquipment::getBoots)
     ;
 
-    val sourceId = "equipment:$source"
+    val sourceId = "assiya:equipment:$source"
 
     fun getSlotItem(equipment: EntityEquipment?): ItemStack? = equipment?.let(getter)
 

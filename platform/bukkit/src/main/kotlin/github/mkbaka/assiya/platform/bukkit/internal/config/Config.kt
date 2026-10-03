@@ -4,6 +4,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigGlobal
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
+import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
@@ -39,8 +40,12 @@ object Config {
                     AttributeRegistration.complete()
                 } catch (e: Exception) {
                     logEx(e, "Failed to rebuild attribute parser after configuration reload")
+                    return false
                 }
             }
+
+            global.parseDefaultAttributes()
+            AttributeSessionRegistry.refresh()
         } finally {
             reloading.set(false)
         }

@@ -1,9 +1,11 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config.obj
 
+import github.mkbaka.assiya.common.parser.AttributeParsedSource
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 
 class ConfigGlobal(
-    section: ConfigNode
+    private val section: ConfigNode
 ) {
 
     val EQUIPMENT_REFRESH_DELAY_TICKS = section.getLong("equipment.refresh-delay-ticks", 8L)
@@ -18,11 +20,30 @@ class ConfigGlobal(
 
     val ASYNC_THREADS = section.getInt("async.threads", 0)
 
+    val DEFAULT_ATTRIBUTES_PRIORITY = section.getInt("default-attributes.priority", 80)
+
+    var DEFAULT_ATTRIBUTES_PLAYER: AttributeParsedSource? = null
+        private set
+
+    var DEFAULT_ATTRIBUTES_ENTITY: AttributeParsedSource? = null
+        private set
+
     val ROMAN_VALUES: Map<Char, Int> = buildMap {
         val roman = section.getNode("formats.roman")!!
         for (key in roman.keys()) {
             put(key.single(), roman.getInt(key))
         }
+    }
+
+    /**
+     * config 加载在属性匹配规则的编译之前
+     *  这个提前解析要放在属性规则编译后调用
+     */
+    fun parseDefaultAttributes() {
+        DEFAULT_ATTRIBUTES_PLAYER = section.getStringList("default-attributes.player")
+            .takeIf { it.isNotEmpty() }?.let(AssiyaAPI::parseSync)
+        DEFAULT_ATTRIBUTES_ENTITY = section.getStringList("default-attributes.entity")
+            .takeIf { it.isNotEmpty() }?.let(AssiyaAPI::parseSync)
     }
 
 }

@@ -95,7 +95,7 @@ object EquipmentPipeline {
                 continue
             }
 
-            val parsed = AttributeReadPipeline.parse(parts)
+            val parsed = AttributeReadPipeline.parseParts(parts)
             parsedSources[sourceId] = parsed
 
             patches += AttributeReadPipeline.patch(

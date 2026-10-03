@@ -1,5 +1,7 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5.mechanic
 
+import github.mkbaka.assiya.compact.mythicmobs.v5.handler.component.TriggerBySkillComponent
+import github.mkbaka.assiya.compact.mythicmobs.v5.util.DamageMetadataFactory
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.SignalUtils
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.Utils
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
@@ -9,20 +11,19 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultiple
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
 import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
 import github.mkbaka.mythicksp.annotation.MythicMechanic
-import io.lumine.mythic.bukkit.MythicBukkit
 import io.lumine.mythic.api.adapters.AbstractEntity
-import io.lumine.mythic.bukkit.BukkitAdapter
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
 import io.lumine.mythic.api.skills.Skill
-import io.lumine.mythic.core.skills.SkillMechanic
 import io.lumine.mythic.api.skills.SkillMetadata
+import io.lumine.mythic.api.skills.SkillResult
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString
+import io.lumine.mythic.bukkit.BukkitAdapter
+import io.lumine.mythic.bukkit.MythicBukkit
+import io.lumine.mythic.core.skills.SkillMechanic
+import io.lumine.mythic.core.skills.mechanics.CustomMechanic
 import io.lumine.mythic.core.skills.variables.Variable
 import io.lumine.mythic.core.skills.variables.VariableType
-import io.lumine.mythic.core.skills.mechanics.CustomMechanic
-import io.lumine.mythic.api.skills.SkillResult
-import github.mkbaka.assiya.compact.mythicmobs.v5.util.DamageMetadataFactory
 import org.bukkit.entity.LivingEntity
 import kotlin.jvm.optionals.getOrNull
 
@@ -87,6 +88,7 @@ class DamageMetaMechanic(
             disabledAttributes = disableAttribute?.split(",") ?: emptyList()
         ) { pcb ->
             pcb[CustomDataComponent.Key]?.putAll(parsed)
+            pcb += TriggerBySkillComponent(meta)
         }
 
         val realCaster = when {

@@ -35,6 +35,12 @@ object AttributeSessionRegistry : AutoCloseable {
     fun remove(ownerId: UUID): AttributeSession? =
         sessions.remove(ownerId)?.also { it.close() }
 
+    fun refresh() {
+        for (session in sessions.values) {
+            session.refreshDefaultAttributes()
+        }
+    }
+
     @Awake(lifeCycle = LifeCycle.DISABLE)
     override fun close() {
         val removed = sessions.values.toList()

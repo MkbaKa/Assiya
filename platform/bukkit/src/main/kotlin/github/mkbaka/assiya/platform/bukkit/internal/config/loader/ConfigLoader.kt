@@ -6,26 +6,23 @@ import github.mkbaka.assiya.platform.bukkit.api.config.DefaultConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils
 import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils.getSubFiles
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
-import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.util.function.BiConsumer
 
 object ConfigLoader {
 
     @JvmStatic
-    fun loadConfig(path: String, definition: Map<String, *>): ConfigNode {
-        val comments = linkedMapOf<String, List<String>>()
-        val defaults = ConfigYaml.parse(definition, comments)
-        val file = FileUtils.saveIfNotExists(path) { ConfigYaml.render(defaults, comments) }
-        return DefaultConfigNode(BukkitConfigNode(FileUtils.readYaml(file)), BukkitConfigNode(defaults))
-    }
-
-    @JvmStatic
     @JvmOverloads
     fun loadConfig(path: String, resource: String = path): ConfigNode {
         val file = FileUtils.saveIfNotExists(path, resource)
-        val defaults = YamlConfiguration()
-        defaults.loadFromString(FileUtils.readResource(resource))
+        return BukkitConfigNode(FileUtils.readYaml(file))
+    }
+
+    @JvmStatic
+    fun loadConfig(path: String, default: Map<String, *>): ConfigNode {
+        val comments = linkedMapOf<String, List<String>>()
+        val defaults = ConfigYaml.parse(default, comments)
+        val file = FileUtils.saveIfNotExists(path) { ConfigYaml.render(defaults, comments) }
         return DefaultConfigNode(BukkitConfigNode(FileUtils.readYaml(file)), BukkitConfigNode(defaults))
     }
 

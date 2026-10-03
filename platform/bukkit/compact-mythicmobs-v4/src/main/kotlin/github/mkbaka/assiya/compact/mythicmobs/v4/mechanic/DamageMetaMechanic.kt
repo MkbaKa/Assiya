@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.compact.mythicmobs.v4.mechanic
 
+import github.mkbaka.assiya.compact.mythicmobs.v4.handler.component.TriggerBySkillComponent
 import github.mkbaka.assiya.compact.mythicmobs.v4.util.SignalUtils
 import github.mkbaka.assiya.compact.mythicmobs.v4.util.Utils
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
@@ -85,6 +86,7 @@ class DamageMetaMechanic(
             disabledAttributes = disableAttribute?.split(",") ?: emptyList()
         ) { pcb ->
             pcb[CustomDataComponent.Key]?.putAll(parsed)
+            pcb += TriggerBySkillComponent(meta)
         }
 
         val realCaster = when {

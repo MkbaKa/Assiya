@@ -9,8 +9,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import java.util.UUID
-import kotlin.uuid.Uuid
+import java.util.*
 
 object AttributeSessionListener {
 

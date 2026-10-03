@@ -13,13 +13,13 @@ import org.bukkit.entity.Entity
 object MythicMobAttributes {
 
     private const val SOURCE_ID = "Assiya:MythicMobs:Attributes"
-    private val definitions = hashMapOf<String, LevelAttribute>()
+    private val levelAttributes = hashMapOf<String, LevelAttribute>()
 
     fun apply(entity: Entity, mobId: String, level: Double, attributes: List<String>, calculator: Boolean) {
         val session = AssiyaAPI.getSessionOrCreate(entity)
         if (attributes.isEmpty()) return
 
-        val levelAttribute = definitions.computeIfAbsent(mobId) {
+        val levelAttribute = levelAttributes.computeIfAbsent(mobId) {
             LevelAttribute(MobAttributeTemplate(mobId, attributes, calculator))
         }
         val parsed = levelAttribute.parsedByLevel.computeIfAbsent(level) {
@@ -43,7 +43,7 @@ object MythicMobAttributes {
     @Awake(lifeCycle = LifeCycle.DISABLE)
     @CustomTask(taskId = "reload", priority = 114514)
     fun clear() {
-        definitions.clear()
+        levelAttributes.clear()
     }
 
     private class LevelAttribute(val template: MobAttributeTemplate) {

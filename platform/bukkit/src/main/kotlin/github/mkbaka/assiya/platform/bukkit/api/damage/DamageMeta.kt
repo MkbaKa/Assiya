@@ -8,6 +8,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcesso
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
+import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
 import org.bukkit.attribute.Attribute
@@ -44,6 +45,7 @@ class DamageMeta(
         val uuid = trigger.uniqueId
 
         DamageMetaStack.push(uuid, this)
+        DamageProcessorStack.push(uuid, processor)
         try {
             prepare()
             if (processor[CancellableComponent]?.isCancelled == true) return
@@ -79,6 +81,7 @@ class DamageMeta(
 
             postDamage?.accept(this)
         } finally {
+            DamageProcessorStack.pop(uuid)
             DamageMetaStack.pop(uuid)
         }
     }

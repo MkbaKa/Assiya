@@ -4,7 +4,7 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
-import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
+import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
 import github.mkbaka.assiya.platform.bukkit.internal.metadata.MetadataRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import java.util.*
@@ -37,8 +37,8 @@ object MythicPlaceholderValues {
     fun damageData(uuid: UUID?, args: String): String {
         val key = args.substringBefore("|")
         val default = args.substringAfter("|", "null")
-        val task = uuid?.let { DamageMetaStack.getCurrent(it) } ?: return default
-        return task.processor[CustomDataComponent]?.get(key)?.toString() ?: default
+        val processor = uuid?.let { DamageProcessorStack.getCurrent(it) } ?: return default
+        return processor[CustomDataComponent]?.get(key)?.toString() ?: default
     }
 
     fun metadata(uuid: UUID?, args: String): String {

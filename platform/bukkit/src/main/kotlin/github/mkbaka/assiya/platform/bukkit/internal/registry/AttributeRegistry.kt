@@ -14,6 +14,7 @@ import github.mkbaka.assiya.common.parser.rule.TextRuleMatched
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
+import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import java.time.Duration
 
 object AttributeRegistry : Registry<Attribute>("属性"), AttributeParser {
@@ -105,10 +106,12 @@ object AttributeRegistry : Registry<Attribute>("属性"), AttributeParser {
 
         override val type: String = delegate.type
 
-        private val cache: Cache<String, List<TextRuleMatched>> = Caffeine.newBuilder()
-            .maximumSize(MAX_CACHED_LINES)
-            .expireAfterAccess(Duration.ofMinutes(10))
-            .build()
+        private val cache: Cache<String, List<TextRuleMatched>> = Config.global.let { config ->
+            Caffeine.newBuilder()
+                .maximumSize(config.PARSER_CACHE_MAXIMUM_SIZE)
+                .expireAfterAccess(Duration.ofSeconds(config.PARSER_CACHE_EXPIRE_AFTER_ACCESS_SECONDS))
+                .build()
+        }
 
         override fun parse(part: AttributeSourcePart): AttributeParsedSource {
             require(part is TextAttributeSourcePart) {
@@ -116,12 +119,6 @@ object AttributeRegistry : Registry<Attribute>("属性"), AttributeParser {
             }
             val results = part.lines.map { line -> cache.get(line) { delegate.parseLine(line) }!! }
             return delegate.toSource(results)
-        }
-
-        private companion object {
-
-            const val MAX_CACHED_LINES = 10_000L
-
         }
 
     }

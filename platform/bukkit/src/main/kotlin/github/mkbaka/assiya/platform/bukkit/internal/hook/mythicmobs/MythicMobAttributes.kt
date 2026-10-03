@@ -4,6 +4,7 @@ import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
+import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.CustomTask
 import github.mkbaka.bukkitksp.annotation.LifeCycle
@@ -12,7 +13,6 @@ import org.bukkit.entity.Entity
 object MythicMobAttributes {
 
     private const val SOURCE_ID = "Assiya:MythicMobs:Attributes"
-    private const val SOURCE_PRIORITY = 100
     private val definitions = hashMapOf<String, LevelAttribute>()
 
     fun apply(entity: Entity, mobId: String, level: Double, attributes: List<String>, calculator: Boolean) {
@@ -32,7 +32,7 @@ object MythicMobAttributes {
             listOf(
                 AttributeSourcePatch(
                     sourceId = SOURCE_ID,
-                    priority = SOURCE_PRIORITY,
+                    priority = Config.global.MYTHICMOBS_SOURCE_PRIORITY,
                     lifeCycle = AttributeSourceLifecycle.Stable,
                     attributes = values
                 )

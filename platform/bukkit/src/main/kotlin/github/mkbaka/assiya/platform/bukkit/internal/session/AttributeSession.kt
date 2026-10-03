@@ -3,14 +3,11 @@ package github.mkbaka.assiya.platform.bukkit.internal.session
 import github.mkbaka.assiya.common.engine.AttributeEngine
 import github.mkbaka.assiya.common.engine.AttributeEngineAction
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
-import github.mkbaka.assiya.common.parser.AttributeParsedSource
-import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
-
+import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import org.bukkit.entity.Entity
 import java.lang.ref.WeakReference
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class AttributeSession(
     owner: Entity,
@@ -29,13 +26,17 @@ class AttributeSession(
     val snapshot: AttributeEngineSnapshot
         get() = engine.snapshot()
 
-    fun submitSnapshot(snapshot: AttributeEngineSnapshot) {
+    @JvmOverloads
+    fun submitSnapshot(
+        snapshot: AttributeEngineSnapshot,
+        lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable
+    ) {
         val patches = arrayListOf<AttributeSourcePatch>()
         for ((sourceId, source) in snapshot.sources) {
             patches += AttributeSourcePatch(
                 sourceId = sourceId,
                 priority = source.priority,
-                lifeCycle = AttributeSourceLifecycle.Stable,
+                lifeCycle = lifeCycle,
                 attributes = source.attributes
             )
         }

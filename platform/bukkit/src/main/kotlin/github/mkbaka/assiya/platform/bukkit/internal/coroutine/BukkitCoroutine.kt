@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.internal.coroutine
 
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
+import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +14,9 @@ import kotlin.coroutines.CoroutineContext
 object BukkitCoroutine : AutoCloseable, CoroutineScope {
 
     private val async = Executors.newFixedThreadPool(
-        (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+        Config.global.ASYNC_THREADS.let { threads ->
+            if (threads == 0) (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1) else threads
+        }
     ).asCoroutineDispatcher()
 
     private val sync = ServerThreadDispatcher(AssiyaBukkitPlugin.INSTANCE)

@@ -3,6 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.equipment
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
+import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
@@ -18,17 +19,13 @@ import java.util.*
 
 object EquipmentPipeline {
 
-    // TODO move to config
-    private const val REFRESH_DELAY_TICKS = 10L
-    private const val EQUIPMENT_PRIORITY = 100
-
     private val pending = hashMapOf<UUID, Job>()
 
     fun cancel(ownerId: UUID) {
         pending.remove(ownerId)?.cancel()
     }
 
-    fun refresh(entity: LivingEntity, refreshDelay: Long = REFRESH_DELAY_TICKS) {
+    fun refresh(entity: LivingEntity, refreshDelay: Long = Config.global.EQUIPMENT_REFRESH_DELAY_TICKS) {
         refresh0(entity, refreshDelay)
     }
 
@@ -73,6 +70,7 @@ object EquipmentPipeline {
         entity: LivingEntity,
         session: AttributeSession
     ) {
+        val priority = Config.global.EQUIPMENT_SOURCE_PRIORITY
         val equipment = entity.equipment
         val inputs = BukkitEquipmentSlot.entries.associate { slot ->
             slot.sourceId to AttributeReadPipeline.extract(
@@ -90,7 +88,7 @@ object EquipmentPipeline {
             if (parts.isEmpty()) {
                 patches += AttributeSourcePatch(
                     sourceId = sourceId,
-                    priority = EQUIPMENT_PRIORITY,
+                    priority = priority,
                     lifeCycle = AttributeSourceLifecycle.Stable,
                     attributes = emptyList()
                 )
@@ -104,7 +102,7 @@ object EquipmentPipeline {
                 entity = entity,
                 sourceId = sourceId,
                 parsed = parsed,
-                priority = EQUIPMENT_PRIORITY,
+                priority = priority,
                 lifeCycle = AttributeSourceLifecycle.Stable
             )
         }

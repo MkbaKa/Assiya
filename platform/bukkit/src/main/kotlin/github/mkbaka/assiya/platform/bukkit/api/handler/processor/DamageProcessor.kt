@@ -6,12 +6,8 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.DefaultAttributeContaine
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
+import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -27,8 +23,14 @@ class DamageProcessor(
     constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(ProcessorComponentBuilder().apply(pcb::accept).build())
 
     override fun process() {
-        HandlerRegistry.publish("damage", this)
-        this[CallbackComponent.Key]?.invoke(this)
+        val uuid = getComponent(TriggerComponent).entity.uniqueId
+        DamageProcessorStack.push(uuid, this)
+        try {
+            HandlerRegistry.publish("damage", this)
+            this[CallbackComponent.Key]?.invoke(this)
+        } finally {
+            DamageProcessorStack.pop(uuid)
+        }
     }
 
     companion object {

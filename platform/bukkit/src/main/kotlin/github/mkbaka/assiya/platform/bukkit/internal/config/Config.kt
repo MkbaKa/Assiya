@@ -1,8 +1,8 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
-import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigGlobal
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.bukkitksp.annotation.Awake
@@ -13,12 +13,13 @@ object Config {
 
     private val reloading = AtomicBoolean(false)
 
-    lateinit var values: ConfigNode
+    @Volatile
+    lateinit var global: ConfigGlobal
         private set
 
     @Awake(lifeCycle = LifeCycle.LOAD)
     fun load() {
-        values = ConfigLoader.loadConfig("config.yml")
+        global = ConfigGlobal(ConfigLoader.loadConfig("config.yml"))
     }
 
     @Awake(lifeCycle = LifeCycle.ENABLE)
@@ -28,7 +29,7 @@ object Config {
         }
 
         try {
-            values = ConfigLoader.loadConfig("config.yml")
+            load()
 
             AttributeRegistration.begin()
             try {

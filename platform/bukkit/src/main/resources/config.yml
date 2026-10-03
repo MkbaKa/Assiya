@@ -1,0 +1,36 @@
+equipment:
+  # 装备变化后的属性读取延迟 (tick)
+  # 频繁变化只有最后一次会读取
+  refresh-delay-ticks: 8
+  # 玩家装备属性的优先级
+  # 修改后重新读取生效
+  source-priority: 100
+
+parser:
+  cache:
+    # 解析文本属性的缓存容量
+    maximum-size: 10000
+    # 缓存过期时间 (秒)
+    expire-after-access-seconds: 600
+
+mythicmobs:
+  # 怪物属性的优先级
+  # 重载后要重新生成怪物生效
+  source-priority: 100
+
+async:
+  # 异步线程池的容量 不知道是啥就不要动
+  # 0 默认为 cpu 逻辑处理器数量的一半
+  # 重启生效
+  threads: 0
+
+formats:
+  # 罗马数字字符对应的数值
+  roman:
+    I: 1
+    V: 5
+    X: 10
+    L: 50
+    C: 100
+    D: 500
+    M: 1000

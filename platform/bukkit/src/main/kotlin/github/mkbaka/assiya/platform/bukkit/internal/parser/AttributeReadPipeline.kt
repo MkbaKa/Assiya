@@ -8,7 +8,6 @@ import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSession
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsync
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withSync
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.uncolored
@@ -94,19 +93,5 @@ object AttributeReadPipeline {
         lifeCycle,
         evaluate(entity, parsed)
     )
-
-    suspend fun submit(
-        session: AttributeSession,
-        entity: Entity,
-        sourceId: String,
-        parsed: AttributeParsedSource,
-        priority: Int,
-        lifeCycle: AttributeSourceLifecycle
-    ) {
-        val patch = patch(
-            entity, sourceId, parsed, priority, lifeCycle
-        )
-        session.submitPatches(listOf(patch))
-    }
 
 }

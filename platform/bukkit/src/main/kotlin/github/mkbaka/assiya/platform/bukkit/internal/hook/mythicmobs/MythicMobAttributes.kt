@@ -27,17 +27,14 @@ object MythicMobAttributes {
         }
 
         val values = AssiyaAPI.evaluateSync(entity, parsed)
-
-        session.submitPatches(
-            listOf(
-                AttributeSourcePatch(
-                    sourceId = SOURCE_ID,
-                    priority = Config.global.MYTHICMOBS_SOURCE_PRIORITY,
-                    lifeCycle = AttributeSourceLifecycle.Stable,
-                    attributes = values
-                )
-            )
+        val patch = AttributeSourcePatch(
+            sourceId = SOURCE_ID,
+            priority = Config.global.MYTHICMOBS_SOURCE_PRIORITY,
+            lifeCycle = AttributeSourceLifecycle.Stable,
+            attributes = values
         )
+
+        session.submitPatches(true, patch)
     }
 
     @Awake(lifeCycle = LifeCycle.DISABLE)

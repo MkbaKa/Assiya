@@ -1,9 +1,9 @@
 package github.mkbaka.assiya.compact.mythicmobs.v4.mechanic
 
-import github.mkbaka.assiya.compact.mythicmobs.v4.util.Utils
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.compact.mythicmobs.v4.util.Utils
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
@@ -14,7 +14,7 @@ import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata
 import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString
-import java.util.UUID
+import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 
 @MythicMechanic("assiya:add-attr", "assiya:addattr")
@@ -54,7 +54,7 @@ class AddAttributeMechanic(
         }
 
         val patch = AttributeSourcePatch(sourceId, priority, lifeCycle, values)
-        AssiyaAPI.getSessionOrCreate(target).submitPatches(listOf(patch))
+        AssiyaAPI.addAttribute(target, patch)
         return true
     }
 

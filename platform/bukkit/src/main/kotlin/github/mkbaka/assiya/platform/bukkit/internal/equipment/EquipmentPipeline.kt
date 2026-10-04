@@ -113,6 +113,6 @@ object EquipmentPipeline {
             return
         }
 
-        session.submitPatches(patches)
+        session.submitPatches(true, *patches.toTypedArray())
     }
 }

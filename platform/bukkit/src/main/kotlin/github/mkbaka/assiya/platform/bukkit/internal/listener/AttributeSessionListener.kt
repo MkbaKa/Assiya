@@ -16,7 +16,6 @@ object AttributeSessionListener {
     @Listener
     fun onJoin(event: PlayerJoinEvent) {
         AttributeSessionRegistry.getOrCreate(event.player)
-        EquipmentPipeline.refresh(event.player)
     }
 
     @Listener

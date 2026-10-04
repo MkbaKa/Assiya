@@ -10,6 +10,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Projectile
 import java.util.function.Consumer
 
 /**
@@ -63,7 +64,7 @@ class DamageProcessor(
 
         @JvmStatic
         fun ofProjectile(
-            projectile: Entity,
+            projectile: Projectile,
             defender: LivingEntity,
             shooter: Entity,
             force: Float,

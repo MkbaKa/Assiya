@@ -10,7 +10,6 @@ import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSession
 import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry.sessions
 import org.bukkit.entity.Entity
-import org.bukkit.inventory.ItemStack
 import java.util.*
 
 /**
@@ -41,6 +40,8 @@ object AssiyaAPI {
         return AttributeReadPipeline.evaluateSync(entity, parsed)
     }
 
+    // TODO triggerEvent
+
     @JvmStatic
     fun addAttribute(
         entity: Entity,
@@ -59,7 +60,7 @@ object AssiyaAPI {
             AttributeReadPipeline.evaluateSync(entity, parsed)
         )
 
-        session.submitPatches(listOf(patch))
+        addAttribute(session, patch)
     }
 
     @JvmStatic
@@ -79,7 +80,24 @@ object AssiyaAPI {
             AttributeReadPipeline.evaluateSync(entity, parsed)
         )
 
-        session.submitPatches(listOf(patch))
+        addAttribute(session, patch)
+    }
+
+    @JvmStatic
+    fun addAttribute(
+        entity: Entity,
+        vararg patches: AttributeSourcePatch
+    ) {
+        val session = getSession(entity) ?: return
+        addAttribute(session, *patches)
+    }
+
+    @JvmStatic
+    fun addAttribute(
+        session: AttributeSession,
+        vararg patches: AttributeSourcePatch
+    ) {
+        session.submitPatches(false, *patches)
     }
 
     @JvmStatic

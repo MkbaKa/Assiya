@@ -1,9 +1,9 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5.mechanic
 
-import github.mkbaka.assiya.compact.mythicmobs.v5.util.Utils
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.compact.mythicmobs.v5.util.Utils
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
@@ -13,10 +13,10 @@ import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
 import io.lumine.mythic.api.skills.SkillMetadata
 import io.lumine.mythic.api.skills.SkillResult
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString
 import io.lumine.mythic.core.skills.SkillMechanic
 import io.lumine.mythic.core.skills.mechanics.CustomMechanic
-import io.lumine.mythic.api.skills.placeholders.PlaceholderString
-import java.util.UUID
+import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 
 @MythicMechanic("assiya:add-attr", "assiya:addattr")
@@ -57,7 +57,7 @@ class AddAttributeMechanic(
         }
 
         val patch = AttributeSourcePatch(sourceId, priority, lifeCycle, values)
-        AssiyaAPI.getSessionOrCreate(target).submitPatches(listOf(patch))
+        AssiyaAPI.addAttribute(target, patch)
         return SkillResult.SUCCESS
     }
 

@@ -42,16 +42,14 @@ class AttributeSession(
             return
         }
         val attributes = AttributeReadPipeline.evaluateSync(owner, parsed)
-        submitPatches(
-            listOf(
-                AttributeSourcePatch(
-                    sourceId = DEFAULT_SOURCE,
-                    priority = config.DEFAULT_ATTRIBUTES_PRIORITY,
-                    lifeCycle = AttributeSourceLifecycle.Stable,
-                    attributes = attributes
-                )
-            )
+        val patch = AttributeSourcePatch(
+            sourceId = DEFAULT_SOURCE,
+            priority = config.DEFAULT_ATTRIBUTES_PRIORITY,
+            lifeCycle = AttributeSourceLifecycle.Stable,
+            attributes = attributes
         )
+
+        submitPatches(false, patch)
     }
 
     @JvmOverloads
@@ -68,15 +66,17 @@ class AttributeSession(
                 attributes = source.attributes
             )
         }
-        submitPatches(patches)
+
+        submitPatches(false, *patches.toTypedArray())
     }
 
-    fun submitPatches(patches: List<AttributeSourcePatch>) {
+    @JvmOverloads
+    fun submitPatches(triggerEvent: Boolean = true, vararg patches: AttributeSourcePatch) {
         val actions = arrayListOf<AttributeEngineAction>()
         for (patch in patches) {
             actions += AttributeEngineAction.UpdateSource(patch)
         }
-        actions += AttributeEngineAction.Refresh()
+        actions += AttributeEngineAction.Refresh(triggerEvent)
         engine.push(*actions.toTypedArray())
     }
 

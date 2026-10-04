@@ -22,13 +22,13 @@ class DamageProcessor(
     constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(ProcessorComponentBuilder().apply(pcb::accept).build())
 
     override fun process() {
-        val uuid = getComponent(TriggerComponent).entity.uniqueId
-        DamageProcessorStack.push(uuid, this)
+        val uuid = this[TriggerComponent.Key]?.entity?.uniqueId
+        uuid?.let { DamageProcessorStack.push(uuid, this) }
         try {
             HandlerRegistry.publish("damage", this)
             this[CallbackComponent.Key]?.invoke(this)
         } finally {
-            DamageProcessorStack.pop(uuid)
+            uuid?.let { DamageProcessorStack.pop(uuid) }
         }
     }
 
@@ -69,7 +69,7 @@ class DamageProcessor(
             force: Float,
             builder: Consumer<ProcessorComponentBuilder>?
         ): DamageProcessor {
-            return of(projectile, defender) { pcb ->
+            return ofSnapshot(projectile, defender) { pcb ->
                 pcb += ProjectileComponent(
                     TriggerComponent(shooter, AssiyaAPI.getSnapshot(shooter)),
                     pcb[TriggerComponent.Key]!!,

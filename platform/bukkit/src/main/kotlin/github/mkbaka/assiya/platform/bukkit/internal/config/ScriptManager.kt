@@ -44,6 +44,7 @@ object ScriptManager {
     private fun defaultResources(): List<String> {
         return listOf(
             "scripts/attribute/health.groovy",
+            "scripts/attribute/moving.groovy",
             "scripts/attribute/fight/attack.groovy",
             "scripts/attribute/fight/pvp-attack.groovy",
             "scripts/attribute/fight/pve-attack.groovy",
@@ -55,6 +56,10 @@ object ScriptManager {
             "scripts/attribute/fight/vampire.groovy",
             "scripts/attribute/fight/armor.groovy",
             "scripts/attribute/fight/dodge.groovy",
+            "scripts/attribute/fight/remote-immune.groovy",
+            "scripts/attribute/fight/reflection.groovy",
+            "scripts/attribute/fight/fire.groovy",
+            "scripts/attribute/fight/frozen.groovy",
             "scripts/condition/level-require.groovy"
 //            "scripts/condition/player-level.js",
 //            "scripts/damage/example.js",

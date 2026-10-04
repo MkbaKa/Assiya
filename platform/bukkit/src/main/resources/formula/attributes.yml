@@ -22,3 +22,24 @@ vampire: '<damage> * <rate> / 100'
 #      <armor>  -  受击者护甲
 #      <penetration>  -  攻击者护甲穿透
 armor: '<damage> * (<armor> - <penetration>) / 100'
+
+# 反弹公式
+#   可用变量:
+#      <damage>  -  当前总伤害
+#      <rate>  -  受击者反弹倍率
+reflection: 'max(0, <damage> * <rate> / 100)'
+
+# 移动速度公式
+#   可用变量:
+#      <value>  -  移动速度属性值
+moving: '<value> / 100'
+
+# 燃烧公式
+#   可用变量:
+#      <damage>  -  攻击者燃烧伤害
+fire: '<damage>'
+
+# 冰冻减速比例公式
+#   可用变量:
+#      <intensity>  -  攻击者冰冻强度
+frozen: '<intensity> / 100'

@@ -19,3 +19,73 @@ max-health:
   #      开启该选项才能把已增加的血量扣掉
   always-run: true
   triggers: update
+
+moving:
+  names: ["移动速度"]
+  reader: default
+  handler: 'attribute/moving'
+  priority: 110
+  always-run: true
+  triggers: update
+
+reflection:
+  names: ["反弹几率"]
+  reader: default
+  handler: 'attribute/fight/reflection'
+  priority: 310
+  triggers: defense
+  options:
+    attacker: '{entity} 反弹了 {reflection} 点伤害.'
+    entity: '你反弹了 {reflection} 点伤害.'
+
+reflection-rate:
+  names: ["反弹倍率"]
+  reader: default
+
+fire:
+  names: ["燃烧几率"]
+  reader: default
+  handler: 'attribute/fight/fire'
+  priority: 320
+  triggers: attack
+  options:
+    attacker: '燃烧! 额外造成 {extra} 点燃烧伤害!'
+    entity: '燃烧! 对方对你额外造成 {extra} 点燃烧伤害!'
+
+fire-damage:
+  names: ["燃烧伤害"]
+  reader: default
+
+# 在基础 3 秒上增加的时间, 单位为秒
+fire-time:
+  names: ["燃烧时间"]
+  reader: default
+
+frozen:
+  names: ["冰冻几率"]
+  reader: default
+  handler: 'attribute/fight/frozen'
+  priority: 330
+  triggers: attack
+  options:
+    attacker: '你降低了对方 {frozen}% 移动速度, 持续 {duration} 秒!'
+    entity: '对方降低了你 {frozen}% 移动速度, 持续 {duration} 秒!'
+
+frozen-intensity:
+  names: ["冰冻强度"]
+  reader: default
+
+# 在基础 3 秒上增加的时间, 单位为秒
+frozen-time:
+  names: ["冰冻时间"]
+  reader: default
+
+remote-immune:
+  names: ["远程免疫"]
+  reader: default
+  handler: 'attribute/fight/remote-immune'
+  priority: 10
+  triggers: defense
+  options:
+    attacker: '{entity} 免疫了你的远程伤害.'
+    entity: '你免疫了 {attacker} 的远程伤害.'

@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api.damage
 
+import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
@@ -23,9 +24,11 @@ import java.util.function.Predicate
  * 唤起一次经 Assiya 处理的伤害
  *
  * @param [processor] 上下文
+ * @param [process] 是否执行属性效果
  */
-class DamageMeta(
-    val processor: DamageProcessor
+class DamageMeta @JvmOverloads constructor(
+    val processor: DamageProcessor,
+    val process: Boolean = true
 ) {
 
     var ignoreImmunity = false
@@ -38,7 +41,11 @@ class DamageMeta(
     var postDamage: Consumer<DamageMeta>? = null
 
     fun doDamage() {
-        execute { processor.process() }
+        execute {
+            if (process) {
+                processor.process()
+            }
+        }
     }
 
     private fun execute(prepare: () -> Unit) {
@@ -106,16 +113,30 @@ class DamageMeta(
 
     companion object {
 
+        /**
+         * 构造一个固定伤害的 DamageMeta 不会再触发属性逻辑
+         * 等价于 [LivingEntity]#damage(double amount, Entity source)
+         * 但经过 Assiya 包装
+         *
+         * @param [attacker]
+         * @param [defender]
+         * @param [damage]
+         * @return [DamageMeta]
+         */
+        @JvmOverloads
+        @JvmStatic
         fun fixedDamage(
             attacker: Entity,
             defender: LivingEntity,
-            damage: Double
+            damage: Double,
+            builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageMeta {
             val processor = DamageProcessor.of(attacker, defender) { pcb ->
                 pcb[DamageMultipleComponent.Key]!!.setDamage("vanilla", damage)
+                builder?.accept(pcb)
             }
 
-            return DamageMeta(processor)
+            return DamageMeta(processor, false)
         }
 
     }

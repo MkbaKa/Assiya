@@ -6,12 +6,8 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultiple
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
-import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
 import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
@@ -30,6 +26,8 @@ class DamageMeta @JvmOverloads constructor(
     val processor: DamageProcessor,
     val process: Boolean = true
 ) {
+
+    constructor(process: Boolean = true, factor: () -> DamageProcessor) : this(factor(), process)
 
     var ignoreImmunity = false
     var preventKnockback = false
@@ -95,22 +93,6 @@ class DamageMeta @JvmOverloads constructor(
         }
     }
 
-    fun repeat(count: Int, periodTicks: Long) {
-        launch(
-            context = BukkitCoroutine.coroutineContext[BukkitDispatchers]!!.sync
-        ) {
-            repeat(count) {
-                val cancel = !processor.getComponent(TargetComponent).entity.isValid
-                if (cancel) {
-                    return@launch
-                }
-
-                doDamage()
-                delayTicks(periodTicks)
-            }
-        }
-    }
-
     companion object {
 
         /**
@@ -131,13 +113,23 @@ class DamageMeta @JvmOverloads constructor(
             damage: Double,
             builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageMeta {
-            val processor = DamageProcessor.of(attacker, defender) { pcb ->
-                pcb[DamageMultipleComponent.Key]!!.setDamage("vanilla", damage)
-                builder?.accept(pcb)
+            return DamageMeta(process = false) {
+                DamageProcessor.of(attacker, defender) { pcb ->
+                    pcb[DamageMultipleComponent.Key]!!.setDamage("vanilla", damage)
+                    builder?.accept(pcb)
+                }
             }
+        }
 
-            return DamageMeta(processor, false)
+        fun lazyTarget(
+            attacker: Entity,
+            builder: Consumer<ProcessorComponentBuilder>? = null
+        ): DamageMeta {
+            return DamageMeta {
+                DamageProcessor.ofLazyTarget(attacker, builder = builder)
+            }
         }
 
     }
+
 }

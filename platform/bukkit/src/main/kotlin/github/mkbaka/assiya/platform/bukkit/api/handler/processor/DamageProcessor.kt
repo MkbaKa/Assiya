@@ -56,7 +56,7 @@ class DamageProcessor(
             return DamageProcessor { pcb ->
                 pcb += Processor.defaults()
                 pcb += TriggerComponent(attacker, attackerSnapshot)
-                pcb += TargetComponent(defender, defenderSnapshot)
+                pcb += TargetDefaultComponent(defender, defenderSnapshot)
                 pcb += DamageMultipleComponent()
                 builder?.accept(pcb)
             }
@@ -76,6 +76,22 @@ class DamageProcessor(
                     pcb[TriggerComponent.Key]!!,
                     force
                 )
+                builder?.accept(pcb)
+            }
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun ofLazyTarget(
+            attacker: Entity,
+            attackerSnapshot: AttributeEngineSnapshot = AssiyaAPI.getSnapshot(attacker),
+            builder: Consumer<ProcessorComponentBuilder>? = null
+        ): DamageProcessor {
+            return DamageProcessor { pcb ->
+                pcb += Processor.defaults()
+                pcb += TriggerComponent(attacker, attackerSnapshot)
+                pcb += TargetLazyComponent()
+                pcb += DamageMultipleComponent()
                 builder?.accept(pcb)
             }
         }

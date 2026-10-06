@@ -7,13 +7,11 @@ import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublis
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSourceRemoveEvent
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeUpdateEvent
-import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
+import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import kotlinx.coroutines.CoroutineScope
-import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.coroutines.cancellation.CancellationException
 
 class BukkitAttributeEngine(
     owner: Entity,
@@ -33,20 +31,17 @@ class BukkitAttributeEngine(
         action: AttributeEngineAction.Refresh,
         context: AttributeUpdateContext
     ) {
-        if (action.triggerEvent) {
-            val entity = ownerEntity ?: return
-            try {
-                val event = AttributeUpdateEvent(entity, context)
-                Bukkit.getPluginManager().callEvent(event)
-                if (event.isCancelled) return
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Throwable) {
-                logEx(e, "Failed to process attribute update")
-                return
-            }
+        val entity = ownerEntity ?: return
+
+        if (action.triggerEvent && AttributeUpdateEvent.Pre(entity, context).call()) {
+            return
         }
+
         super.refresh(action, context)
+
+        if (action.triggerEvent) {
+            AttributeUpdateEvent.Post(entity, context).call()
+        }
     }
 
     override fun removeSource(
@@ -56,18 +51,18 @@ class BukkitAttributeEngine(
     ) {
         val source = state.sourceIndex[sourceId] ?: return
 
+        val entity = ownerEntity ?: return
+        if (AttributeSourceRemoveEvent.Pre(entity, source).call()) {
+            return
+        }
+
         super.removeSource(
             sourceId,
             affectedAttributes,
             changedSources
         )
 
-        val entity = ownerEntity ?: return
-        try {
-            Bukkit.getPluginManager().callEvent(AttributeSourceRemoveEvent(entity, source))
-        } catch (e: Throwable) {
-            logEx(e, "Failed to notify removal of source $sourceId")
-        }
+        AttributeSourceRemoveEvent.Post(entity, source).call()
     }
 
 }

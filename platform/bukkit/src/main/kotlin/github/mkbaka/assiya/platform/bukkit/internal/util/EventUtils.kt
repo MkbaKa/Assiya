@@ -2,13 +2,18 @@ package github.mkbaka.assiya.platform.bukkit.internal.util
 
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import org.bukkit.Bukkit
-import org.bukkit.event.Event
-import org.bukkit.event.EventPriority
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import java.util.function.Consumer
 
 object EventUtils {
+
+    /**
+     * @return [Boolean] cancelled
+     */
+    fun Event.call(): Boolean {
+        Bukkit.getPluginManager().callEvent(this)
+        return this is Cancellable && (this as Cancellable).isCancelled
+    }
 
     @JvmStatic
     fun <T : Event> listen(

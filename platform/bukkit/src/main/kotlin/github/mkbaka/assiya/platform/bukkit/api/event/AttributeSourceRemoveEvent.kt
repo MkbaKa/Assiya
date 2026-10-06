@@ -7,23 +7,19 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class AttributeSourceRemoveEvent(
-    val entity: Entity,
-    val info: AttributeSourceInfo
-) : Event(!Bukkit.isPrimaryThread()), Cancellable {
+/**
+ * 当一个属性源被移除时触发
+ * [Pre] 取消后会阻止本次移除行为 像过期的临时源会等到下次其他源一起处理
+ */
+sealed class AttributeSourceRemoveEvent : Event(!Bukkit.isPrimaryThread()) {
 
-    private var cancelled = false
+    class Pre(val entity: Entity, val info: AttributeSourceInfo) : AttributeSourceRemoveEvent(),
+        Cancellable by CancellableEvent()
+
+    class Post(val entity: Entity, val info: AttributeSourceInfo) : AttributeSourceRemoveEvent()
 
     override fun getHandlers(): HandlerList {
         return HANDLERS
-    }
-
-    override fun isCancelled(): Boolean {
-        return cancelled
-    }
-
-    override fun setCancelled(cancel: Boolean) {
-        cancelled = cancel
     }
 
     companion object {

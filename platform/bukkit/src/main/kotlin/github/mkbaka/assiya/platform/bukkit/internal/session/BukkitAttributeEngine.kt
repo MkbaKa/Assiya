@@ -9,29 +9,20 @@ import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSourceRemoveEvent
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeUpdateEvent
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import kotlinx.coroutines.CoroutineScope
-import org.bukkit.entity.Entity
-import java.lang.ref.WeakReference
-import java.util.*
 
 class BukkitAttributeEngine(
-    owner: Entity,
+    val assiyaSession: AssiyaSession,
     parentScope: CoroutineScope,
     publisher: AttributeEngineSnapshotPublisher
 ) : DefaultAttributeEngine(
     parentScope, publisher, AssiyaBukkitPlugin.INSTANCE.logger
 ) {
 
-    val owner: UUID = owner.uniqueId
-    private val ownerRef = WeakReference(owner)
-
-    val ownerEntity: Entity?
-        get() = ownerRef.get()
-
     override fun refresh(
         action: AttributeEngineAction.Refresh,
         context: AttributeUpdateContext
     ) {
-        val entity = ownerEntity ?: return
+        val entity = assiyaSession.owner ?: return
 
         if (action.triggerEvent && AttributeUpdateEvent.Pre(entity, context).call()) {
             return
@@ -51,7 +42,7 @@ class BukkitAttributeEngine(
     ) {
         val source = state.sourceIndex[sourceId] ?: return
 
-        val entity = ownerEntity ?: return
+        val entity = assiyaSession.owner ?: return
         if (AttributeSourceRemoveEvent.Pre(entity, source).call()) {
             return
         }

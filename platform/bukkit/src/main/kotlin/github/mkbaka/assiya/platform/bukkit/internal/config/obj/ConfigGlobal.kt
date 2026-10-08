@@ -8,6 +8,10 @@ class ConfigGlobal(
     private val section: ConfigNode
 ) {
 
+    val HEALTH_SCALE = section.getBoolean("settings.health-scale", true)
+
+    val HEALTH_SCALE_VALUE = section.getDouble("settings.health-scale-value", 40.0)
+
     val EQUIPMENT_REFRESH_DELAY_TICKS = section.getLong("equipment.refresh-delay-ticks", 8L)
 
     val EQUIPMENT_SOURCE_PRIORITY = section.getInt("equipment.source-priority", 100)

@@ -6,7 +6,6 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
-import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -23,13 +22,14 @@ class DamageProcessor(
     constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(ProcessorComponentBuilder().apply(pcb::accept).build())
 
     override fun process() {
-        val uuid = this[TriggerComponent.Key]?.entity?.uniqueId
-        uuid?.let { DamageProcessorStack.push(uuid, this) }
+        val session = this[TriggerComponent.Key]?.session
+        val damageProcessorStack = session?.damageProcessorStack
+        damageProcessorStack?.push(this)
         try {
             HandlerRegistry.publish("damage", this)
             this[CallbackComponent.Key]?.invoke(this)
         } finally {
-            uuid?.let { DamageProcessorStack.pop(uuid) }
+            damageProcessorStack?.pop()
         }
     }
 

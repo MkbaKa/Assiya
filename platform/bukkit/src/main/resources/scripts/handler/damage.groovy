@@ -7,9 +7,8 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableCom
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
-import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
-import github.mkbaka.assiya.platform.bukkit.internal.metadata.MetadataRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
+import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
 import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Projectile
@@ -35,7 +34,7 @@ class Damage {
                     if (!(shooter instanceof LivingEntity)) return
 
                     AttributeEngineSnapshot shooterSnapshot = AssiyaAPI.getSnapshot((LivingEntity) shooter)
-                    AssiyaAPI.getSessionOrCreate(projectile).submitSnapshot(shooterSnapshot)
+                    AssiyaAPI.getSessionOrCreate(projectile).attribute.submitSnapshot(shooterSnapshot)
                 }
                 .register()
 
@@ -43,7 +42,7 @@ class Damage {
                 .setEventPriority(EventPriority.HIGHEST)
                 .setIgnoreCancelled(true)
                 .setHandler { EntityShootBowEvent event ->
-                    MetadataRegistry.setMetadata(event.projectile.uniqueId, FORCE_METADATA_KEY, event.getForce())
+                    AssiyaAPI.getSessionOrCreate(event.projectile, false).metadata.put(FORCE_METADATA_KEY, event.force)
                 }
                 .register()
 
@@ -63,8 +62,10 @@ class Damage {
         // 不处理展示框之类的非生物实体
         if (!(event.entity instanceof LivingEntity)) return
 
+        AssiyaSession assiyaSession = AssiyaAPI.getSession(event.damager)
+
         // 避免递归
-        if (DamageMetaStack.getCurrent(event.damager.uniqueId) != null) return
+        if (assiyaSession.damageMetaStack.current != null) return
 
         LivingEntity defender = (LivingEntity) event.entity
         DamageProcessor processor
@@ -81,7 +82,7 @@ class Damage {
 
             // 取发射时的蓄力力度
             // 若不存在则默认 1.0
-            Float force = MetadataRegistry.getMetadata(projectile.uniqueId, FORCE_METADATA_KEY)
+            Float force = assiyaSession.getMetadata(FORCE_METADATA_KEY)
             if (force == null) force = 1.0f
 
             processor = DamageProcessor.ofProjectile(

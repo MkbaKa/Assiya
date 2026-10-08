@@ -1,14 +1,16 @@
 package github.mkbaka.assiya.platform.bukkit.api
 
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublisherBase
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSession
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry.sessions
+import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
+import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.session.BukkitAttributeEngine
 import org.bukkit.entity.Entity
 import java.util.*
 
@@ -18,19 +20,32 @@ import java.util.*
 object AssiyaAPI {
 
     @JvmStatic
-    fun getSession(entity: Entity): AttributeSession? = sessions[entity.uniqueId]
+    fun getSession(entity: Entity): AssiyaSession? = AssiyaSessionRegistry[entity.uniqueId]
 
     @JvmStatic
-    fun getSession(uuid: UUID): AttributeSession? = sessions[uuid]
+    fun getSession(uuid: UUID): AssiyaSession? = AssiyaSessionRegistry[uuid]
 
     @JvmStatic
-    fun getSessionOrCreate(entity: Entity): AttributeSession {
-        return AttributeSessionRegistry.getOrCreate(entity)
+    @JvmOverloads
+    fun getSessionOrCreate(entity: Entity, withAttribute: Boolean = true): AssiyaSession {
+        val session = AssiyaSessionRegistry.getOrCreate(entity)
+
+        if (withAttribute && !session.hasAttribute) {
+            session.initAttribute(
+                BukkitAttributeEngine(
+                    session,
+                    BukkitCoroutine,
+                    AttributeEngineSnapshotPublisherBase()
+                )
+            )
+        }
+
+        return session
     }
 
     @JvmStatic
     fun getSnapshot(entity: Entity): AttributeEngineSnapshot {
-        return getSession(entity)?.snapshot ?: AttributeEngineSnapshot.EMPTY
+        return getSession(entity)?.attribute?.snapshot ?: AttributeEngineSnapshot.EMPTY
     }
 
     @JvmStatic
@@ -94,16 +109,16 @@ object AssiyaAPI {
 
     @JvmStatic
     fun addAttribute(
-        session: AttributeSession,
+        session: AssiyaSession,
         vararg patches: AttributeSourcePatch
     ) {
-        session.submitPatches(false, *patches)
+        session.attribute.submitPatches(false, *patches)
     }
 
     @JvmStatic
     fun takeAttribute(entity: Entity, sourceId: String) {
         val session = getSession(entity) ?: return
-        session.submitRemove(sourceId)
+        session.attribute.submitRemove(sourceId)
     }
 
 
@@ -111,7 +126,7 @@ object AssiyaAPI {
     fun parseSync(lines: List<String>): AttributeParsedSource =
         AttributeReadPipeline.parseSync(lines)
 
-//    @JvmStatic
+    //    @JvmStatic
 //    fun parseSync(item: ItemStack): AttributeParsedSource =
 //        AttributeReadPipeline.parseSync(
 //            AttributeReadPipeline.extract(item)

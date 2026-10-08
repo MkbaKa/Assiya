@@ -22,7 +22,7 @@ class TakeAttributeMechanic(
         val target = ae.bukkitEntity
         val sourceId = source.get(meta, ae)
 
-        AssiyaAPI.getSession(target)?.submitRemove(sourceId)
+        AssiyaAPI.getSession(target)?.attribute?.submitRemove(sourceId)
         return SkillResult.SUCCESS
     }
 

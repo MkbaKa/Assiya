@@ -4,8 +4,6 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
-import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
-import github.mkbaka.assiya.platform.bukkit.internal.metadata.MetadataRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import java.util.*
 
@@ -24,7 +22,10 @@ object MythicPlaceholderValues {
             "Unknown attribute value: $attributeId:$captureId"
         }
 
-        val status = uuid?.let { AssiyaAPI.getSession(it)?.snapshot?.get(attributeId) } ?: Status.empty<Any>()
+        val status = uuid?.let {
+            AssiyaAPI.getSession(it)?.attribute?.snapshot?.get(attributeId)
+        } ?: Status.empty<Any>()
+
         val value = reader.read(status, captureId) ?: return "0"
 
         return if (value is Number) {
@@ -37,14 +38,19 @@ object MythicPlaceholderValues {
     fun damageData(uuid: UUID?, args: String): String {
         val key = args.substringBefore("|")
         val default = args.substringAfter("|", "null")
-        val processor = uuid?.let { DamageProcessorStack.getCurrent(it) } ?: return default
+
+        val session = uuid?.let { AssiyaAPI.getSession(it) } ?: return default
+        val processor = session.damageProcessorStack.current ?: return default
+
         return processor[CustomDataComponent]?.get(key)?.toString() ?: default
     }
 
     fun metadata(uuid: UUID?, args: String): String {
         val key = args.substringBefore("|")
         val default = args.substringAfter("|", "null")
-        return uuid?.let { MetadataRegistry.getMetadata<Any>(it, key) }?.toString() ?: default
+
+        val session = uuid?.let { AssiyaAPI.getSession(it) } ?: return default
+        return session.getMetadata(key) ?: default
     }
 
 }

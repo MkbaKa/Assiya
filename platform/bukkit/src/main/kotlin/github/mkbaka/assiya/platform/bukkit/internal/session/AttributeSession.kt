@@ -6,26 +6,16 @@ import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
-import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigGlobal
 import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import java.lang.ref.WeakReference
-import java.util.*
 
 class AttributeSession(
-    owner: Entity,
+    val assiyaSession: AssiyaSession,
     private val engine: AttributeEngine
 ) : AutoCloseable {
 
     var isClosed: Boolean = false
         private set
-
-    val ownerId: UUID = owner.uniqueId
-    private val ownerRef = WeakReference(owner)
-
-    val owner: Entity?
-        get() = ownerRef.get()
 
     val snapshot: AttributeEngineSnapshot
         get() = engine.snapshot()
@@ -34,8 +24,10 @@ class AttributeSession(
         refreshDefaultAttributes()
     }
 
-    fun refreshDefaultAttributes(config: ConfigGlobal = Config.global) {
-        val owner = owner ?: return
+    fun refreshDefaultAttributes() {
+        val owner = assiyaSession.owner ?: return
+
+        val config = Config.global
         val parsed = if (owner is Player) config.DEFAULT_ATTRIBUTES_PLAYER else config.DEFAULT_ATTRIBUTES_ENTITY
         if (parsed == null) {
             submitRemove(DEFAULT_SOURCE)

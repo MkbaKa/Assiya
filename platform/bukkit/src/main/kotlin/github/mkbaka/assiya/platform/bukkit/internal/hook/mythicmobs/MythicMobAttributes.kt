@@ -34,7 +34,7 @@ object MythicMobAttributes {
             attributes = values
         )
 
-        session.submitPatches(true, patch)
+        session.attribute.submitPatches(true, patch)
     }
 
     @Awake(lifeCycle = LifeCycle.DISABLE)

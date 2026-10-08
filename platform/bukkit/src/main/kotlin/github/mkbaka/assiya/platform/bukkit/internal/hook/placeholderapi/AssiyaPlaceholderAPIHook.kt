@@ -1,9 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.internal.hook.placeholderapi
 
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import org.bukkit.Bukkit
@@ -29,12 +29,12 @@ object AssiyaPlaceholderAPIHook {
                             setExecutor { context ->
                                 val default = context.getArgument<String>("default")
                                 val player = context.source ?: return@setExecutor default
-                                val session = AttributeSessionRegistry[player.uniqueId]
+                                val session = AssiyaAPI.getSession(player.uniqueId)
                                     ?: return@setExecutor default
                                 val attribute = context.getArgument<String>("attr")
                                 val capture = context.getArgument<String>("capture")
 
-                                val snapshot = session.snapshot
+                                val snapshot = session.attribute.snapshot
                                 val attr = AttributeRegistry[attribute] ?: return@setExecutor default
                                 val status = snapshot[attribute] ?: return@setExecutor default
                                 val result = attr[ReaderComponent.Key]?.reader?.read(status, capture)

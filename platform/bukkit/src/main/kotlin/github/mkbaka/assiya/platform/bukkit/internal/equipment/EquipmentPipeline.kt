@@ -8,8 +8,8 @@ import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSession
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
+import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
@@ -31,7 +31,7 @@ object EquipmentPipeline {
 
     private fun refresh0(entity: LivingEntity, delay: Long) {
         val ownerId = entity.uniqueId
-        val session = AttributeSessionRegistry[ownerId] ?: return
+        val session = AssiyaSessionRegistry[ownerId] ?: return
 
         pending.remove(ownerId)?.cancel()
 
@@ -46,7 +46,7 @@ object EquipmentPipeline {
             try {
                 delayTicks(delay)
 
-                if (AttributeSessionRegistry[ownerId] !== session) {
+                if (AssiyaSessionRegistry[ownerId] !== session) {
                     return@launch
                 }
 
@@ -68,7 +68,7 @@ object EquipmentPipeline {
 
     private suspend fun readAndSubmit(
         entity: LivingEntity,
-        session: AttributeSession
+        session: AssiyaSession
     ) {
         val priority = Config.global.EQUIPMENT_SOURCE_PRIORITY
         val equipment = entity.equipment
@@ -109,10 +109,10 @@ object EquipmentPipeline {
 
         currentCoroutineContext().ensureActive()
 
-        if (AttributeSessionRegistry[session.ownerId] !== session) {
+        if (AssiyaSessionRegistry[session.ownerUUID] !== session) {
             return
         }
 
-        session.submitPatches(true, *patches.toTypedArray())
+        session.attribute.submitPatches(true, *patches.toTypedArray())
     }
 }

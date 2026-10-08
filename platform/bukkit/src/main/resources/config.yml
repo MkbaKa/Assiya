@@ -1,3 +1,9 @@
+settings:
+  # 是否启用血量压缩
+  health-scale: false
+  # 当启用血量压缩时 压缩到多少血
+  health-scale-value: 40
+
 equipment:
   # 装备变化后的属性读取延迟 (tick)
   # 频繁变化只有最后一次会读取

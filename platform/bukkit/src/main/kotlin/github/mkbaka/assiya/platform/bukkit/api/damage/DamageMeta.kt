@@ -6,8 +6,6 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultiple
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
-import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageMetaStack
-import github.mkbaka.assiya.platform.bukkit.internal.damage.DamageProcessorStack
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
@@ -47,12 +45,14 @@ class DamageMeta @JvmOverloads constructor(
     }
 
     private fun execute(prepare: () -> Unit) {
-        val trigger = processor.getComponent(TriggerComponent).entity
+        val trigger = processor.getComponent(TriggerComponent)
         val target = processor.getComponent(TargetComponent).entity
-        val uuid = trigger.uniqueId
 
-        DamageMetaStack.push(uuid, this)
-        DamageProcessorStack.push(uuid, processor)
+        val damageMetaStack = trigger.session!!.damageMetaStack
+        val damageProcessorStack = trigger.session!!.damageProcessorStack
+        damageMetaStack.push(this)
+        damageProcessorStack.push(processor)
+
         try {
             prepare()
             if (processor[CancellableComponent]?.isCancelled == true) return
@@ -63,7 +63,7 @@ class DamageMeta @JvmOverloads constructor(
                     target.noDamageTicks = 0
                 }
 
-                target.damage(processor.getComponent(DamageMultipleComponent).totalDamage, trigger)
+                target.damage(processor.getComponent(DamageMultipleComponent).totalDamage, trigger.entity)
 
                 noDamageTicks?.let { target.noDamageTicks = it }
             }
@@ -88,8 +88,8 @@ class DamageMeta @JvmOverloads constructor(
 
             postDamage?.accept(this)
         } finally {
-            DamageProcessorStack.pop(uuid)
-            DamageMetaStack.pop(uuid)
+            damageProcessorStack.pop()
+            damageMetaStack.pop()
         }
     }
 

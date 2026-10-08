@@ -1,13 +1,10 @@
 package github.mkbaka.assiya.platform.bukkit.internal.listener
 
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeUpdateEvent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.UpdateProcessor
-import github.mkbaka.assiya.platform.bukkit.internal.session.AttributeSessionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
-import github.mkbaka.bukkitksp.annotation.Awake
-import github.mkbaka.bukkitksp.annotation.LifeCycle
 import github.mkbaka.bukkitksp.annotation.Listener
 import org.bukkit.event.EventPriority
 
@@ -17,10 +14,10 @@ object AttributeUpdateListener {
         priority = EventPriority.HIGHEST,
         ignoreCancelled = true
     )
-    fun onUpdate(event: AttributeUpdateEvent) {
+    fun onUpdate(event: AttributeUpdateEvent.Pre) {
         try {
-            val session = AttributeSessionRegistry[event.entity] ?: return
-            val processor = UpdateProcessor.of(event.entity, session.snapshot, event.context)
+            val session = AssiyaAPI.getSession(event.entity) ?: return
+            val processor = UpdateProcessor.of(event.entity, session.attribute.snapshot, event.context)
 
             processor.process()
 

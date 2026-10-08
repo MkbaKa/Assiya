@@ -16,7 +16,6 @@ static void onDefense(Attribute attribute, Processor processor) {
     TargetComponent defender = processor.get(TargetComponent.@Key)
     if (defender == null) return
 
-    // TODO: 配置模块与冷却工具接入后支持玩家闪避冷却, 默认冷却为 0.
     double chance = defender.getValue(attribute.id, 'total', 0.0d)
     chance -= attacker.getValue('hit', 'total', 0.0d)
     if (!ScriptTools.chance(chance)) return

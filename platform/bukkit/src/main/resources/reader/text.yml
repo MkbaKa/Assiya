@@ -1,0 +1,8 @@
+# 文本读取规则
+text:
+  captures:
+    value:
+      op: last
+      format: text
+  patterns:
+    - '{name}.*?<value>'

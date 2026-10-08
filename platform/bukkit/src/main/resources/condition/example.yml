@@ -1,0 +1,18 @@
+# 索引名
+level-require:
+  # 识别名
+  names: ["等级需求", "Lv."]
+  # 读取规则
+  reader: default
+  # 实现逻辑的脚本位置
+  # 具体信息见 attribute/fight/attack.yml
+  handler: 'condition/level-require'
+
+# "权限需求: xxx"
+# 多个权限可以用 / 分隔  满足任意一个就通过
+# 像 "权限需求: 战士/法师/弓箭手"
+# 后面的内容会被作为权限节点判断
+permission:
+  names: ["权限需求", "职业"]
+  reader: text
+  handler: 'condition/permission'

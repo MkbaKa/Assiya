@@ -60,7 +60,8 @@ object ScriptManager {
             "scripts/attribute/fight/reflection.groovy",
             "scripts/attribute/fight/fire.groovy",
             "scripts/attribute/fight/frozen.groovy",
-            "scripts/condition/level-require.groovy"
+            "scripts/condition/level-require.groovy",
+            "scripts/condition/permission.groovy"
 //            "scripts/condition/player-level.js",
 //            "scripts/damage/example.js",
 //            "scripts/damage/attack.groovy",

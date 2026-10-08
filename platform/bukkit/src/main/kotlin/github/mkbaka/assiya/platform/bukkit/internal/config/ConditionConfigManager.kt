@@ -16,7 +16,7 @@ object ConditionConfigManager {
     val size: Int get() = conditions.size
 
     private fun defaultResources(): List<String> {
-        return listOf("condition/level.yml")
+        return listOf("condition/example.yml")
     }
 
     @CustomTask(taskId = "reload", priority = 20)

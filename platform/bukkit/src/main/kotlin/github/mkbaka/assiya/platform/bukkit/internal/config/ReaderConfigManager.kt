@@ -23,7 +23,10 @@ internal object ReaderConfigManager {
     val size: Int get() = readers.size
 
     private fun defaultResources(): List<String> {
-        return listOf("reader/default.yml")
+        return listOf(
+            "reader/default.yml",
+            "reader/text.yml"
+        )
     }
 
     @CustomTask(taskId = "reload", priority = 10)

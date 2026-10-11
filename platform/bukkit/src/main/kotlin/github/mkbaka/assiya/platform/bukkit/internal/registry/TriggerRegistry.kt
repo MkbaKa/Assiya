@@ -63,7 +63,9 @@ object TriggerRegistry : Registry<TriggerRegistry.TriggerType>("trigger") {
                     "timer trigger period must be a positive number"
                 }
             },
-            null,
+            { processor, id ->
+                processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
+            },
         )
     }
 

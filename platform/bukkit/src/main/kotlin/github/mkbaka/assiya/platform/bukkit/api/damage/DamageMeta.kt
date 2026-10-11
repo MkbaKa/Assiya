@@ -48,10 +48,10 @@ class DamageMeta @JvmOverloads constructor(
         val trigger = processor.getComponent(TriggerComponent)
         val target = processor.getComponent(TargetComponent).entity
 
-        val damageMetaStack = trigger.session!!.damageMetaStack
-        val damageProcessorStack = trigger.session!!.damageProcessorStack
-        damageMetaStack.push(this)
-        damageProcessorStack.push(processor)
+        val damageMetaStack = trigger.session?.damageMetaStack
+        val damageProcessorStack = trigger.session?.damageProcessorStack
+        damageMetaStack?.push(this)
+        damageProcessorStack?.push(processor)
 
         try {
             prepare()
@@ -88,8 +88,8 @@ class DamageMeta @JvmOverloads constructor(
 
             postDamage?.accept(this)
         } finally {
-            damageProcessorStack.pop()
-            damageMetaStack.pop()
+            damageProcessorStack?.pop()
+            damageMetaStack?.pop()
         }
     }
 

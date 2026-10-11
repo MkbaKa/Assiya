@@ -12,6 +12,10 @@ class ConfigGlobal(
 
     val HEALTH_SCALE_VALUE = section.getDouble("settings.health-scale-value", 40.0)
 
+    val TIMER_RESET_PERIOD = section.getLong("settings.timer-reset-period", 1200L).also {
+        require(it > 0) { "settings.timer-reset-period must be positive" }
+    }
+
     val EQUIPMENT_REFRESH_DELAY_TICKS = section.getLong("equipment.refresh-delay-ticks", 8L)
 
     val EQUIPMENT_SOURCE_PRIORITY = section.getInt("equipment.source-priority", 100)

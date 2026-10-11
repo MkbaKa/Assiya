@@ -5,11 +5,13 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSetting
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomFilterComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.begin
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.complete
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiPredicate
 import java.util.function.Consumer
+import java.util.function.Predicate
 
 object HandlerRegistry : Registry<HandlerComponent>("handler") {
 
@@ -54,7 +56,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
 
         if (index.get()) {
             for (subscriber in subscribers) {
-                addToIndex(subscriber)
+                addIndex(subscriber)
             }
         }
     }
@@ -67,7 +69,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         val subscribers = registrations.remove(id.lowercase()) ?: return true
         if (index.get()) {
             for (subscriber in subscribers) {
-                removeFromIndex(subscriber)
+                removeIndex(subscriber)
             }
         }
         return true
@@ -99,6 +101,15 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         index.set(true)
     }
 
+    fun select(id: String, filter: Predicate<Subscriber>): List<Subscriber> {
+        val subscribers = indexes[id.lowercase()] ?: return emptyList()
+        val selected = arrayListOf<Subscriber>()
+        for (subscriber in subscribers) {
+            if (filter.test(subscriber)) selected += subscriber
+        }
+        return selected
+    }
+
     /**
      * 触发对应类型的 handler
      *
@@ -110,7 +121,10 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         processor: Processor,
     ) {
         val subscribers = indexes[id.lowercase()] ?: return
+        publish(subscribers, processor)
+    }
 
+    fun publish(subscribers: List<Subscriber>, processor: Processor) {
         for (index in subscribers.indices) {
             val subscriber = subscribers[index]
             // 属性直接阻止了整个 processor 触发
@@ -122,6 +136,10 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
             if (processor[CancellableAttributeComponent.Key]
                     ?.isCancelled(subscriber.attributeId) == true
             ) {
+                continue
+            }
+
+            if (processor[CustomFilterComponent.Key]?.test(processor, subscriber) == false) {
                 continue
             }
 
@@ -142,7 +160,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         }
     }
 
-    private fun addToIndex(subscriber: Subscriber) {
+    private fun addIndex(subscriber: Subscriber) {
         val subscribers = indexes.getOrPut(subscriber.indexId) { arrayListOf() }
         // 二分永远找不到即将新增的元素 所以这里一定会返回负数
         // 取绝对值再 -1 就能得出正确的下标位置
@@ -150,7 +168,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         subscribers.add(index, subscriber)
     }
 
-    private fun removeFromIndex(subscriber: Subscriber) {
+    private fun removeIndex(subscriber: Subscriber) {
         val subscribers = indexes[subscriber.indexId] ?: return
         val position = subscribers.binarySearch(subscriber, SUBSCRIBER_COMPARATOR)
         if (position >= 0) {
@@ -161,7 +179,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         }
     }
 
-    private class Subscriber(
+    class Subscriber(
         val indexId: String,
         val attributeId: String,
         val settings: TriggerSettings,

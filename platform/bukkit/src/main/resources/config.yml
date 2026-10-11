@@ -3,6 +3,10 @@ settings:
   health-scale: false
   # 当启用血量压缩时 压缩到多少血
   health-scale-value: 40
+  # 定时属性的全局计数上限 (tick)
+  # 必须是所有 timer 触发器 period 的公倍数
+  # 例如两个属性的 period 为 20 和 30 上限可以填 60 或 1200
+  timer-reset-period: 1200
 
 equipment:
   # 装备变化后的属性读取延迟 (tick)

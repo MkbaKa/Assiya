@@ -17,7 +17,7 @@ class TriggerSettings private constructor(
         get() = get("handler")
 
     val periodTicks: Long?
-        get() = get<Long>("period")
+        get() = get<Number>("period")?.toLong()
 
     @Suppress("UNCHECKED_CAST")
     operator fun <T> get(key: String): T? {

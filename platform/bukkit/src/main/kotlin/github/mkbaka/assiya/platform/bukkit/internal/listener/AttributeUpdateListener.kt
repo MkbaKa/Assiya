@@ -7,7 +7,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.processor.TimerProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.UpdateProcessor
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callAsyncTimer
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
@@ -41,7 +41,7 @@ object AttributeUpdateListener {
 
     @Awake(lifeCycle = LifeCycle.ENABLE)
     fun register() {
-        SchedulerUtils.callAsyncTimer(0, 1) {
+        callAsyncTimer(0, 1) {
             val resetPeriod = Config.global.TIMER_RESET_PERIOD
             val tick = ticks.incrementAndGet()
             val subscribers = HandlerRegistry.select("timer") { subscriber ->

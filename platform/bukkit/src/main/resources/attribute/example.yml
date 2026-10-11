@@ -45,3 +45,11 @@ example:
       # 即 example 里的 priority 114514 + handler attribute/fight/attack
       # priority: 1919810
       # handler: 'attribute/fight/kill'
+
+runtime-example:
+  names: ['测试定时触发']
+  reader: default
+  handler: 'attribute/runtime-example'
+  priority: 100
+  period: 20
+  triggers: timer

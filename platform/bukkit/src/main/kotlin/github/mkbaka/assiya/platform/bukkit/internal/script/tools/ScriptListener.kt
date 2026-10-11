@@ -2,7 +2,6 @@ package github.mkbaka.assiya.platform.bukkit.internal.script.tools
 
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callSync
-import github.mkbaka.bukkitksp.annotation.CustomTask
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -56,16 +55,17 @@ class ScriptListener<T : Event>(
     fun unregister() {
         callSync {
             unregister.unregister()
+            listeners.remove(this)
         }
     }
 
     companion object {
 
-        private val listeners = ArrayList<ScriptListener<*>>()
+        private val listeners = hashSetOf<ScriptListener<*>>()
 
         fun unregister() {
             callSync {
-                for (listener in listeners) {
+                for (listener in listeners.toList()) {
                     listener.unregister()
                 }
                 listeners.clear()

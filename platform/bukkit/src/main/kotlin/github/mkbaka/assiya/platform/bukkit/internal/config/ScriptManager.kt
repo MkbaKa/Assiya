@@ -6,6 +6,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.GroovyEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.NashornEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
+import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptScheduler
 import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils.getSubFiles
 import github.mkbaka.assiya.platform.bukkit.internal.util.warning
 import github.mkbaka.bukkitksp.annotation.CustomTask
@@ -43,6 +44,9 @@ object ScriptManager {
 
     private fun defaultResources(): List<String> {
         return listOf(
+            "scripts/handler/damage.groovy",
+            "scripts/handler/update.groovy",
+            "scripts/handler/timer.groovy",
             "scripts/attribute/health.groovy",
             "scripts/attribute/moving.groovy",
             "scripts/attribute/fight/attack.groovy",
@@ -84,6 +88,7 @@ object ScriptManager {
     }
 
     fun unload() {
+        ScriptScheduler.unregister()
         ScriptListener.unregister()
     }
 

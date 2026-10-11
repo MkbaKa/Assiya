@@ -15,6 +15,7 @@ object Config {
     private val reloading = AtomicBoolean(false)
 
     @Volatile
+    @JvmStatic
     lateinit var global: ConfigGlobal
         private set
 

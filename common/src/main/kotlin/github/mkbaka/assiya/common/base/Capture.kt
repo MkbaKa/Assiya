@@ -28,7 +28,7 @@ class Capture<T : Any>(
         for (status in incoming) {
             for ((captureId, value) in status.entries) {
                 val operation = operations[captureId]?.operation
-                // TODO fix
+
                 // 若自身没有 capture 需要的 operation 则将其值直接存入
                 // 如果后续的 status 仍然持有不存在的 operation 会覆盖上个 status 的值
                 merged[captureId] = operation?.merge(merged[captureId], value) ?: value

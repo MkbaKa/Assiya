@@ -25,7 +25,6 @@ object AssiyaPlaceholderAPIHook {
                 argument("attr", StringArgument()) {
                     argument("capture", StringArgument()) {
                         argument("default", StringArgument<OfflinePlayer, String>().setDefaultValue("")) {
-                            // TODO
                             setExecutor { context ->
                                 val default = context.getArgument<String>("default")
                                 val player = context.source ?: return@setExecutor default

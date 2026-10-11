@@ -49,12 +49,13 @@ object TriggerRegistry : Registry<TriggerRegistry.TriggerType>("trigger") {
             processor[TargetComponent.Key]?.hasAttribute(id) ?: false
         }
 
+        // TODO impl
+        register(Trigger.Base("kill", "onKill"))
+
         register(Trigger.Base("update", "onUpdate")) { processor, id ->
             processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
         }
 
-        // TODO impl
-        register(Trigger.Base("kill", "onKill"))
         register(
             Trigger.Base("timer", "onTimer"),
             { context ->

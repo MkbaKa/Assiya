@@ -2,10 +2,10 @@ package github.mkbaka.assiya.platform.bukkit.api.handler.processor
 
 import github.mkbaka.assiya.common.engine.AttributeUpdateContext
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.DefaultAttributeContainer
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
@@ -29,6 +29,7 @@ class UpdateProcessor(
 
     companion object {
 
+        @JvmStatic
         fun of(
             entity: Entity,
             snapshot: AttributeEngineSnapshot,

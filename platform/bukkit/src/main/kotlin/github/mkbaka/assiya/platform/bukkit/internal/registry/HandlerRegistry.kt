@@ -78,6 +78,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
     /**
      * 批量注册前关掉单元素排序
      */
+    @JvmStatic
     fun begin() {
         index.set(false)
     }
@@ -85,6 +86,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
     /**
      * 批量注册完统一排序
      */
+    @JvmStatic
     fun complete() {
         indexes.clear()
 
@@ -101,6 +103,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         index.set(true)
     }
 
+    @JvmStatic
     fun select(id: String, filter: Predicate<Subscriber>): List<Subscriber> {
         val subscribers = indexes[id.lowercase()] ?: return emptyList()
         val selected = arrayListOf<Subscriber>()
@@ -116,6 +119,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
      * @param [id] 类型
      * @param [processor] 上下文
      */
+    @JvmStatic
     fun publish(
         id: String,
         processor: Processor,
@@ -124,6 +128,7 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         publish(subscribers, processor)
     }
 
+    @JvmStatic
     fun publish(subscribers: List<Subscriber>, processor: Processor) {
         for (index in subscribers.indices) {
             val subscriber = subscribers[index]

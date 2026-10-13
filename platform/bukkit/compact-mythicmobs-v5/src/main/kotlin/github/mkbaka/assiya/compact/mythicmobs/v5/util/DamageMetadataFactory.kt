@@ -6,7 +6,7 @@ import io.lumine.mythic.api.skills.damage.DamageMetadata
 import org.bukkit.event.entity.EntityDamageEvent
 import java.lang.invoke.MethodHandles
 
-internal object DamageMetadataFactory {
+ object DamageMetadataFactory {
 
     private val baseTypes = listOf(
         SkillCaster::class.java.name, "double", "java.util.Map", "java.util.Map",

@@ -1,11 +1,13 @@
 package github.mkbaka.assiya.platform.bukkit.api.damage
 
+import github.mkbaka.assiya.platform.bukkit.api.event.DamageMetaEvent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
@@ -39,12 +41,22 @@ class DamageMeta @JvmOverloads constructor(
     fun doDamage() {
         execute {
             if (process) {
+                if (DamageMetaEvent.PreProcess(this, processor).call()) {
+                    return@execute
+                }
+
                 processor.process()
+
+                DamageMetaEvent.PostProcess(this, processor).call()
             }
         }
     }
 
     private fun execute(prepare: () -> Unit) {
+        if (DamageMetaEvent.Start(this, processor).call()) {
+            return
+        }
+
         val trigger = processor.getComponent(TriggerComponent)
         val target = processor.getComponent(TargetComponent).entity
 
@@ -55,6 +67,11 @@ class DamageMeta @JvmOverloads constructor(
 
         try {
             prepare()
+
+            if (DamageMetaEvent.PreDamage(this, processor).call()) {
+                return
+            }
+
             if (processor[CancellableComponent]?.isCancelled == true) return
             if (preDamage?.test(this) == true) return
 
@@ -86,11 +103,14 @@ class DamageMeta @JvmOverloads constructor(
                 else -> block()
             }
 
+            DamageMetaEvent.PostDamage(this, processor).call()
             postDamage?.accept(this)
         } finally {
             damageProcessorStack?.pop()
             damageMetaStack?.pop()
         }
+
+        DamageMetaEvent.End(this, processor).call()
     }
 
     companion object {

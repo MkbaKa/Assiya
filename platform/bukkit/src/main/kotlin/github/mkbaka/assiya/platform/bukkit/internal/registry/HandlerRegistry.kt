@@ -1,11 +1,12 @@
 package github.mkbaka.assiya.platform.bukkit.internal.registry
 
+import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.CustomFilterComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomFilterComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.begin
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.complete
 import java.util.concurrent.atomic.AtomicBoolean
@@ -144,10 +145,6 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
                 continue
             }
 
-            if (processor[CustomFilterComponent.Key]?.test(processor, subscriber) == false) {
-                continue
-            }
-
             // 属性值判断
             if (!subscriber.settings.alwaysRun) {
                 val hasAttribute = subscriber.hasAttribute
@@ -158,6 +155,10 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
                 if (!hasAttribute.test(processor, subscriber.attributeId)) {
                     continue
                 }
+            }
+
+            if (subscriber.attribute?.get(CustomFilterComponent.Key)?.test(processor) == false) {
+                continue
             }
 
             // 执行逻辑
@@ -190,6 +191,11 @@ object HandlerRegistry : Registry<HandlerComponent>("handler") {
         val settings: TriggerSettings,
         val hasAttribute: BiPredicate<Processor, String>?,
         val action: Consumer<Processor>,
-    )
+    ) {
+
+        val attribute: Attribute?
+            get() = AttributeRegistry[attributeId]
+
+    }
 
 }

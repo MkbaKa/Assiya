@@ -8,7 +8,7 @@ import java.util.function.Consumer
 object EventUtils {
 
     /**
-     * @return [Boolean] cancelled
+     * @return [Boolean] 是否被取消
      */
     fun Event.call(): Boolean {
         Bukkit.getPluginManager().callEvent(this)

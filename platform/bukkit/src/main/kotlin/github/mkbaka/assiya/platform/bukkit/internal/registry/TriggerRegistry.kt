@@ -8,7 +8,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerCompone
 import java.util.function.BiPredicate
 import java.util.function.Consumer
 
-object TriggerRegistry : Registry<TriggerRegistry.TriggerType>("trigger") {
+object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
 
     private val NO_VALIDATION = Consumer<TriggerSettings> {}
 

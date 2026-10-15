@@ -5,7 +5,7 @@ import github.mkbaka.assiya.common.operation.Operation
 import github.mkbaka.assiya.common.operation.TextOperations
 
 
-object OperationsRegistry : Registry<Operation<*>>("operation") {
+object OperationsRegistry : NamedRegistry<Operation<*>>("operation") {
 
     fun <T : Any> of(key: String): Operation<T> {
         return this[key] as Operation<T>

@@ -5,7 +5,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.bukkitksp.annotation.CustomTask
 
 
-object ValueRegistry : Registry<Value<*>>("format") {
+object ValueRegistry : NamedRegistry<Value<*>>("format") {
 
     private var roman: Value.RomanNumber? = null
 

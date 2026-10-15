@@ -3,7 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.registry
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 
 
-object ReaderRegistry : Registry<Reader>("reader") {
+object ReaderRegistry : NamedRegistry<Reader>("reader") {
 
     fun register(reader: Reader) {
         register(reader.id, reader)

@@ -17,7 +17,7 @@ import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import java.time.Duration
 
-object AttributeRegistry : Registry<Attribute>("属性"), AttributeParser {
+object AttributeRegistry : NamedRegistry<Attribute>("属性"), AttributeParser {
 
     @Volatile
     private var parser: AttributeParser = compile(emptyList(), emptyList())

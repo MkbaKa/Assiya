@@ -23,7 +23,7 @@ object BukkitCoroutine : AutoCloseable, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = SupervisorJob() + async + BukkitDispatchers(async, sync)
 
-    @Awake(lifeCycle = LifeCycle.DISABLE)
+    @Awake(lifeCycle = LifeCycle.DISABLE, priority = 114514)
     override fun close() {
         cancel()
         async.close()

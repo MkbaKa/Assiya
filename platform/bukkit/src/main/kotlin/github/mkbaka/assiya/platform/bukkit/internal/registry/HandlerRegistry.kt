@@ -14,7 +14,7 @@ import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Predicate
 
-object HandlerRegistry : Registry<HandlerComponent>("handler") {
+object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
 
     /**
      * 根据 priority 排序后的 subscriber 列表

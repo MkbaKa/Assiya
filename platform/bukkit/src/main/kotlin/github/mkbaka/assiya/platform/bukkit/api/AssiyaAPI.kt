@@ -6,12 +6,14 @@ import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.session.BukkitAttributeEngine
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import java.util.*
 
 /**
@@ -121,10 +123,18 @@ object AssiyaAPI {
         session.attribute.submitRemove(sourceId)
     }
 
-
     @JvmStatic
     fun parseSync(lines: List<String>): AttributeParsedSource =
         AttributeReadPipeline.parseSync(lines)
+
+
+    @JvmStatic
+    fun attackTo(attacker: Entity, defender: LivingEntity, damage: Double) {
+        DamageMeta.fixedDamage(attacker, defender, damage).doDamage()
+    }
+
+
+
 
     //    @JvmStatic
 //    fun parseSync(item: ItemStack): AttributeParsedSource =

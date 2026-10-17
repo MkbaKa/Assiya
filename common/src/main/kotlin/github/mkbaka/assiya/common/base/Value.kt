@@ -8,9 +8,13 @@ interface Value<T : Any> {
 
     val regex: String
 
+    val defaultValue: T
+
     fun parse(raw: String): T?
 
     data object Number : Value<Double> {
+
+        override val defaultValue: Double = 0.0
 
         // 正负符号可选 正数部分必须 小数部分可选
         override val regex: String = "[-+]?\\d+(?:\\.\\d+)?"
@@ -21,10 +25,8 @@ interface Value<T : Any> {
 
     data object Text : Value<String> {
 
-        /**
-         * 贪婪: 文本捕获组取到行尾, 或取到模板中它后面那段字面量为止 (靠回溯定位).
-         * 不能用懒惰量词 — 捕获组位于模板末尾时 (最常见的写法) 懒惰只会匹到一个字符.
-         */
+        override val defaultValue: String = ""
+
         override val regex: String = ".+"
 
         override fun parse(raw: String): String = raw
@@ -34,6 +36,8 @@ interface Value<T : Any> {
         private val keys: List<Char>,
         private val transformer: (Char) -> Int?
     ) : Value<Double> {
+
+        override val defaultValue: Double = 0.0
 
         override val regex: String = "[${keys.joinToString("")}]+"
 

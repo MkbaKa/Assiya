@@ -21,6 +21,8 @@ interface Reader {
             ?: status[captureId]
     }
 
+    fun defaultValue(captureId: String): Any? = capture[captureId]?.value?.defaultValue
+
     fun register() {
         ReaderRegistry.register(this)
     }

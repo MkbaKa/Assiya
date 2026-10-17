@@ -3,6 +3,7 @@ package github.mkbaka.assiya.common.parser
 import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.condition.ParsedCondition
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.common.source.mergeAttributeValues
 import java.util.function.Predicate
 
 class AttributeParsedSource(val parts: List<Part>) {
@@ -48,8 +49,7 @@ class AttributeParsedSource(val parts: List<Part>) {
             accepted.addAll((attributes ?: part.attributes).values)
         }
 
-        return accepted.groupBy { it.attributeId }
-            .mapValues { (_, values) -> merge<Any>(values) }
+        return mergeAttributeValues(accepted)
     }
 
     private fun removePath(attributes: MutableMap<String, AttributeValue<*>>, path: String) {
@@ -76,12 +76,6 @@ class AttributeParsedSource(val parts: List<Part>) {
         }
 
         return value.copy(status = Status.of(remaining))
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun <T : Any> merge(values: List<AttributeValue<*>>): AttributeValue<T> {
-        val first = values.first() as AttributeValue<T>
-        return first.copy(status = first.capture.merge(values.map { (it as AttributeValue<T>).status }))
     }
 
     companion object {

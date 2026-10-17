@@ -23,10 +23,10 @@ object MythicMobAttributes {
             LevelAttribute(MobAttributeTemplate(mobId, attributes, calculator))
         }
         val parsed = levelAttribute.parsedByLevel.computeIfAbsent(level) {
-            AssiyaAPI.parseSync(levelAttribute.template.render(level))
+            AssiyaAPI.parse(levelAttribute.template.render(level))
         }
 
-        val values = AssiyaAPI.evaluateSync(entity, parsed)
+        val values = AssiyaAPI.evaluate(entity, parsed)
         val patch = AttributeSourcePatch(
             sourceId = SOURCE_ID,
             priority = Config.global.MYTHICMOBS_SOURCE_PRIORITY,

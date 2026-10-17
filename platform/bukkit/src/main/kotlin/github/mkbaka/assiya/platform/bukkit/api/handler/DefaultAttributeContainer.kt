@@ -6,9 +6,9 @@ import github.mkbaka.assiya.common.engine.state.AttributeEngineState
 import github.mkbaka.assiya.common.engine.state.AttributeState
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
+import github.mkbaka.assiya.common.source.mergeAttribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.mergeAttribute
 
 /**
  * 供 processor 过程中临时操作属性

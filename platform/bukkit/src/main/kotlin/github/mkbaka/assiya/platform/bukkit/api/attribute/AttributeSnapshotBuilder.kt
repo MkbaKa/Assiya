@@ -5,9 +5,9 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.engine.state.AttributeEngineState
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.common.source.mergeAttribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.mergeAttribute
 
 /**
  * 基于现有快照做一层新的快照

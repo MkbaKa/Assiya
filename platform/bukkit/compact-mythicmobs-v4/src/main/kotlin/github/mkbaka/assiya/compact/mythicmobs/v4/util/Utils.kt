@@ -42,7 +42,7 @@ object Utils {
         val attributes = hashMapOf<String, Status<Any>>()
         // 解析后条件通过才可用
         if (lines.isNotEmpty()) {
-            val parsed = AssiyaAPI.parseSync(entity, lines)
+            val parsed = AssiyaAPI.parse(entity, lines)
 
             for ((attributeId, attribute) in parsed) {
                 @Suppress("UNCHECKED_CAST")

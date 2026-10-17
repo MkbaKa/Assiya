@@ -1,7 +1,6 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5.mechanic
 
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
-import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.Utils
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
@@ -56,8 +55,7 @@ class AddAttributeMechanic(
             AttributeSourceLifecycle.Temporary(50.milliseconds * ticks.toDouble())
         }
 
-        val patch = AttributeSourcePatch(sourceId, priority, lifeCycle, values)
-        AssiyaAPI.addAttribute(target, patch)
+        AssiyaAPI.addAttribute(target, sourceId, values, priority, lifeCycle)
         return SkillResult.SUCCESS
     }
 

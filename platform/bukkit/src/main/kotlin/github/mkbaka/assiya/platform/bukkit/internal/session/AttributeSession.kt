@@ -33,7 +33,7 @@ class AttributeSession(
             submitRemove(DEFAULT_SOURCE)
             return
         }
-        val attributes = AttributeReadPipeline.evaluateSync(owner, parsed)
+        val attributes = AttributeReadPipeline.evaluate(owner, parsed)
         val patch = AttributeSourcePatch(
             sourceId = DEFAULT_SOURCE,
             priority = config.DEFAULT_ATTRIBUTES_PRIORITY,

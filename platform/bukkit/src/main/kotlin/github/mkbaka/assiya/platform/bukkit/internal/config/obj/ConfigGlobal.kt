@@ -49,9 +49,9 @@ class ConfigGlobal(
      */
     fun parseDefaultAttributes() {
         DEFAULT_ATTRIBUTES_PLAYER = section.getStringList("default-attributes.player")
-            .takeIf { it.isNotEmpty() }?.let(AssiyaAPI::parseSync)
+            .takeIf { it.isNotEmpty() }?.let(AssiyaAPI::parse)
         DEFAULT_ATTRIBUTES_ENTITY = section.getStringList("default-attributes.entity")
-            .takeIf { it.isNotEmpty() }?.let(AssiyaAPI::parseSync)
+            .takeIf { it.isNotEmpty() }?.let(AssiyaAPI::parse)
     }
 
 }

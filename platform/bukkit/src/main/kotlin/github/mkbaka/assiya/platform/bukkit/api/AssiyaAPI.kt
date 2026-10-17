@@ -6,6 +6,7 @@ import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.common.source.mergeAttributeValues
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
@@ -14,11 +15,9 @@ import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegist
 import github.mkbaka.assiya.platform.bukkit.internal.session.BukkitAttributeEngine
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.inventory.ItemStack
 import java.util.*
 
-/**
- * TODO refactor
- */
 object AssiyaAPI {
 
     @JvmStatic
@@ -51,42 +50,80 @@ object AssiyaAPI {
     }
 
     @JvmStatic
-    fun parseSync(entity: Entity, lines: List<String>): Map<String, AttributeValue<*>> {
-        val parsed = AttributeReadPipeline.parseSync(lines)
-
-        return AttributeReadPipeline.evaluateSync(entity, parsed)
+    fun parse(entity: Entity, lines: List<String>): Map<String, AttributeValue<*>> {
+        val parsed = AttributeReadPipeline.parse(lines)
+        return AttributeReadPipeline.evaluate(entity, parsed)
     }
 
-    // TODO triggerEvent
+    @JvmStatic
+    fun parse(lines: List<String>): AttributeParsedSource = AttributeReadPipeline.parse(lines)
 
     @JvmStatic
+    fun evaluate(
+        entity: Entity,
+        parsed: AttributeParsedSource
+    ): Map<String, AttributeValue<*>> = AttributeReadPipeline.evaluate(entity, parsed)
+
+    @JvmStatic
+    @JvmOverloads
     fun addAttribute(
         entity: Entity,
         sourceId: String,
         attributes: List<String>,
         priority: Int,
-        lifeCycle: AttributeSourceLifecycle
+        lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
+        triggerEvent: Boolean = false
+    ) {
+        val parsed = AttributeReadPipeline.parse(attributes)
+        addAttribute(entity, sourceId, parsed, priority, lifeCycle, triggerEvent)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun addAttribute(
+        entity: Entity,
+        sourceId: String,
+        itemStack: ItemStack,
+        priority: Int,
+        lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
+        triggerEvent: Boolean = false
+    ) {
+        val parts = AttributeReadPipeline.extract(itemStack)
+        val parsed = AttributeReadPipeline.parseParts(parts)
+        addAttribute(entity, sourceId, parsed, priority, lifeCycle, triggerEvent)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun addAttribute(
+        entity: Entity,
+        sourceId: String,
+        attributes: Map<String, AttributeValue<*>>,
+        priority: Int,
+        lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
+        triggerEvent: Boolean = false
     ) {
         val session = getSession(entity) ?: return
 
-        val parsed = AttributeReadPipeline.parseSync(attributes)
         val patch = AttributeSourcePatch(
             sourceId,
             priority,
             lifeCycle,
-            AttributeReadPipeline.evaluateSync(entity, parsed)
+            attributes
         )
 
-        addAttribute(session, patch)
+        session.attribute.submitPatches(triggerEvent, patch)
     }
 
     @JvmStatic
+    @JvmOverloads
     fun addAttribute(
         entity: Entity,
         sourceId: String,
         parsed: AttributeParsedSource,
         priority: Int,
-        lifeCycle: AttributeSourceLifecycle
+        lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
+        triggerEvent: Boolean = false
     ) {
         val session = getSession(entity) ?: return
 
@@ -94,27 +131,42 @@ object AssiyaAPI {
             sourceId,
             priority,
             lifeCycle,
-            AttributeReadPipeline.evaluateSync(entity, parsed)
+            AttributeReadPipeline.evaluate(entity, parsed)
         )
 
-        addAttribute(session, patch)
+        session.attribute.submitPatches(triggerEvent, patch)
     }
 
     @JvmStatic
-    fun addAttribute(
+    @JvmOverloads
+    fun addAttributeItems(
         entity: Entity,
-        vararg patches: AttributeSourcePatch
+        sourceId: String,
+        items: List<ItemStack>,
+        priority: Int,
+        lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
+        triggerEvent: Boolean = false
     ) {
         val session = getSession(entity) ?: return
-        addAttribute(session, *patches)
-    }
 
-    @JvmStatic
-    fun addAttribute(
-        session: AssiyaSession,
-        vararg patches: AttributeSourcePatch
-    ) {
-        session.attribute.submitPatches(false, *patches)
+        val values = items.flatMap { item ->
+            val parts = AttributeReadPipeline.extract(item)
+
+            val parsed = AttributeReadPipeline.parseParts(parts)
+
+            val result = AttributeReadPipeline.evaluate(entity, parsed)
+
+            result.values
+        }
+
+        val patch = AttributeSourcePatch(
+            sourceId,
+            priority,
+            lifeCycle,
+            mergeAttributeValues(values)
+        )
+
+        session.attribute.submitPatches(triggerEvent, patch)
     }
 
     @JvmStatic
@@ -124,95 +176,8 @@ object AssiyaAPI {
     }
 
     @JvmStatic
-    fun parseSync(lines: List<String>): AttributeParsedSource =
-        AttributeReadPipeline.parseSync(lines)
-
-
-    @JvmStatic
     fun attackTo(attacker: Entity, defender: LivingEntity, damage: Double) {
         DamageMeta.fixedDamage(attacker, defender, damage).doDamage()
     }
-
-
-
-
-    //    @JvmStatic
-//    fun parseSync(item: ItemStack): AttributeParsedSource =
-//        AttributeReadPipeline.parseSync(
-//            AttributeReadPipeline.extract(item)
-//        )
-//
-//    @JvmStatic
-//    fun parseAsync(
-//        lines: List<String>
-//    ): CompletableFuture<AttributeParsedSource> = BukkitCoroutine.future {
-//        AttributeReadPipeline.parse(lines)
-//    }
-//
-//    @JvmStatic
-//    fun parseAsync(
-//        item: ItemStack
-//    ): CompletableFuture<AttributeParsedSource> = BukkitCoroutine.future {
-//        AttributeReadPipeline.parse(item)
-//    }
-//
-    @JvmStatic
-    fun evaluateSync(
-        entity: Entity,
-        parsed: AttributeParsedSource
-    ): Map<String, AttributeValue<*>> =
-        AttributeReadPipeline.evaluateSync(entity, parsed)
-//
-//    @JvmStatic
-//    fun evaluateAsync(
-//        entity: Entity,
-//        parsed: AttributeParsedSource
-//    ): CompletableFuture<Map<String, AttributeValue<*>>> = BukkitCoroutine.future {
-//        AttributeReadPipeline.evaluate(entity, parsed)
-//    }
-//
-//    @JvmStatic
-//    fun submitAsync(
-//        entity: Entity,
-//        sourceId: String,
-//        parsed: AttributeParsedSource,
-//        priority: Int,
-//        lifeCycle: AttributeSourceLifecycle
-//    ): CompletableFuture<Unit> = BukkitCoroutine.future {
-//        AttributeReadPipeline.submit(
-//            AttributeSessionRegistry[entity]!!,
-//            entity, sourceId, parsed, priority, lifeCycle
-//        )
-//    }
-//
-//    @JvmStatic
-//    fun parseAndSubmitAsync(
-//        entity: Entity,
-//        sourceId: String,
-//        lines: List<String>,
-//        priority: Int,
-//        lifeCycle: AttributeSourceLifecycle
-//    ): CompletableFuture<Unit> = BukkitCoroutine.future {
-//        val session = AttributeSessionRegistry[entity]!!
-//        val parsed = AttributeReadPipeline.parse(lines)
-//        AttributeReadPipeline.submit(
-//            session, entity, sourceId, parsed, priority, lifeCycle
-//        )
-//    }
-//
-//    @JvmStatic
-//    fun parseAndSubmitAsync(
-//        entity: Entity,
-//        sourceId: String,
-//        item: ItemStack,
-//        priority: Int,
-//        lifeCycle: AttributeSourceLifecycle
-//    ): CompletableFuture<Unit> = BukkitCoroutine.future {
-//        val session = AttributeSessionRegistry[entity]!!
-//        val parsed = AttributeReadPipeline.parse(item)
-//        AttributeReadPipeline.submit(
-//            session, entity, sourceId, parsed, priority, lifeCycle
-//        )
-//    }
 
 }

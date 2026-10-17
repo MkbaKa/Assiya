@@ -4,13 +4,13 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.base.Value
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
-import java.math.BigDecimal
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.skills.SkillMetadata
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString
 import org.bukkit.entity.Entity
+import java.math.BigDecimal
 
 object Utils {
 
@@ -43,9 +43,9 @@ object Utils {
         if (lines.isNotEmpty()) {
             val parsed = AssiyaAPI.parseSync(entity, lines)
 
-            for (attribute in parsed) {
+            for ((attributeId, attribute) in parsed) {
                 @Suppress("UNCHECKED_CAST")
-                attributes[attribute.attributeId] = attribute.status as Status<Any>
+                attributes[attributeId] = attribute.status as Status<Any>
             }
         }
 

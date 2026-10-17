@@ -70,7 +70,7 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
     @JvmOverloads
     fun replaceSource(
         sourceId: String,
-        attributes: List<AttributeValue<*>>,
+        attributes: Map<String, AttributeValue<*>>,
         priority: Int? = null
     ) {
         state.replace(sourceId, priority ?: state.sourceIndex[sourceId]?.priority ?: 0, attributes)

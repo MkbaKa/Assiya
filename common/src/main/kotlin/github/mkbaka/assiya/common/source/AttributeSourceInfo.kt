@@ -12,5 +12,5 @@ data class AttributeSourceInfo(
     val sourceId: String,
     val priority: Int,
     val sequence: Long,
-    val attributes: List<AttributeValue<*>>
+    val attributes: Map<String, AttributeValue<*>>
 )

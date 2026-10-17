@@ -27,7 +27,7 @@ class AttributeParsedSource(val parts: List<Part>) {
         return results
     }
 
-    fun resolve(conditions: BooleanArray): List<AttributeValue<*>> {
+    fun resolve(conditions: BooleanArray): Map<String, AttributeValue<*>> {
         val accepted = arrayListOf<AttributeValue<*>>()
         var index = 0
         for (part in parts) {
@@ -37,7 +37,7 @@ class AttributeParsedSource(val parts: List<Part>) {
                 // 条件满足
                 if (conditions[index++]) continue
                 // 不指定路径就是整个来源级的条件
-                if (condition.paths.isEmpty()) return emptyList()
+                if (condition.paths.isEmpty()) return emptyMap()
 
                 // 解析结果可能会被多个实体、来源复用 所以不能直接改原来的属性列表
                 // 有条件不满足出现删除需求时才应该搓个新的列表去修改
@@ -49,7 +49,7 @@ class AttributeParsedSource(val parts: List<Part>) {
         }
 
         return accepted.groupBy { it.attributeId }
-            .map { (_, values) -> merge<Any>(values) }
+            .mapValues { (_, values) -> merge<Any>(values) }
     }
 
     private fun removePath(attributes: MutableMap<String, AttributeValue<*>>, path: String) {

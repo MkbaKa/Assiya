@@ -24,7 +24,7 @@ interface AttributeEngineAction {
      */
     data class ModifySource(
         val sourceId: String,
-        val attributes: List<AttributeValue<*>>,
+        val attributes: Map<String, AttributeValue<*>>,
         val priority: Int? = null,
         val create: Boolean = false,
         val lifeCycle: AttributeSourceLifecycle? = null

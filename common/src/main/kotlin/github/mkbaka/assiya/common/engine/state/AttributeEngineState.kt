@@ -25,7 +25,7 @@ class AttributeEngineState {
 
             for ((sourceId, source) in sourceIndex) {
                 result.sourceIndex[sourceId] = source.copy(
-                    attributes = source.attributes.toList()
+                    attributes = source.attributes.toMap()
                 )
             }
 
@@ -45,7 +45,7 @@ class AttributeEngineState {
 
     fun modify(
         sourceId: String,
-        attributes: List<AttributeValue<*>>,
+        attributes: Map<String, AttributeValue<*>>,
         priority: Int? = null
     ): AttributeSourceDiff {
         val previous = requireNotNull(sourceIndex[sourceId]) {
@@ -63,9 +63,9 @@ class AttributeEngineState {
         val maybe = sourceIndex.remove(sourceId)
             ?: return AttributeSourceRemoveResult(false, emptySet())
 
-        val affected = maybe.attributes.mapTo(linkedSetOf()) { it.attributeId }
-        for (contribution in maybe.attributes) {
-            removeAttr(contribution.attributeId, sourceId)
+        val affected = maybe.attributes.keys.toSet()
+        for (attributeId in maybe.attributes.keys) {
+            removeAttr(attributeId, sourceId)
         }
 
         return AttributeSourceRemoveResult(true, affected)
@@ -74,7 +74,7 @@ class AttributeEngineState {
     fun removeAttributeContribution(sourceId: String, attributeId: String) {
         val source = sourceIndex[sourceId] ?: return
         sourceIndex[sourceId] = source.copy(
-            attributes = source.attributes.filterNot { it.attributeId == attributeId }
+            attributes = source.attributes - attributeId
         )
         removeAttr(attributeId, sourceId)
     }
@@ -82,15 +82,15 @@ class AttributeEngineState {
     fun replace(
         sourceId: String,
         priority: Int,
-        attributes: List<AttributeValue<*>>
+        attributes: Map<String, AttributeValue<*>>
     ): AttributeSourceDiff {
         val previous = sourceIndex[sourceId]
         val affected = linkedSetOf<String>()
 
         if (previous != null) {
-            for (attribute in previous.attributes) {
-                affected += attribute.attributeId
-                removeAttr(attribute.attributeId, sourceId)
+            for (attributeId in previous.attributes.keys) {
+                affected += attributeId
+                removeAttr(attributeId, sourceId)
             }
         }
 
@@ -103,8 +103,8 @@ class AttributeEngineState {
 
         sourceIndex[sourceId] = source
 
-        for (attribute in source.attributes) {
-            affected += attribute.attributeId
+        for ((attributeId, attribute) in source.attributes) {
+            affected += attributeId
             setAttr(source, attribute)
         }
 
@@ -149,7 +149,7 @@ class AttributeEngineState {
                 state.sourceIndex[sourceId] = source
                 state.sequence = maxOf(state.sequence, source.sequence)
 
-                for (attribute in source.attributes) {
+                for (attribute in source.attributes.values) {
                     state.setAttr(source, attribute)
                 }
             }

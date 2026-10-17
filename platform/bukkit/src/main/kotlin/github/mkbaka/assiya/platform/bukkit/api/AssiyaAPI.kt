@@ -51,7 +51,7 @@ object AssiyaAPI {
     }
 
     @JvmStatic
-    fun parseSync(entity: Entity, lines: List<String>): List<AttributeValue<*>> {
+    fun parseSync(entity: Entity, lines: List<String>): Map<String, AttributeValue<*>> {
         val parsed = AttributeReadPipeline.parseSync(lines)
 
         return AttributeReadPipeline.evaluateSync(entity, parsed)
@@ -160,14 +160,14 @@ object AssiyaAPI {
     fun evaluateSync(
         entity: Entity,
         parsed: AttributeParsedSource
-    ): List<AttributeValue<*>> =
+    ): Map<String, AttributeValue<*>> =
         AttributeReadPipeline.evaluateSync(entity, parsed)
 //
 //    @JvmStatic
 //    fun evaluateAsync(
 //        entity: Entity,
 //        parsed: AttributeParsedSource
-//    ): CompletableFuture<List<AttributeValue<*>>> = BukkitCoroutine.future {
+//    ): CompletableFuture<Map<String, AttributeValue<*>>> = BukkitCoroutine.future {
 //        AttributeReadPipeline.evaluate(entity, parsed)
 //    }
 //

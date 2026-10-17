@@ -49,7 +49,7 @@ object AttributeReadPipeline {
     fun evaluateSync(
         entity: Entity,
         parsed: AttributeParsedSource
-    ): List<AttributeValue<*>> {
+    ): Map<String, AttributeValue<*>> {
         val conditions = parsed.evaluateConditions {
             ConditionRegistry.eval(entity, it)
         }
@@ -59,7 +59,7 @@ object AttributeReadPipeline {
     suspend fun evaluate(
         entity: Entity,
         parsed: AttributeParsedSource
-    ): List<AttributeValue<*>> {
+    ): Map<String, AttributeValue<*>> {
         val conditions = withSync {
             parsed.evaluateConditions {
                 ConditionRegistry.eval(entity, it)

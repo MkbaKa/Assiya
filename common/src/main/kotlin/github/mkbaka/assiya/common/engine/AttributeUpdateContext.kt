@@ -22,7 +22,7 @@ class AttributeUpdateContext(
 
     fun submit(patch: AttributeSourcePatch) {
         val accepted = patch.copy(
-            attributes = patch.attributes.toList()
+            attributes = patch.attributes.toMap()
         )
 
         workingState.update(accepted)
@@ -34,7 +34,7 @@ class AttributeUpdateContext(
 
     fun modify(
         sourceId: String,
-        attributes: List<AttributeValue<*>>,
+        attributes: Map<String, AttributeValue<*>>,
         priority: Int? = null,
         create: Boolean = false,
         lifeCycle: AttributeSourceLifecycle? = null
@@ -56,7 +56,7 @@ class AttributeUpdateContext(
             return
         }
 
-        val accepted = attributes.toList()
+        val accepted = attributes.toMap()
         workingState.modify(sourceId, accepted, priority)
 
         commands += AttributeEngineAction.ModifySource(

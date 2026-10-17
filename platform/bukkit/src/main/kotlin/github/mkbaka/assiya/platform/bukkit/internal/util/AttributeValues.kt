@@ -6,20 +6,17 @@ import github.mkbaka.assiya.common.source.AttributeValue
 
 @Suppress("UNCHECKED_CAST")
 internal fun mergeAttribute(
-    attributes: List<AttributeValue<*>>,
+    attributes: Map<String, AttributeValue<*>>,
     attributeId: String,
     status: Status<Any>,
     capture: Capture<Any>
-): List<AttributeValue<*>> {
-    val merged = linkedMapOf<String, AttributeValue<*>>()
-    for (attribute in attributes) {
-        merged[attribute.attributeId] = attribute
-    }
+): Map<String, AttributeValue<*>> {
+    val merged = attributes.toMutableMap()
     val previous = merged[attributeId]?.status as? Status<Any>
     merged[attributeId] = AttributeValue(
         attributeId = attributeId,
         status = if (previous == null) status else capture.merge(previous, status),
         capture = capture
     )
-    return merged.values.toList()
+    return merged
 }

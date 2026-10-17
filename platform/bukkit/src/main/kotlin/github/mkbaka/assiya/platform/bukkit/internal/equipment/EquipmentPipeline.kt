@@ -104,7 +104,7 @@ object EquipmentPipeline {
                 currentCoroutineContext().ensureActive()
 
                 // 如果物品没有可解析的 part
-                // 那么 resolve 的属性结果也会是一个空列表
+                // 那么 resolve 的属性结果也会是一个空 Map
                 // 搓个无内容 patch 覆盖掉旧装备给的属性
                 results += AttributeSourcePatch(
                     sourceId = sourceId,

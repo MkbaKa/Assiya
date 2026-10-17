@@ -40,11 +40,11 @@ class AddAttributeMechanic(
         val parsed = Utils.parseAllEntries(variables, meta, ae)
         val attributes = Utils.parseAttributes(target, parsed)
 
-        val values = arrayListOf<AttributeValue<*>>()
+        val values = linkedMapOf<String, AttributeValue<*>>()
         for ((attributeId, status) in attributes) {
             val attribute = AttributeRegistry[attributeId] ?: error("Unknown attribute: $attributeId")
             val reader = attribute[ReaderComponent]?.reader ?: error("$attributeId has no reader")
-            values += AttributeValue(attributeId, status, reader.capture)
+            values[attributeId] = AttributeValue(attributeId, status, reader.capture)
         }
 
         val lifeCycle = if (ticks == -1L) {

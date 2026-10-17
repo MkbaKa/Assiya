@@ -6,11 +6,11 @@ package github.mkbaka.assiya.common.source
  * @param [sourceId] 源名称
  * @param [priority] 优先级
  * @param [lifeCycle] 生命周期
- * @param [attributes] 影响的属性
+ * @param [attributes] attribute id -> attribute value
  */
 data class AttributeSourcePatch(
     val sourceId: String,
     val priority: Int,
     val lifeCycle: AttributeSourceLifecycle,
-    val attributes: List<AttributeValue<*>>
+    val attributes: Map<String, AttributeValue<*>>
 )

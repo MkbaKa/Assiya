@@ -18,12 +18,6 @@ class Capture<T : Any>(
     }
 
     fun merge(incoming: Iterable<Status<T>>): Status<T> {
-        val iterator = incoming.iterator()
-        // 为空代表没有需要合并的内容
-        if (!iterator.hasNext()) {
-            return Status.empty()
-        }
-
         val merged = linkedMapOf<String, T>()
         for (status in incoming) {
             for ((captureId, value) in status.entries) {

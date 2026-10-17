@@ -20,6 +20,16 @@ object StringUtils {
     }
 
     @JvmStatic
+    fun List<String>.colored(): List<String> {
+        return map { it.colored() }
+    }
+
+    @JvmStatic
+    fun List<String>.uncolored(): List<String> {
+        return map { it.uncolored() }
+    }
+
+    @JvmStatic
     @JvmOverloads
     fun String.replaceVariables(
         variables: Map<String, String>,

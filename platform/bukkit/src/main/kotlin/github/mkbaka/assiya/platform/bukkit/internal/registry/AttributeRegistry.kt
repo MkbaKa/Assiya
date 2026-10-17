@@ -1,23 +1,21 @@
 package github.mkbaka.assiya.platform.bukkit.internal.registry
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
-import github.mkbaka.assiya.common.parser.AttributeParsedSource
-import github.mkbaka.assiya.common.parser.AttributeParser
-import github.mkbaka.assiya.common.parser.DefaultAttributeParser
+import github.mkbaka.assiya.common.parser.*
 import github.mkbaka.assiya.common.parser.part.AttributeSourcePart
 import github.mkbaka.assiya.common.parser.part.AttributeSourcePartParser
-import github.mkbaka.assiya.common.parser.part.TextAttributeSourcePart
-import github.mkbaka.assiya.common.parser.part.TextAttributeSourcePartParser
-import github.mkbaka.assiya.common.parser.rule.TextRule
-import github.mkbaka.assiya.common.parser.rule.TextRuleMatched
+import github.mkbaka.assiya.common.parser.part.AttributeSourcePartParserFactory
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
-import github.mkbaka.assiya.platform.bukkit.internal.config.Config
-import java.time.Duration
+import github.mkbaka.assiya.platform.bukkit.internal.parser.MapParserFactory
+import github.mkbaka.assiya.platform.bukkit.internal.parser.TextParserFactory
 
 object AttributeRegistry : NamedRegistry<Attribute>("属性"), AttributeParser {
+
+    private val parserFactories: List<AttributeSourcePartParserFactory> = listOf(
+        TextParserFactory,
+        MapParserFactory
+    )
 
     @Volatile
     private var parser: AttributeParser = compile(emptyList(), emptyList())
@@ -55,73 +53,39 @@ object AttributeRegistry : NamedRegistry<Attribute>("属性"), AttributeParser {
     }
 
     fun compile(attributes: List<Attribute>, conditions: List<Condition>): AttributeParser {
-        val attributeRules = attributes.mapNotNull(::compile)
-        val conditionRules = conditions.mapNotNull(::compile)
+        val rules = collectRules(attributes, conditions)
 
-        return DefaultAttributeParser(
-            listOf(
-                CachedSourcePartParser(
-                    delegate = TextAttributeSourcePartParser(
-                        attributeRules + conditionRules,
-                    )
-                )
-            )
-        )
+        val parsers = arrayListOf<AttributeSourcePartParser>()
+        for (factory in parserFactories) {
+            parsers += factory.create(rules)
+        }
+
+        return DefaultAttributeParser(parsers)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun compile(attribute: Attribute): TextRule? {
-        val component = attribute[ReaderComponent] ?: return null
-        val reader = ReaderRegistry[component.readerId] ?: return null
-
-        return TextRule(
-            names = component.names,
-            capture = reader.capture,
-            patterns = reader.patterns,
-            target = TextRule.Target.Attribute(
+    private fun collectRules(attributes: List<Attribute>, conditions: List<Condition>): RuleSet {
+        val attributeRules = arrayListOf<Rule>()
+        val conditionRules = arrayListOf<Rule>()
+        for (attribute in attributes) {
+            val component = attribute[ReaderComponent] ?: continue
+            val reader = ReaderRegistry[component.readerId] ?: continue
+            attributeRules += Rule(
                 id = attribute.id,
-                capture = reader.capture
+                capture = reader.capture,
+                names = component.names,
+                patterns = reader.patterns
             )
-        )
-    }
-
-    private fun compile(condition: Condition): TextRule? {
-        if (condition.names.isEmpty()) {
-            return null
         }
-
-        val reader = ReaderRegistry[condition.reader] ?: return null
-
-        return TextRule(
-            names = condition.names,
-            capture = reader.capture,
-            patterns = reader.patterns,
-            target = TextRule.Target.Condition(condition.id),
-        )
-    }
-
-    private class CachedSourcePartParser(
-        private val delegate: TextAttributeSourcePartParser,
-    ) : AttributeSourcePartParser {
-
-        override val type: String = delegate.type
-
-        private val cache: Cache<String, List<TextRuleMatched>> = Config.global.let { config ->
-            Caffeine.newBuilder()
-                .maximumSize(config.PARSER_CACHE_MAXIMUM_SIZE)
-                .expireAfterAccess(Duration.ofSeconds(config.PARSER_CACHE_EXPIRE_AFTER_ACCESS_SECONDS))
-                .build()
+        for (condition in conditions) {
+            val reader = ReaderRegistry[condition.reader] ?: continue
+            conditionRules += Rule(
+                id = condition.id,
+                capture = reader.capture,
+                names = condition.names,
+                patterns = reader.patterns
+            )
         }
-
-        override fun parse(part: AttributeSourcePart): AttributeParsedSource {
-            require(part is TextAttributeSourcePart) {
-                "非文本类型无法由 ${this::class.java.simpleName} 解析"
-            }
-            val results = part.lines.map { line -> cache.get(line) { delegate.parseLine(line) }!! }
-            return delegate.toSource(results)
-        }
-
+        return RuleSet(attributeRules, conditionRules)
     }
-
 
 }

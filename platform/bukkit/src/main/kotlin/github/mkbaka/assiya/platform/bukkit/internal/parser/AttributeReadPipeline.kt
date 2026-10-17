@@ -8,45 +8,34 @@ import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.ItemReaderRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsync
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withSync
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.uncolored
-import github.mkbaka.assiya.platform.bukkit.internal.util.isAir
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 
 object AttributeReadPipeline {
 
-    fun text(lines: List<String>): TextAttributeSourcePart {
-        return TextAttributeSourcePart(lines.map { it.uncolored() })
-    }
-
     fun extract(item: ItemStack?): List<AttributeSourcePart> {
-        if (item.isAir) return emptyList()
-
-        val lore = item.itemMeta?.lore.orEmpty()
-        if (lore.isEmpty()) return emptyList()
-
-        // TODO nbt parse
-
-        return listOf(text(lore))
+        return ItemReaderRegistry.read(item)
     }
 
-    fun parsePartsSync(
+    fun parseParts(
         parts: List<AttributeSourcePart>
     ): AttributeParsedSource = AttributeRegistry.parse(parts)
 
     fun parseSync(attributes: List<String>): AttributeParsedSource {
-        return AttributeRegistry.parse(listOf(text(attributes)))
+        return AttributeRegistry.parse(listOf(TextAttributeSourcePart(attributes.uncolored())))
     }
 
-    suspend fun parseParts(
-        parts: List<AttributeSourcePart>
-    ): AttributeParsedSource = withAsync { parsePartsSync(parts) }
+//    suspend fun parseParts(
+//        parts: List<AttributeSourcePart>
+//    ): AttributeParsedSource = withAsync { parsePartsSync(parts) }
 
-    suspend fun parse(
-        attributes: List<String>
-    ): AttributeParsedSource = withAsync { parseSync(attributes) }
+//    suspend fun parse(
+//        attributes: List<String>
+//    ): AttributeParsedSource = withAsync { parseSync(attributes) }
 
 //    suspend fun parse(item: ItemStack): AttributeParsedSource {
 //        val parts = withSync { extract(item) }

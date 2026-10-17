@@ -2,7 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.api.reader
 
 import github.mkbaka.assiya.common.base.Capture
 import github.mkbaka.assiya.common.base.Status
-import github.mkbaka.assiya.common.parser.rule.TextPatternTemplate
+import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 
 interface Reader {
@@ -23,13 +23,10 @@ interface Reader {
 
     fun register() {
         ReaderRegistry.register(this)
-//        AttributeParserManager.rebuild()
     }
 
     fun unregister() {
-        if (ReaderRegistry.unregister(this)) {
-//            AttributeParserManager.rebuild()
-        }
+        ReaderRegistry.unregister(this)
     }
 
 }

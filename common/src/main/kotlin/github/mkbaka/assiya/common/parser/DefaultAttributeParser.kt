@@ -12,17 +12,17 @@ class DefaultAttributeParser(
     override fun parse(parts: List<AttributeSourcePart>): AttributeParsedSource {
         if (parts.isEmpty()) return AttributeParsedSource.EMPTY
 
-        val parseds = arrayListOf<AttributeParsedSource.Parsed>()
+        val results = arrayListOf<AttributeParsedSource.Part>()
 
         for (part in parts) {
             val parser = parsers[part.type] ?: continue
 
             val parsed = parser.parse(part)
 
-            parseds += parsed.parseds
+            results += parsed.parts
         }
 
-        return AttributeParsedSource(parseds)
+        return AttributeParsedSource(results)
     }
 
 }

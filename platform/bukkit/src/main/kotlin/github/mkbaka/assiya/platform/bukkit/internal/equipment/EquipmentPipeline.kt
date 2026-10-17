@@ -8,10 +8,12 @@ import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsync
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import kotlinx.coroutines.*
 import org.bukkit.entity.LivingEntity
@@ -56,9 +58,7 @@ object EquipmentPipeline {
             } catch (e: Throwable) {
                 logEx(e, "Failed to refresh equipment for $ownerId")
             } finally {
-                if (pending[ownerId] === task) {
-                    pending.remove(ownerId)
-                }
+                pending.remove(ownerId, task)
             }
         }
 
@@ -78,41 +78,45 @@ object EquipmentPipeline {
             )
         }
 
-        val parsedSources =
-            linkedMapOf<String, AttributeParsedSource>()
-        val patches = arrayListOf<AttributeSourcePatch>()
+        // 把基于物品拿到的 part 塞进异步处理
+        val parsedSources = withAsync {
+            val sources = linkedMapOf<String, AttributeParsedSource>()
+            for ((sourceId, parts) in inputs) {
+                currentCoroutineContext().ensureActive()
+                sources[sourceId] = AttributeReadPipeline.parseParts(parts)
+            }
+            sources
+        }
 
-        for ((sourceId, parts) in inputs) {
+        // 条件判断结果
+        val conditionResults = linkedMapOf<String, BooleanArray>()
+        for ((sourceId, parsed) in parsedSources) {
             currentCoroutineContext().ensureActive()
+            conditionResults[sourceId] = parsed.evaluateConditions {
+                ConditionRegistry.eval(entity, it)
+            }
+        }
 
-            if (parts.isEmpty()) {
-                patches += AttributeSourcePatch(
+        // 满足条件/无条件的可用属性结果
+        withAsync {
+            val results = arrayListOf<AttributeSourcePatch>()
+            for ((sourceId, parsed) in parsedSources) {
+                currentCoroutineContext().ensureActive()
+
+                // 如果物品没有可解析的 part
+                // 那么 resolve 的属性结果也会是一个空列表
+                // 搓个无内容 patch 覆盖掉旧装备给的属性
+                results += AttributeSourcePatch(
                     sourceId = sourceId,
                     priority = priority,
                     lifeCycle = AttributeSourceLifecycle.Stable,
-                    attributes = emptyList()
+                    attributes = parsed.resolve(conditionResults.getValue(sourceId))
                 )
-                continue
             }
+            currentCoroutineContext().ensureActive()
+            if (AssiyaSessionRegistry[session.ownerUUID] !== session) return@withAsync
 
-            val parsed = AttributeReadPipeline.parseParts(parts)
-            parsedSources[sourceId] = parsed
-
-            patches += AttributeReadPipeline.patch(
-                entity = entity,
-                sourceId = sourceId,
-                parsed = parsed,
-                priority = priority,
-                lifeCycle = AttributeSourceLifecycle.Stable
-            )
+            session.attribute.submitPatches(true, *results.toTypedArray())
         }
-
-        currentCoroutineContext().ensureActive()
-
-        if (AssiyaSessionRegistry[session.ownerUUID] !== session) {
-            return
-        }
-
-        session.attribute.submitPatches(true, *patches.toTypedArray())
     }
 }

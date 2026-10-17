@@ -33,7 +33,7 @@ object AttributeRegistration {
             if (triggers != null) {
                 HandlerRegistry.register(attribute.id, triggers)
             }
-            changed()
+            refresh()
         } catch (cause: Throwable) {
             if (triggers != null) {
                 HandlerRegistry.unregister(attribute.id, triggers)
@@ -53,7 +53,7 @@ object AttributeRegistration {
             HandlerRegistry.unregister(attribute.id, triggers)
         }
         AttributeRegistry.unregister(attribute)
-        changed()
+        refresh()
     }
 
     fun <T> batch(action: () -> T): T {
@@ -65,7 +65,7 @@ object AttributeRegistration {
         }
     }
 
-    private fun changed() {
+    internal fun refresh() {
         if (!refreshEnabled.get()) return
         if (batchDepth == 0) {
             AttributeRegistry.refresh()

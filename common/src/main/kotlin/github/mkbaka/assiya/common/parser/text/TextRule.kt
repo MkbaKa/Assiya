@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.common.parser.rule
+package github.mkbaka.assiya.common.parser.text
 
 import github.mkbaka.assiya.common.base.Capture
 

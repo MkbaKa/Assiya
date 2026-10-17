@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.common.parser.rule
+package github.mkbaka.assiya.common.parser.text
 
 /**
  * 单行文本里的 rule 命中

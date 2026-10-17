@@ -1,108 +1,90 @@
 package github.mkbaka.assiya.common.parser
 
+import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.condition.ParsedCondition
-import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
-import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import java.util.function.Predicate
 
-class AttributeParsedSource(
-    val parseds: List<Parsed>
-) {
+class AttributeParsedSource(val parts: List<Part>) {
 
-    fun evaluateConditions(
-        evaluator: Predicate<ParsedCondition>
-    ): BooleanArray {
-        val results = BooleanArray(parseds.size)
+    class Part(val attributes: Map<String, AttributeValue<*>>, val conditions: List<Condition>)
 
-        for ((index, parsed) in parseds.withIndex()) {
-            when (parsed) {
-                is Parsed.Attribute -> Unit
-                is Parsed.SkipCondition -> {
-                    results[index] = parsed.conditions.all(evaluator::test)
-                }
-                is Parsed.SourceCondition -> {
-                    results[index] = parsed.conditions.all(evaluator::test)
-                    if (!results[index]) break
-                }
+    class Condition(
+        val conditions: List<ParsedCondition>,
+        val paths: List<String> = emptyList()
+    )
+
+    fun evaluateConditions(evaluator: Predicate<ParsedCondition>): BooleanArray {
+        val results = BooleanArray(parts.sumOf { it.conditions.size })
+        var index = 0
+        for (part in parts) {
+            for (condition in part.conditions) {
+                val passed = condition.conditions.all(evaluator::test)
+                results[index++] = passed
+                if (!passed && condition.paths.isEmpty()) return results
             }
         }
-
         return results
     }
 
-    fun resolve(
-        conditions: BooleanArray
-    ): List<AttributeValue<*>> {
+    fun resolve(conditions: BooleanArray): List<AttributeValue<*>> {
         val accepted = arrayListOf<AttributeValue<*>>()
-        var skip = 0
+        var index = 0
+        for (part in parts) {
+            var attributes: MutableMap<String, AttributeValue<*>>? = null
 
-        /**
-         * 如果把整个 part 的解析结果看作 Stack
-         * 那么把结果都压进栈里就是
-         *  属性即栈中的元素
-         *  单行/来源级的条件为对n个元素影响的运算符
-         *  单行条件是有限操作 即跳过 n 次弹栈
-         *  来源条件不满足这个栈中的所有元素都没有存在的必要了
-         */
-        for ((index, parsed) in parseds.withIndex()) {
-            when (parsed) {
-                is Parsed.Attribute -> {
-                    if (skip > 0) {
-                        skip--
-                    } else {
-                        accepted += parsed.value
-                    }
-                }
+            for (condition in part.conditions) {
+                // 条件满足
+                if (conditions[index++]) continue
+                // 不指定路径就是整个来源级的条件
+                if (condition.paths.isEmpty()) return emptyList()
 
-                is Parsed.SkipCondition -> {
-                    if (!conditions[index]) {
-                        skip += parsed.attributeCount
-                    }
-                }
-
-                is Parsed.SourceCondition -> {
-                    if (!conditions[index]) {
-                        return emptyList()
-                    }
-                }
+                // 解析结果可能会被多个实体、来源复用 所以不能直接改原来的属性列表
+                // 有条件不满足出现删除需求时才应该搓个新的列表去修改
+                if (attributes == null) attributes = part.attributes.toMutableMap()
+                for (path in condition.paths) removePath(attributes, path)
             }
+
+            accepted.addAll((attributes ?: part.attributes).values)
         }
 
-        return merge(accepted)
+        return accepted.groupBy { it.attributeId }
+            .map { (_, values) -> merge<Any>(values) }
     }
 
-    private fun merge(values: List<AttributeValue<*>>): List<AttributeValue<*>> {
-        return values.groupBy { it.attributeId }.map { (_, group) -> mergeGroup<Any>(group) }
+    private fun removePath(attributes: MutableMap<String, AttributeValue<*>>, path: String) {
+        val iterator = attributes.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key == path || entry.key.startsWith("$path.")) {
+                // 路径指向属性本身或它的分组 整条属性一起删
+                iterator.remove()
+            } else if (path.startsWith("${entry.key}.")) {
+                // 路径比属性多出一层 那就只删这个 capture
+                val value = withoutCapture(entry.value, path.removePrefix("${entry.key}."))
+                if (value.status.isEmpty) iterator.remove() else entry.setValue(value)
+            }
+        }
+    }
+
+    private fun <T : Any> withoutCapture(value: AttributeValue<T>, captureId: String): AttributeValue<T> {
+        if (value.status[captureId] == null) return value
+
+        val remaining = linkedMapOf<String, T>()
+        for ((id, captured) in value.status.entries) {
+            if (id != captureId) remaining[id] = captured
+        }
+
+        return value.copy(status = Status.of(remaining))
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : Any> mergeGroup(values: List<AttributeValue<*>>): AttributeValue<T> {
+    private fun <T : Any> merge(values: List<AttributeValue<*>>): AttributeValue<T> {
         val first = values.first() as AttributeValue<T>
-        return AttributeValue(
-            attributeId = first.attributeId,
-            status = first.capture.merge(values.map { (it as AttributeValue<T>).status }),
-            capture = first.capture,
-        )
-    }
-
-    sealed interface Parsed {
-
-        class Attribute(val value: AttributeValue<*>) : Parsed
-
-        class SkipCondition(
-            val conditions: List<ParsedCondition>,
-            val attributeCount: Int
-        ) : Parsed
-
-        class SourceCondition(val conditions: List<ParsedCondition>) : Parsed
-
+        return first.copy(status = first.capture.merge(values.map { (it as AttributeValue<T>).status }))
     }
 
     companion object {
-
         val EMPTY = AttributeParsedSource(emptyList())
-
     }
-
 }

@@ -7,6 +7,22 @@ import org.bukkit.entity.Entity
 
 object ConditionRegistry : NamedRegistry<Condition>("条件") {
 
+    override fun register(id: String, value: Condition) {
+        super.register(id, value)
+        try {
+            AttributeRegistration.refresh()
+        } catch (cause: Throwable) {
+            super.unregister(id, value)
+            throw cause
+        }
+    }
+
+    override fun unregister(id: String, value: Condition): Boolean {
+        if (!super.unregister(id, value)) return false
+        AttributeRegistration.refresh()
+        return true
+    }
+
     fun register(condition: Condition) {
         register(condition.id, condition)
     }

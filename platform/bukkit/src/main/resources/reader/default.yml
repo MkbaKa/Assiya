@@ -16,11 +16,11 @@ default:
   # 实际读取时会从上往下挨个判断 所以可能重叠的规则要把容易匹配的放在后面
   patterns:
     # 范围数值  "物理伤害: 100-200"
-    - '{name}.*?<min>-<max>'
+    - '{name}[\s:：]*<min>\s*-\s*<max>'
     # 百分比    "物理伤害: 50%"
-    - '{name}.*?<percent>%'
+    - '{name}[\s:：]*<percent>%'
     # 普通数值  "物理伤害: 100"
-    - '{name}.*?<value>'
+    - '{name}[\s:：]*<value>'
   # 提前对读取后的值做一些运算 方便执行时/papi变量直接拿出结果
   # 这里可以使用 captures 里的捕获名称
   placeholders:
@@ -45,4 +45,4 @@ roman:
       format: roman
   patterns:
     # "力量: V"
-    - '{name}.*?<value>'
+    - '{name}[\s:：]*<value>'

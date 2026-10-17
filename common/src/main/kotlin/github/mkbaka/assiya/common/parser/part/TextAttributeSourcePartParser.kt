@@ -4,10 +4,11 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.condition.ConditionContext
 import github.mkbaka.assiya.common.condition.ParsedCondition
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
-import github.mkbaka.assiya.common.parser.rule.TextPatternTemplate
-import github.mkbaka.assiya.common.parser.rule.TextRule
-import github.mkbaka.assiya.common.parser.rule.TextRuleMatched
-import github.mkbaka.assiya.common.parser.rule.Trie
+import github.mkbaka.assiya.common.parser.RuleSet
+import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
+import github.mkbaka.assiya.common.parser.text.TextRule
+import github.mkbaka.assiya.common.parser.text.TextRuleMatched
+import github.mkbaka.assiya.common.parser.text.Trie
 import github.mkbaka.assiya.common.source.AttributeValue
 
 /**
@@ -32,19 +33,24 @@ class TextAttributeSourcePartParser(
     }
 
     fun toSource(results: List<List<TextRuleMatched>>): AttributeParsedSource {
-        val parseds = arrayListOf<AttributeParsedSource.Parsed>()
+        val attributesByPath = linkedMapOf<String, AttributeValue<*>>()
+        val parsedConditions = arrayListOf<AttributeParsedSource.Condition>()
 
-        for ((index, matches) in results.withIndex()) {
-            val attributes = arrayListOf<AttributeValue<*>>()
+        for ((lineIndex, matches) in results.withIndex()) {
+            // 用 "行号.本行序号" 保存每一条贡献 避免同一条属性多次出现时互相覆盖.
+            var attributeIndex = 0
             val conditions = arrayListOf<ParsedCondition>()
 
             for (matched in matches) {
                 when (val target = matched.rule.target) {
-                    is TextRule.Target.Attribute -> attributes += AttributeValue(
-                        attributeId = target.id,
-                        status = Status.of(matched.captures),
-                        capture = target.capture,
-                    )
+                    is TextRule.Target.Attribute -> {
+                        attributesByPath["$lineIndex.$attributeIndex"] = AttributeValue(
+                            attributeId = target.id,
+                            status = Status.of(matched.captures),
+                            capture = target.capture,
+                        )
+                        attributeIndex++
+                    }
 
                     is TextRule.Target.Condition -> conditions += ParsedCondition(
                         conditionId = target.id,
@@ -54,21 +60,17 @@ class TextAttributeSourcePartParser(
             }
 
             if (conditions.isNotEmpty()) {
-                parseds += if (attributes.isEmpty()) {
-                    AttributeParsedSource.Parsed.SourceCondition(conditions)
-                } else {
-                    // 单行条件影响本行产出的所有属性
-                    AttributeParsedSource.Parsed.SkipCondition(conditions, attributes.size)
-                }
-            }
-
-            for (attribute in attributes) {
-                parseds += AttributeParsedSource.Parsed.Attribute(attribute)
+                // 如果这一行有属性 说明它是一个单行条件
+                // 反之为整个来源级的条件
+                parsedConditions += AttributeParsedSource.Condition(
+                    conditions,
+                    if (attributeIndex == 0) emptyList() else listOf(lineIndex.toString())
+                )
             }
 
         }
 
-        return AttributeParsedSource(parseds)
+        return AttributeParsedSource(listOf(AttributeParsedSource.Part(attributesByPath, parsedConditions)))
     }
 
     fun parseLine(line: String): List<TextRuleMatched> {
@@ -127,6 +129,32 @@ class TextAttributeSourcePartParser(
         }
 
         return null
+    }
+
+    companion object {
+
+        fun compile(rules: RuleSet): TextAttributeSourcePartParser {
+            val textRules = arrayListOf<TextRule>()
+            for (rule in rules.attributes) {
+                textRules += TextRule(
+                    names = rule.names,
+                    capture = rule.capture,
+                    patterns = rule.patterns,
+                    target = TextRule.Target.Attribute(rule.id, rule.capture)
+                )
+            }
+            for (rule in rules.conditions) {
+                if (rule.names.isEmpty()) continue
+                textRules += TextRule(
+                    names = rule.names,
+                    capture = rule.capture,
+                    patterns = rule.patterns,
+                    target = TextRule.Target.Condition(rule.id)
+                )
+            }
+            return TextAttributeSourcePartParser(textRules)
+        }
+
     }
 
     private fun parseValues(

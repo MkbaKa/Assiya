@@ -3,7 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 import github.mkbaka.assiya.common.base.Capture
 import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.operation.NumberOperations
-import github.mkbaka.assiya.common.parser.rule.TextPatternTemplate
+import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.reader.Placeholder
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader

@@ -4,6 +4,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.util.isAir
 import github.mkbaka.bukkitksp.annotation.Listener
 import org.bukkit.event.EventPriority
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 
 object EquipmentListener {
@@ -16,6 +17,11 @@ object EquipmentListener {
         if (!previous.isAir || !new.isAir) {
             EquipmentPipeline.refresh(event.player)
         }
+    }
+
+    @Listener(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun close(event: InventoryCloseEvent) {
+        EquipmentPipeline.refresh(event.player)
     }
 
 }

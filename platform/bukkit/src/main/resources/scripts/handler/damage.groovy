@@ -7,6 +7,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableCom
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
 import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
 import groovy.transform.CompileStatic
@@ -68,6 +69,7 @@ class Damage {
         if (assiyaSession.damageMetaStack.current != null) return
 
         LivingEntity defender = (LivingEntity) event.entity
+        double vanillaDamage = Config.global.VANILLA_DAMAGE ? event.finalDamage : 0.0d
         DamageProcessor processor
 
         /**
@@ -89,7 +91,7 @@ class Damage {
                     projectile, defender, shooter as LivingEntity, force
             ) { ProcessorComponentBuilder builder ->
                 builder.add(new TriggerByEventComponent(event))
-                builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
+                builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', vanillaDamage)
             }
         } else {
             // 正常攻击伤害
@@ -98,7 +100,7 @@ class Damage {
             LivingEntity attacker = (LivingEntity) event.damager
             processor = DamageProcessor.of(attacker, defender) { ProcessorComponentBuilder builder ->
                 builder.add(new TriggerByEventComponent(event))
-                builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', event.finalDamage)
+                builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', vanillaDamage)
             }
         }
 

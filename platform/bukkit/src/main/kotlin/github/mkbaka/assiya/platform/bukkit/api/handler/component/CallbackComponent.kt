@@ -8,11 +8,13 @@ import java.util.*
 /**
  * processor 执行结束后的回调
  *
- * @param [callback]
+ * @param [callbacks]
  */
 class CallbackComponent(
-    private val callback: MutableMap<String, Callback> = linkedMapOf()
+    callbacks: Map<String, Callback> = emptyMap()
 ) : ProcessorComponent {
+
+    private val container = Container(HashMap(callbacks), ArrayList())
 
     override val key: ProcessorComponent.Key<*> = Key
 
@@ -22,11 +24,11 @@ class CallbackComponent(
         id: String = UUID.randomUUID().toString(),
         runnable: Runnable
     ) {
-        callback[id] = Callback(id, ignoreCancelled, runnable)
+        container.register(id, Callback(id, ignoreCancelled, runnable))
     }
 
     fun invoke(id: String, processor: Processor) {
-        val callback = callback[id] ?: return
+        val callback = container.callbacks[id] ?: return
 
         if (processor[CancellableComponent.Key]?.isCancelled == true
             && !callback.ignoreCancelled) return
@@ -35,7 +37,7 @@ class CallbackComponent(
     }
 
     fun invoke(processor: Processor) {
-        for (callback in callback.values) {
+        for (callback in container.loop) {
             /**
              * 若 processor 持有 [CancellableComponent] 且处于取消
              * 则仅 ignoreCancelled 为 true 的回调可以执行
@@ -50,6 +52,18 @@ class CallbackComponent(
                 logEx(e, "Failed to invoke callback action: ${callback.id}")
             }
         }
+    }
+
+    private class Container(
+        val callbacks: MutableMap<String, Callback>,
+        val loop: ArrayList<Callback>
+    ) {
+
+        fun register(id: String, callback: Callback) {
+            callbacks[id] = callback
+            loop.add(callback)
+        }
+
     }
 
     data class Callback(

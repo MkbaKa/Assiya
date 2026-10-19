@@ -6,20 +6,24 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackCompon
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
 
 @CompileStatic
 static void onAttack(Attribute attribute, Processor processor) {
-    DamageMultipleComponent damage = processor.get(DamageMultipleComponent.@Key)
-
     TriggerComponent attacker = processor.get(TriggerComponent.@Key)
     if (attacker == null) return
 
-    double value = attacker.getValue(attribute.id, 'total')
+    DamageMultipleComponent damage = processor.get(DamageMultipleComponent.@Key)
 
+    double value = attacker.getValue(attribute.id, 'total')
     damage.addDamage(attribute.id, value)
 
     processor.get(CallbackComponent.@Key)?.callback {
-        ScriptTools.sendCombatMessage(attribute, processor, [damage: damage.totalDamage])
+        ScriptTools.sendCombatMessage(
+                attribute,
+                processor,
+                [total: StringUtils.format(damage.totalDamage, 2), damage: StringUtils.format(value, 2)]
+        )
     }
 }

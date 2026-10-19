@@ -4,6 +4,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -34,6 +35,10 @@ static void onAttack(Attribute attribute, Processor processor) {
     }
 
     processor.get(CallbackComponent.@Key)?.callback {
-        ScriptTools.sendCombatMessage(attribute, processor, [damage: damage.totalDamage, extra: extraDamage])
+        ScriptTools.sendCombatMessage(
+                attribute,
+                processor,
+                [damage: StringUtils.format(damage.totalDamage, 2), extra: StringUtils.format(extraDamage, 2)]
+        )
     }
 }

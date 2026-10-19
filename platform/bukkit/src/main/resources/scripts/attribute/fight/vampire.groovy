@@ -5,6 +5,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsCompo
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
 
@@ -52,7 +53,11 @@ class Vampire {
         }
 
         processor.get(CallbackComponent.@Key)?.callback {
-            ScriptTools.sendCombatMessage(attribute, processor, [damage: damage.totalDamage, heal: heal])
+            ScriptTools.sendCombatMessage(
+                    attribute,
+                    processor,
+                    [damage: StringUtils.format(damage.totalDamage, 2), heal: StringUtils.format(heal, 2)]
+            )
         }
     }
 }

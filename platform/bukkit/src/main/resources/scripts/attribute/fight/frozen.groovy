@@ -8,6 +8,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponen
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.task.EntityTaskBuilder
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
 import org.bukkit.attribute.Attribute as VanillaAttribute
 import org.bukkit.attribute.AttributeInstance
@@ -70,7 +71,11 @@ class Frozen {
             customData.put("frozen-duration", duration)
         }
 
-        ScriptTools.sendCombatMessage(attribute, processor, [frozen: rate * 100.0d, duration: duration])
+        ScriptTools.sendCombatMessage(
+                attribute,
+                processor,
+                [frozen: StringUtils.format(rate * 100.0d, 2), duration: StringUtils.format(duration, 2)]
+        )
     }
 
     private static void removeFrozen(AttributeInstance instance) {

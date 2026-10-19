@@ -6,9 +6,9 @@ physical-attack:
   triggers: attack
   options:
     # attacker 是攻击方的消息提示
-    attacker: '你对 {entity} 造成了 {damage} 点伤害.'
+    attacker: '你对 {entity} 共造成了 {total} 点伤害.'
     # entity 是受击方的消息提示
-    entity: '{attacker} 对你造成了 {damage} 点伤害.'
+    entity: '{attacker} 对你造成了 {total} 点伤害.'
 
 pvp-attack:
   names: ["PVP伤害"]
@@ -23,6 +23,18 @@ pve-attack:
   handler: 'attribute/fight/pve-attack'
   priority: 120
   triggers: attack
+
+real-attack:
+  names: ["真实伤害"]
+  reader: default
+  # 真伤没有什么特殊逻辑 可以复用物理伤害的脚本实现
+  # 如果要单独改物理伤害或真伤的逻辑 那就得拆成两个脚本了
+  handler: 'attribute/fight/attack'
+  priority: 340
+  triggers: attack
+  options:
+    attacker: '你对 {entity} 造成了 {damage} 点真实伤害.'
+    entity: '{attacker} 对你造成了 {damage} 点真实伤害.'
 
 physical-defense:
   names: [ "物理防御", "防御力" ]

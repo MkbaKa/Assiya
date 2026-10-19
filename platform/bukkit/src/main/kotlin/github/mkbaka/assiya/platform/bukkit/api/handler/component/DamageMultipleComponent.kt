@@ -28,7 +28,7 @@ class DamageMultipleComponent(
 
     fun takeDamage(id: String, value: Double) {
         val target = (getDamage(id) ?: 0.0) - value
-        setDamage(id, target)
+        setDamage(id, target.coerceAtLeast(0.0))
     }
 
     operator fun get(id: String) = components[id]

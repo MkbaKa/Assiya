@@ -11,7 +11,7 @@ import java.util.*
  * @param [callback]
  */
 class CallbackComponent(
-    private val callback: MutableMap<String, Callback> = hashMapOf()
+    private val callback: MutableMap<String, Callback> = linkedMapOf()
 ) : ProcessorComponent {
 
     override val key: ProcessorComponent.Key<*> = Key

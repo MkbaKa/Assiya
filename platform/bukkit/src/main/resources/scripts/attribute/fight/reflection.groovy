@@ -5,6 +5,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
 
@@ -35,5 +36,9 @@ static void onDefense(Attribute attribute, Processor processor) {
         customData.put("reflection-damage", reflectedDamage)
     }
 
-    ScriptTools.sendCombatMessage(attribute, processor, [reflection: reflectedDamage])
+    ScriptTools.sendCombatMessage(
+            attribute,
+            processor,
+            [reflection: StringUtils.format(reflectedDamage, 2)]
+    )
 }

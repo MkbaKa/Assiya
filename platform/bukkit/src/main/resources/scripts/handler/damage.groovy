@@ -48,12 +48,13 @@ class Damage {
                 .register()
 
         ScriptListener.create(EntityDamageByEntityEvent)
-                .setEventPriority(EventPriority.HIGHEST)
+                .setEventPriority(EventPriority.NORMAL)
                 .setIgnoreCancelled(true)
                 .setHandler { EntityDamageByEntityEvent event ->
                     handle(event)
                 }
                 .register()
+
     }
 
     private static void handle(EntityDamageByEntityEvent event) {
@@ -66,7 +67,7 @@ class Damage {
         AssiyaSession assiyaSession = AssiyaAPI.getSession(event.damager)
 
         // 避免递归
-        if (assiyaSession.damageMetaStack.current != null) return
+        if (assiyaSession?.damageMetaStack?.current != null) return
 
         LivingEntity defender = (LivingEntity) event.entity
         double vanillaDamage = Config.global.VANILLA_DAMAGE ? event.finalDamage : 0.0d
@@ -84,7 +85,7 @@ class Damage {
 
             // 取发射时的蓄力力度
             // 若不存在则默认 1.0
-            Float force = assiyaSession.getMetadata(FORCE_METADATA_KEY)
+            Float force = assiyaSession?.getMetadata(FORCE_METADATA_KEY)
             if (force == null) force = 1.0f
 
             processor = DamageProcessor.ofProjectile(

@@ -148,11 +148,8 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
             // 属性值判断
             if (!subscriber.settings.alwaysRun) {
                 val hasAttribute = subscriber.hasAttribute
-                    ?: error(
-                        "Trigger in index ${subscriber.indexId} has no attribute predicate"
-                    )
 
-                if (!hasAttribute.test(processor, subscriber.attributeId)) {
+                if (hasAttribute?.test(processor, subscriber.attributeId) == false) {
                     continue
                 }
             }

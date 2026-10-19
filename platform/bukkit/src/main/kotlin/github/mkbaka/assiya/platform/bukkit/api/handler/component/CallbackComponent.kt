@@ -18,16 +18,20 @@ class CallbackComponent(
 
     @JvmOverloads
     fun callback(
-        id: String = UUID.randomUUID().toString(),
         ignoreCancelled: Boolean = false,
+        id: String = UUID.randomUUID().toString(),
         runnable: Runnable
     ) {
         callback[id] = Callback(id, ignoreCancelled, runnable)
     }
 
     fun invoke(id: String, processor: Processor) {
-        if (processor[CancellableComponent.Key]?.isCancelled == true) return
-        callback[id]?.action?.run()
+        val callback = callback[id] ?: return
+
+        if (processor[CancellableComponent.Key]?.isCancelled == true
+            && !callback.ignoreCancelled) return
+
+        callback.action.run()
     }
 
     fun invoke(processor: Processor) {

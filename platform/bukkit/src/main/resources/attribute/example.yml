@@ -53,3 +53,13 @@ runtime-example:
   priority: 100
   period: 20
   triggers: timer
+
+kill-example:
+  names: ['击杀测试']
+  reader: default
+  handler: 'attribute/kill-example'
+  priority: 100
+  triggers: kill
+  options:
+    attacker: '你击杀了 {entity}.'
+    entity: '{attacker} 击杀了你.'

@@ -57,5 +57,5 @@ default-attributes:
     - '生命上限 100'
   # 非玩家实体
   # mm 怪会同时获得这些和他配置里的 attributes
-  entity:
-    - '生命上限 20'
+#  entity:
+#    - '生命上限 20'

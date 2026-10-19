@@ -49,8 +49,9 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
             processor[TargetComponent.Key]?.hasAttribute(id) ?: false
         }
 
-        // TODO impl
-        register(Trigger.Base("kill", "onKill"))
+        register(Trigger.Base("kill", "onKill")) { processor, id ->
+            processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
+        }
 
         register(Trigger.Base("update", "onUpdate")) { processor, id ->
             processor[TriggerComponent.Key]?.hasAttribute(id) ?: false

@@ -2,10 +2,7 @@ package scripts.attribute.fight
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
 import groovy.transform.CompileStatic
 
@@ -26,6 +23,12 @@ static void onAttack(Attribute attribute, Processor processor) {
     }
     target.entity.world.strikeLightningEffect(target.entity.location)
     damage.addDamage('lightning', extraDamage)
+
+    CustomDataComponent customData = processor.get(CustomDataComponent.@Key)
+    if (customData != null) {
+        customData.put("is-lightning", true)
+        customData.put("lightning-damage", extraDamage)
+    }
 
     processor.get(CallbackComponent.@Key)?.callback {
         ScriptTools.sendCombatMessage(attribute, processor, [damage: damage.totalDamage, extra: extraDamage])

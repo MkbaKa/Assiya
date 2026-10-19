@@ -55,6 +55,13 @@ class Damage {
                 }
                 .register()
 
+        ScriptListener.create(EntityDamageByEntityEvent)
+                .setEventPriority(EventPriority.MONITOR)
+                .setIgnoreCancelled(true)
+                .setHandler { EntityDamageByEntityEvent event ->
+                    AssiyaAPI.getSession(event.damager)?.damageProcessorStack?.pop()
+                }
+                .register()
     }
 
     private static void handle(EntityDamageByEntityEvent event) {
@@ -105,6 +112,10 @@ class Damage {
             }
         }
 
+        // 由普通攻击触发的 processor 保留到 MONITOR 再清理
+        // 这样就可以在 mm 的受伤触发技能里判断本次伤害的信息了
+        // 因为他用的是 HIGHEST
+        assiyaSession?.damageProcessorStack?.push(processor)
         processor.process()
 
         // 事件同步 processor 的取消状态

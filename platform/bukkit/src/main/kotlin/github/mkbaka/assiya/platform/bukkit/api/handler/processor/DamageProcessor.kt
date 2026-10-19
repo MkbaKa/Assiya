@@ -22,15 +22,8 @@ class DamageProcessor(
     constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(ProcessorComponentBuilder().apply(pcb::accept).build())
 
     override fun process() {
-        val session = this[TriggerComponent.Key]?.session
-        val damageProcessorStack = session?.damageProcessorStack
-        damageProcessorStack?.push(this)
-        try {
-            HandlerRegistry.publish("damage", this)
-            this[CallbackComponent.Key]?.invoke(this)
-        } finally {
-            damageProcessorStack?.pop()
-        }
+        HandlerRegistry.publish("damage", this)
+        this[CallbackComponent.Key]?.invoke(this)
     }
 
     companion object {

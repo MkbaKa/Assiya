@@ -1,12 +1,9 @@
 package scripts.attribute.fight
 
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
-import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
 import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
@@ -30,6 +27,13 @@ static void onDefense(Attribute attribute, Processor processor) {
         variables.put('rate', defender.getValue('reflection-rate', 'total', 0.0d))
     }
 
-    DamageMeta.fixedDamage(defender.entity, (LivingEntity) attacker.entity, reflectedDamage).doDamage()
+    AssiyaAPI.attackTo(defender.entity, (LivingEntity) attacker.entity, reflectedDamage)
+
+    CustomDataComponent customData = processor.get(CustomDataComponent.@Key)
+    if (customData != null) {
+        customData.put("is-reflection", true)
+        customData.put("reflection-damage", reflectedDamage)
+    }
+
     ScriptTools.sendCombatMessage(attribute, processor, [reflection: reflectedDamage])
 }

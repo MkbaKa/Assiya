@@ -1,12 +1,12 @@
 package scripts.attribute.fight
 
-
 import github.mkbaka.assiya.platform.bukkit.api.EntityTaskAPI
-import github.mkbaka.assiya.platform.bukkit.api.task.EntityTaskBuilder
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.api.task.EntityTaskBuilder
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
 import groovy.transform.CompileStatic
 import org.bukkit.attribute.Attribute as VanillaAttribute
@@ -14,6 +14,7 @@ import org.bukkit.attribute.AttributeInstance
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+
 import java.util.function.BiConsumer
 
 @CompileStatic
@@ -60,6 +61,13 @@ class Frozen {
         long ticks = (long) Math.ceil(duration * 20.0d)
         EntityTaskAPI.runTask(target.entity, MODIFIER_NAME) { EntityTaskBuilder builder ->
             builder.key(MODIFIER_NAME).delay(ticks)
+        }
+
+        CustomDataComponent customData = processor.get(CustomDataComponent.@Key)
+        if (customData != null) {
+            customData.put("is-frozen", true)
+            customData.put("frozen-rate", rate)
+            customData.put("frozen-duration", duration)
         }
 
         ScriptTools.sendCombatMessage(attribute, processor, [frozen: rate * 100.0d, duration: duration])

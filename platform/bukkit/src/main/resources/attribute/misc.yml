@@ -20,6 +20,19 @@ max-health:
   always-run: true
   triggers: update
 
+health-regain:
+  names: ['生命恢复']
+  reader: default
+  handler: 'attribute/health-regain'
+  priority: 100
+  # 触发间隔 (20tick = 1s)
+  period: 20
+  triggers: timer
+  options:
+    # 战斗状态中能否触发恢复
+    # 为 false 则只在脱战状态恢复
+    regain-in-combat: false
+
 moving:
   names: ["移动速度"]
   reader: default

@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.api.event
+package github.mkbaka.assiya.platform.bukkit.api.event.util
 
 import org.bukkit.event.Cancellable
 

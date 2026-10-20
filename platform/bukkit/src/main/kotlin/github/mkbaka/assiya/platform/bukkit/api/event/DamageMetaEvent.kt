@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.event
 
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
+import github.mkbaka.assiya.platform.bukkit.api.event.util.CancellableEvent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
 import org.bukkit.Bukkit
 import org.bukkit.event.Cancellable

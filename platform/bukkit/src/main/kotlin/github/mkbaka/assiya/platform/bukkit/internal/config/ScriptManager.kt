@@ -48,6 +48,7 @@ object ScriptManager {
             "scripts/handler/update.groovy",
             "scripts/handler/timer.groovy",
             "scripts/attribute/health.groovy",
+            "scripts/attribute/health-regain.groovy",
             "scripts/attribute/moving.groovy",
             "scripts/attribute/fight/attack.groovy",
             "scripts/attribute/fight/pvp-attack.groovy",
@@ -65,25 +66,8 @@ object ScriptManager {
             "scripts/attribute/fight/fire.groovy",
             "scripts/attribute/fight/frozen.groovy",
             "scripts/condition/level-require.groovy",
-            "scripts/condition/permission.groovy"
-//            "scripts/condition/player-level.js",
-//            "scripts/damage/example.js",
-//            "scripts/damage/attack.groovy",
-//            "scripts/damage/real-attack.groovy",
-//            "scripts/damage/break-shield.groovy",
-//            "scripts/damage/fire.groovy",
-//            "scripts/damage/frozen.groovy",
-//            "scripts/damage/lightning.groovy",
-//            "scripts/damage/crit.groovy",
-//            "scripts/damage/vampire.groovy",
-//            "scripts/damage/dodge.groovy",
-//            "scripts/damage/shield-block.groovy",
-//            "scripts/damage/defense.groovy",
-//            "scripts/damage/armor.groovy",
-//            "scripts/damage/reflection.groovy",
-//            "scripts/runtime/restore.groovy",
-//            "scripts/update/max-health.groovy",
-//            "scripts/update/moving.groovy",
+            "scripts/condition/permission.groovy",
+            "scripts/feature/CombatStateListener.groovy"
         )
     }
 

@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.event
 
 import github.mkbaka.assiya.common.source.AttributeSourceInfo
+import github.mkbaka.assiya.platform.bukkit.api.event.util.CancellableEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable

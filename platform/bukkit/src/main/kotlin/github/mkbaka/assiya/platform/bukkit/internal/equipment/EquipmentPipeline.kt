@@ -3,14 +3,14 @@ package github.mkbaka.assiya.platform.bukkit.internal.equipment
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
-import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
-import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsync

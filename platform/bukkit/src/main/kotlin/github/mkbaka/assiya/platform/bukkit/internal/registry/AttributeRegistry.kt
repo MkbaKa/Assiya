@@ -7,8 +7,8 @@ import github.mkbaka.assiya.common.parser.part.AttributeSourcePartParserFactory
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
-import github.mkbaka.assiya.platform.bukkit.internal.parser.MapParserFactory
-import github.mkbaka.assiya.platform.bukkit.internal.parser.TextParserFactory
+import github.mkbaka.assiya.platform.bukkit.internal.feature.MapParserFactory
+import github.mkbaka.assiya.platform.bukkit.internal.feature.TextParserFactory
 
 object AttributeRegistry : NamedRegistry<Attribute>("属性"), AttributeParser {
 

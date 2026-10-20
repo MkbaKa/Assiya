@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.session
+package github.mkbaka.assiya.platform.bukkit.api.session
 
 import github.mkbaka.assiya.common.engine.AttributeEngine
 import github.mkbaka.assiya.common.engine.AttributeEngineAction
@@ -6,7 +6,7 @@ import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
-import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
 import org.bukkit.entity.Player
 
 class AttributeSession(

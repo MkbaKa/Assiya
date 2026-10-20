@@ -1,8 +1,10 @@
-package github.mkbaka.assiya.platform.bukkit.internal.session
+package github.mkbaka.assiya.platform.bukkit.api.session
 
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 
@@ -16,6 +18,8 @@ class AssiyaSession(
         get() = entityRef.get()
 
     val ownerUUID = entity.uniqueId
+
+    val combatState: CombatState? = if (entity is Player) CombatState(this) else null
 
     lateinit var attribute: AttributeSession
     val hasAttribute: Boolean
@@ -43,6 +47,7 @@ class AssiyaSession(
     }
 
     fun close() {
+        combatState?.leave()
         if (this::attribute.isInitialized) {
             EquipmentPipeline.cancel(ownerUUID)
             attribute.close()

@@ -7,9 +7,9 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableCom
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
-import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
 import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Projectile

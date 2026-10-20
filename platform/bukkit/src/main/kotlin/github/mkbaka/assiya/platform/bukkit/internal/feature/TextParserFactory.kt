@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.parser
+package github.mkbaka.assiya.platform.bukkit.internal.feature
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine

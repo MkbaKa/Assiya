@@ -7,14 +7,11 @@ import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.registry.EntityTaskRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
-import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import org.bukkit.entity.Entity
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
@@ -34,20 +31,33 @@ object EntityTaskAPI {
 
     @JvmStatic
     fun cancelTask(owner: Entity, key: String) {
-        EntityTaskRegistry.cancel(owner.uniqueId, key)
+        cancelTask(owner.uniqueId, key)
     }
+
+    @JvmStatic
+    fun cancelTask(ownerUUID: UUID, key: String) {
+        EntityTaskRegistry.cancel(ownerUUID, key)
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun runTaskKt(
+        owner: Entity,
+        taskId: String,
+        builder: (EntityTaskBuilder.() -> Unit)? = null
+    ) = runTask(owner, taskId, builder)
 
     @JvmStatic
     @JvmOverloads
     fun runTask(
         owner: Entity,
         taskId: String,
-        builder: Consumer<EntityTaskBuilder> = Consumer {}
+        builder: Consumer<EntityTaskBuilder>? = null
     ): EntityTask {
         val task = tasks[taskId] ?: error("Entity task '$taskId' is not registered")
 
         val options = EntityTaskBuilder()
-        builder.accept(options)
+        builder?.accept(options)
 
         val key = options.key
         val delay = options.delay

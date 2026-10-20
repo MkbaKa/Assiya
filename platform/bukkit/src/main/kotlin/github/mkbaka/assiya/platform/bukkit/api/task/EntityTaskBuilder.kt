@@ -3,17 +3,16 @@ package github.mkbaka.assiya.platform.bukkit.api.task
 class EntityTaskBuilder {
 
     var key: String? = null
-        private set
+
     var delay: Long = 0
-        private set
+
     var period: Long = 0
-        private set
+
     var count: Int? = 1
-        private set
+
     var async: Boolean = false
-        private set
+
     var params: Map<String, Any> = emptyMap()
-        private set
 
     fun key(key: String?): EntityTaskBuilder {
         this.key = key

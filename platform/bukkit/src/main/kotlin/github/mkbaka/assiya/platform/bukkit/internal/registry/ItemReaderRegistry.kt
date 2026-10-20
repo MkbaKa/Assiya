@@ -2,7 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.registry
 
 import github.mkbaka.assiya.common.parser.part.AttributeSourcePart
 import github.mkbaka.assiya.platform.bukkit.api.reader.ItemReader
-import github.mkbaka.assiya.platform.bukkit.internal.parser.LoreItemReader
+import github.mkbaka.assiya.platform.bukkit.internal.feature.LoreItemReader
 import github.mkbaka.assiya.platform.bukkit.internal.util.isAir
 import org.bukkit.inventory.ItemStack
 

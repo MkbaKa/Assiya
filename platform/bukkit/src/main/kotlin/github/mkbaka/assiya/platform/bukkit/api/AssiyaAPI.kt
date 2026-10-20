@@ -8,11 +8,11 @@ import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.common.source.mergeAttributeValues
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.parser.AttributeReadPipeline
-import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
-import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSessionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.session.BukkitAttributeEngine
+import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack

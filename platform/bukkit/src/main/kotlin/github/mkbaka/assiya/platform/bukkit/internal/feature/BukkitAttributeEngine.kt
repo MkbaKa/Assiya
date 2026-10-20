@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.session
+package github.mkbaka.assiya.platform.bukkit.internal.feature
 
 import github.mkbaka.assiya.common.engine.AttributeEngineAction
 import github.mkbaka.assiya.common.engine.AttributeUpdateContext
@@ -7,6 +7,7 @@ import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublis
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSourceRemoveEvent
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeUpdateEvent
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import kotlinx.coroutines.CoroutineScope
 

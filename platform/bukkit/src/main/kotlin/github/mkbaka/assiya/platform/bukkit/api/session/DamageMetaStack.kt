@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.session
+package github.mkbaka.assiya.platform.bukkit.api.session
 
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
 import java.util.*

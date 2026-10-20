@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.parser
+package github.mkbaka.assiya.platform.bukkit.internal.feature
 
 import github.mkbaka.assiya.common.parser.RuleSet
 import github.mkbaka.assiya.common.parser.part.AttributeSourcePartParser

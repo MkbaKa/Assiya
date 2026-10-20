@@ -1,4 +1,6 @@
 settings:
+  # 每次进入战斗后自动脱战的时长 (秒)
+  combat-duration: 10
   # 是否将原版攻击伤害加入属性伤害计算
   vanilla-damage: true
   # 是否启用血量压缩

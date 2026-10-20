@@ -2,11 +2,11 @@ package scripts.handler
 
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.TimerProcessor
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.Subscriber
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptScheduler
-import github.mkbaka.assiya.platform.bukkit.internal.session.AssiyaSession
 import groovy.transform.CompileStatic
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity

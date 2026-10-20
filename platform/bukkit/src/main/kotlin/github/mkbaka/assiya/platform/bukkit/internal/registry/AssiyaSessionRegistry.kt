@@ -1,6 +1,6 @@
-package github.mkbaka.assiya.platform.bukkit.internal.session
+package github.mkbaka.assiya.platform.bukkit.internal.registry
 
-import github.mkbaka.assiya.platform.bukkit.internal.registry.Registry
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import org.bukkit.entity.Entity

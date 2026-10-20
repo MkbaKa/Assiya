@@ -1,8 +1,9 @@
-package github.mkbaka.assiya.platform.bukkit.internal.session
+package github.mkbaka.assiya.platform.bukkit.internal.listener
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.bukkitksp.annotation.Listener
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority

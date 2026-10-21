@@ -47,7 +47,7 @@ internal object ReaderConfigManager {
         val section = node.getNode("captures")
             ?: error("Reader $id is missing captures")
 
-        val captures = hashMapOf<String, Capture.Entry<*>>()
+        val captures = linkedMapOf<String, Capture.Entry<*>>()
 
         for (key in section.keys()) {
             captures[key] = parseCapture(section, key)
@@ -73,7 +73,7 @@ internal object ReaderConfigManager {
         }
 
         val numeric = captures.filterValues { it.operation is NumberOperations }
-        val formulas = hashMapOf<String, Formula>()
+        val formulas = linkedMapOf<String, Formula>()
 
         for (key in node.keys()) {
             formulas[key] = FormulaCompiler.compile("${id}.placeholder.${key}", node.getString(key)!!)

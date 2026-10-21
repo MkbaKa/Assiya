@@ -12,7 +12,6 @@ import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.validate
-import java.util.Locale
 
 class MythicProcessor(
     private val codeGenerator: CodeGenerator,
@@ -79,7 +78,7 @@ class MythicProcessor(
             }
             declaration.containingFile?.let(sourceFiles::add)
             for (value in names) {
-                val name = (value as? String)?.lowercase(Locale.ROOT)
+                val name = (value as? String)?.lowercase()
                 if (name.isNullOrBlank()) {
                     fail("@$annotationName names must not be blank", symbol)
                     continue

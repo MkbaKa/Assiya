@@ -17,7 +17,7 @@ example:
   # 实现逻辑的脚本位置
   # 位置会基于 scripts 目录进行偏移
   # 比如这个例子里的实际脚本位置是:
-  # plugins/Assiya/scripts/damage/attack.xxx 文件
+  # plugins/Assiya/scripts/attribute/fight/attack.groovy 文件
   # 脚本的后缀不重要 无论是 js 还是 groovy 都不用写
   handler: 'attribute/fight/attack'
   # 触发优先级
@@ -44,7 +44,7 @@ example:
       # 如果将下面两条注释掉不指定 会自动继承根节点的相关设置
       # 即 example 里的 priority 114514 + handler attribute/fight/attack
       # priority: 1919810
-      # handler: 'attribute/fight/kill'
+      # handler: 'attribute/kill-example'
 
 runtime-example:
   names: ['测试定时触发']

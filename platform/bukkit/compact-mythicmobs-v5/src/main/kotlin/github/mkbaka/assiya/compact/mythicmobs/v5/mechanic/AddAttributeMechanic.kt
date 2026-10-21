@@ -55,7 +55,7 @@ class AddAttributeMechanic(
             AttributeSourceLifecycle.Temporary(50.milliseconds * ticks.toDouble())
         }
 
-        AssiyaAPI.addAttribute(target, sourceId, values, priority, lifeCycle)
+        AssiyaAPI.addAttribute(AssiyaAPI.getSessionOrCreate(target), sourceId, values, priority, lifeCycle)
         return SkillResult.SUCCESS
     }
 

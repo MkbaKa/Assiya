@@ -1,0 +1,100 @@
+usage:
+  - ' '
+  - ' &eAssiya &fv{version}'
+  - ' &7Command: &f/assiya &8[...]'
+  - ' &7Arguments:'
+  - '   &8- &fsource'
+  - '     &8- &flist &7<player>'
+  - '       &7List all attribute sources of the player.'
+  - '     &8- &finfo &7<player> <source>'
+  - '       &7View the attributes contained in the source.'
+  - '     &8- &fgive &7<player> <source> <priority> <attributes> &8[<seconds>] &8[<silent>]'
+  - '       &7Give an attribute source. separate multiple attributes with commas.'
+  - '       &7For example: &fphysical attack100&e&l,&fcrit chance100'
+  - '       &7Omit the duration or pass -1 to keep it until logout.'
+  - '       &7To pass silent only, use -1 as the duration.'
+  - '     &8- &fremove &7<player> <source> &8[<silent>]'
+  - '       &7Remove the specified attribute source.'
+  - '   &8- &fstatus &7<target>'
+  - '     &7View the total attributes of the player.'
+  - '   &8- &freload'
+  - '     &7Reload configuration.'
+  - ' '
+  - '   &7Tips: &fsilent &7skips the output when set to &ftrue&7.'
+  - ' '
+no-permission: '&fYou &cdon''t have permission to use this command.'
+invalid-duration: '&fDuration &cmust be a positive whole number of seconds, or use &f-1 &cto keep it until logout.'
+invalid-priority: '&fPriority &cmust be an integer.'
+reload-success:
+  - ' '
+  - ' &7Reloaded in &f{time}&7ms...'
+  - ' '
+reload-unavailable: '&fConfiguration reload &cfailed: another reload is already running, or the attribute parser couldn''t be rebuilt. Check the console for details.'
+source-absent: '&f{player} &cdoesn''t have attribute source &f{source}&c.'
+source-empty: '&fNo usable attributes &cwere found.'
+source-data-not-loaded: '&f{player} &cdoes not have attribute data loaded yet, so you cannot give them attributes.'
+
+source-list-header:
+  - ' '
+  - ' &f{player} &eattribute sources'
+  - ' &7Total &f{count}&7:'
+source-list-entry:
+  type: json
+  parts:
+    prefix:
+      type: text
+      content: '   &8- '
+    source:
+      type: click
+      content: '&f{source}'
+      action: command
+      value: '/assiya source info {player} {source}'
+      hover: '&fClick to view attributes contributed by {source}'
+source-list-footer: ' '
+
+source-info-header:
+  - ' '
+  - ' &f{player} &eattribute sources'
+  - '   &8- &f{source}'
+  - '     &7Total &f{count} &7attributes:'
+source-info-entry:
+  type: json
+  parts:
+    attribute:
+      type: text
+      content:
+        - '     &8- &f{id}{names}'
+      hover:
+        - ' '
+        - ' &f{id}'
+        - '   &8- &eCaptures'
+        - '{captures}{placeholders}'
+        - ' '
+source-info-names: ' &8| &7{names}'
+source-info-value: '     &8- &7{id} = &f{value}'
+source-info-none: '     &8- &7None'
+source-info-placeholders:
+  - ''
+  - ''
+  - '   &8- &eComputed values'
+  - '{values}'
+source-info-footer: ' '
+
+source-give-submitted:
+  - ' '
+  - ' &eTrying to give &f{player} &ean attribute source: &f{source}'
+  - '   &8- &7Lasts &f{duration} &7seconds, &f{count} &7attributes:'
+source-give-submitted-stable:
+  - ' '
+  - ' &eTrying to give &f{player} &ean attribute source: &f{source}'
+  - '   &8- &7Lasts until logout, &f{count} &7attributes:'
+source-remove-submitted:
+  - ' '
+  - ' &eTrying to remove attribute source &f{source} &efrom &f{player}'
+  - ' '
+status-header:
+  - ' '
+  - ' &f{player} &eattributes'
+  - '   &7Total &f{count} &7attributes:'
+status-empty: '     &8- &7No attributes.'
+status-footer: ' '

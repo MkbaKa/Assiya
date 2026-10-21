@@ -2,9 +2,9 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
-import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigAttribute

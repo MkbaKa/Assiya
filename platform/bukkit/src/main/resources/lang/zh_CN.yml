@@ -1,0 +1,99 @@
+usage:
+  - ' '
+  - ' &eAssiya &fv{version}'
+  - ' &7命令: &f/assiya &8[...]'
+  - ' &7参数:'
+  - '   &8- &fsource'
+  - '     &8- &flist &7<player>'
+  - '       &7列出玩家的所有属性源.'
+  - '     &8- &finfo &7<player> <source>'
+  - '       &7查看属性源包含的属性.'
+  - '     &8- &fgive &7<player> <source> <priority> <attributes> &8[<seconds>] &8[<silent>]'
+  - '       &7给予属性源, 多个属性用英文逗号分隔.'
+  - '       &7比如: &f物理伤害100&e&l,&f暴击几率100'
+  - '       &7不指定时长或填入 &f-1 &7则持续到下线.'
+  - '     &8- &fremove &7<player> <source> &8[<silent>]'
+  - '       &7移除指定属性源.'
+  - '   &8- &fstatus &7<target>'
+  - '     &7查看玩家的总属性.'
+  - '   &8- &freload'
+  - '     &7重载配置.'
+  - ' '
+  - '   &7Tips: &fsilent &7参数为 &ftrue &7时不发送提示.'
+  - ' '
+no-permission: '&c你没有权限使用这个命令.'
+invalid-duration: '&c时长必须是一个整数, 如果填 &f-1 &c则持续到下线.'
+invalid-priority: '&c优先级必须是一个整数.'
+reload-success:
+  - ' '
+  - ' &7重载耗时 &f{time}&7ms...'
+  - ' '
+reload-unavailable: '&f无法重复重载.'
+source-absent: '&f{player} &c没有属性源 &f{source}&c.'
+source-empty: '&f属性文本 &c里没有可用的属性.'
+source-data-not-loaded: '&f{player} &c的属性数据未加载, 无法给予属性.'
+
+source-list-header:
+  - ' '
+  - ' &f{player} &e的属性源'
+  - ' &7共 &f{count} &7个:'
+source-list-entry:
+  type: json
+  parts:
+    prefix:
+      type: text
+      content: '   &8- '
+    source:
+      type: click
+      content: '&f{source}'
+      action: command
+      value: '/assiya source info {player} {source}'
+      hover: '&f点击查看 {source} 贡献的属性'
+source-list-footer: ' '
+
+source-info-header:
+  - ' '
+  - ' &f{player} &e的属性源'
+  - '   &8- &f{source}'
+  - '     &7共 &f{count} &7条属性:'
+source-info-entry:
+  type: json
+  parts:
+    attribute:
+      type: text
+      content:
+        - '     &8- &f{id}{names}'
+      hover:
+        - ' '
+        - ' &f{id}'
+        - '   &8- &e捕获值'
+        - '{captures}{placeholders}'
+        - ' '
+source-info-names: ' &8| &7{names}'
+source-info-value: '     &8- &7{id} = &f{value}'
+source-info-none: '     &8- &7无'
+source-info-placeholders:
+  - ''
+  - ''
+  - '   &8- &e计算值'
+  - '{values}'
+source-info-footer: ' '
+
+source-give-submitted:
+  - ' '
+  - ' &e尝试给 &f{player} &e添加属性源 &f{source}'
+  - '   &8- &7持续 &f{duration} &7秒, 共 &f{count} &7条属性:'
+source-give-submitted-stable:
+  - ' '
+  - ' &e尝试给 &f{player} &e添加属性源 &f{source}'
+  - '   &8- &7持续至下线, 共 &f{count} &7条属性:'
+source-remove-submitted:
+  - ' '
+  - ' &e尝试移除 &f{player} &e的属性源 &f{source}'
+  - ' '
+status-header:
+  - ' '
+  - ' &f{player} &e的属性'
+  - '   &7共 &f{count} &7条属性:'
+status-empty: '     &8- &7没有属性.'
+status-footer: ' '

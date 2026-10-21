@@ -9,6 +9,8 @@ class Capture<T : Any>(
     private val operations: Map<String, Entry<T>>
 ) {
 
+    val ids: Set<String> get() = operations.keys
+
     operator fun get(capture: String) = operations[capture]
 
     operator fun contains(capture: String) = operations.containsKey(capture)

@@ -59,6 +59,15 @@ object AssiyaPlaceholderAPIHook {
                     }
                 }
             }
+
+            literal("in-combat") {
+                setExecutor { context ->
+                    val player = context.source ?: return@setExecutor "false"
+                    AssiyaAPI.getSession(player.uniqueId)
+                        ?.combatState?.inCombat?.toString()
+                        ?: "false"
+                }
+            }
         }
 
         val desc = AssiyaBukkitPlugin.INSTANCE.description

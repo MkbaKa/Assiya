@@ -15,7 +15,6 @@ import io.lumine.xikage.mythicmobs.skills.SkillMechanic
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
-import java.util.Locale
 import org.bukkit.event.EventPriority
 
 class MythicMobs4Hook : MythicMobsCompatibility {
@@ -54,12 +53,12 @@ class MythicMobs4Hook : MythicMobsCompatibility {
     }
 
     fun onMechanic(event: MythicMechanicLoadEvent) {
-        val constructor = mechanics[event.mechanicName.lowercase(Locale.ROOT)] ?: return
+        val constructor = mechanics[event.mechanicName.lowercase()] ?: return
         event.register(constructor.invoke(event.config) as SkillMechanic)
     }
 
     fun onCondition(event: MythicConditionLoadEvent) {
-        val constructor = conditions[event.conditionName.lowercase(Locale.ROOT)] ?: return
+        val constructor = conditions[event.conditionName.lowercase()] ?: return
         event.register(constructor.invoke(event.config) as SkillCondition)
     }
 

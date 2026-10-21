@@ -37,19 +37,22 @@ object ScriptManager {
     }
 
     fun invoke(id: String, function: String, vararg args: Any?): Any? {
-        return scripts[id]?.invokeSafely(function, *args)
+        return scripts[id.lowercase()]?.invokeSafely(function, *args)
     }
 
-    operator fun get(id: String): Script? = scripts[id]
+    operator fun get(id: String): Script? = scripts[id.lowercase()]
 
     private fun defaultResources(): List<String> {
         return listOf(
-            "scripts/handler/damage.groovy",
-            "scripts/handler/update.groovy",
-            "scripts/handler/timer.groovy",
-            "scripts/attribute/health.groovy",
+            "scripts/handler/Damage.groovy",
+            "scripts/handler/Update.groovy",
+            "scripts/handler/Timer.groovy",
+            "scripts/handler/Kill.groovy",
+            "scripts/attribute/Health.groovy",
             "scripts/attribute/health-regain.groovy",
-            "scripts/attribute/moving.groovy",
+            "scripts/attribute/Moving.groovy",
+            "scripts/attribute/kill-example.groovy",
+            "scripts/attribute/runtime-example.groovy",
             "scripts/attribute/fight/attack.groovy",
             "scripts/attribute/fight/pvp-attack.groovy",
             "scripts/attribute/fight/pve-attack.groovy",
@@ -64,7 +67,7 @@ object ScriptManager {
             "scripts/attribute/fight/remote-immune.groovy",
             "scripts/attribute/fight/reflection.groovy",
             "scripts/attribute/fight/fire.groovy",
-            "scripts/attribute/fight/frozen.groovy",
+            "scripts/attribute/fight/Frozen.groovy",
             "scripts/condition/level-require.groovy",
             "scripts/condition/permission.groovy",
             "scripts/feature/CombatStateListener.groovy"
@@ -93,7 +96,7 @@ object ScriptManager {
             val relativePath = file.invariantSeparatorsPath.substringAfterLast("scripts/")
             val id = relativePath.substringBeforeLast('.')
             try {
-                if (scripts.putIfAbsent(id, engine.compile(id, file)) != null) {
+                if (scripts.putIfAbsent(id.lowercase(), engine.compile(id, file)) != null) {
                     warning("Duplicate key $id found in scripts")
                 }
             } catch (e: Throwable) {

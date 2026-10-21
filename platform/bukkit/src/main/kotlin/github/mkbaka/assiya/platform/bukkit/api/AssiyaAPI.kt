@@ -67,7 +67,7 @@ object AssiyaAPI {
     @JvmStatic
     @JvmOverloads
     fun addAttribute(
-        entity: Entity,
+        session: AssiyaSession,
         sourceId: String,
         attributes: List<String>,
         priority: Int,
@@ -75,13 +75,13 @@ object AssiyaAPI {
         triggerEvent: Boolean = false
     ) {
         val parsed = AttributeReadPipeline.parse(attributes)
-        addAttribute(entity, sourceId, parsed, priority, lifeCycle, triggerEvent)
+        addAttribute(session, sourceId, parsed, priority, lifeCycle, triggerEvent)
     }
 
     @JvmStatic
     @JvmOverloads
     fun addAttribute(
-        entity: Entity,
+        session: AssiyaSession,
         sourceId: String,
         itemStack: ItemStack,
         priority: Int,
@@ -90,21 +90,19 @@ object AssiyaAPI {
     ) {
         val parts = AttributeReadPipeline.extract(itemStack)
         val parsed = AttributeReadPipeline.parseParts(parts)
-        addAttribute(entity, sourceId, parsed, priority, lifeCycle, triggerEvent)
+        addAttribute(session, sourceId, parsed, priority, lifeCycle, triggerEvent)
     }
 
     @JvmStatic
     @JvmOverloads
     fun addAttribute(
-        entity: Entity,
+        session: AssiyaSession,
         sourceId: String,
         attributes: Map<String, AttributeValue<*>>,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
         triggerEvent: Boolean = false
     ) {
-        val session = getSession(entity) ?: return
-
         val patch = AttributeSourcePatch(
             sourceId,
             priority,
@@ -118,14 +116,14 @@ object AssiyaAPI {
     @JvmStatic
     @JvmOverloads
     fun addAttribute(
-        entity: Entity,
+        session: AssiyaSession,
         sourceId: String,
         parsed: AttributeParsedSource,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
         triggerEvent: Boolean = false
     ) {
-        val session = getSession(entity) ?: return
+        val entity = session.owner ?: return
 
         val patch = AttributeSourcePatch(
             sourceId,
@@ -140,14 +138,14 @@ object AssiyaAPI {
     @JvmStatic
     @JvmOverloads
     fun addAttributeItems(
-        entity: Entity,
+        session: AssiyaSession,
         sourceId: String,
         items: List<ItemStack>,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
         triggerEvent: Boolean = false
     ) {
-        val session = getSession(entity) ?: return
+        val entity = session.owner ?: return
 
         val values = items.flatMap { item ->
             val parts = AttributeReadPipeline.extract(item)

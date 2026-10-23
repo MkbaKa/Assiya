@@ -7,6 +7,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.Subscriber
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Projectile
@@ -14,15 +15,32 @@ import java.util.function.Consumer
 
 /**
  * 一次伤害处理的过程
+ * 可以通过 [HandlerRegistry.select] 提前筛出允许执行的 subscriber
  */
 class DamageProcessor(
-    override val components: Map<ProcessorComponent.Key<*>, ProcessorComponent>
+    override val components: Map<ProcessorComponent.Key<*>, ProcessorComponent>,
+    val subscribers: List<Subscriber>? = null
 ) : Processor {
 
-    constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(ProcessorComponentBuilder().apply(pcb::accept).build())
+    constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(
+        ProcessorComponentBuilder().apply(pcb::accept).build()
+    )
+
+    constructor(
+        subscribers: List<Subscriber>?,
+        pcb: Consumer<ProcessorComponentBuilder>
+    ) : this(
+        ProcessorComponentBuilder().apply(pcb::accept).build(),
+        subscribers
+    )
 
     override fun process() {
-        HandlerRegistry.publish("damage", this)
+        val selected = subscribers
+        if (selected == null) {
+            HandlerRegistry.publish("damage", this)
+        } else {
+            HandlerRegistry.publish(selected, this)
+        }
         this[CallbackComponent.Key]?.invoke(this)
     }
 
@@ -42,11 +60,12 @@ class DamageProcessor(
         fun ofSnapshot(
             attacker: Entity,
             defender: LivingEntity,
+            subscribers: List<Subscriber>? = null,
             attackerSnapshot: AttributeEngineSnapshot = AssiyaAPI.getSnapshot(attacker),
             defenderSnapshot: AttributeEngineSnapshot = AssiyaAPI.getSnapshot(defender),
             builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageProcessor {
-            return DamageProcessor { pcb ->
+            return DamageProcessor(subscribers) { pcb ->
                 pcb += Processor.defaults()
                 pcb += TriggerComponent(attacker, attackerSnapshot)
                 pcb += TargetDefaultComponent(defender, defenderSnapshot)

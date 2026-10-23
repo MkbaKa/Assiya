@@ -12,6 +12,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAtt
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
 import github.mkbaka.mythicksp.annotation.MythicMechanic
 import io.lumine.mythic.api.adapters.AbstractEntity
@@ -47,7 +48,17 @@ class DamageMetaMechanic(
     private val isClear = mlc.getPlaceholderString(arrayOf("clear", "c", "isClear"), "false")
     private val signal = mlc.getPlaceholderString(arrayOf("signal", "s"), "")
     private val overwrite = mlc.getPlaceholderString(arrayOf("overwrite", "ow"), "false")
+
+    private val usableAttribute = mlc.getString(arrayOf("usableAttribute", "ua"), null)
+        ?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotEmpty() }
+
     private val disableAttribute = mlc.getString(arrayOf("disableAttribute", "da"), null)
+        ?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotEmpty() }
+        .orEmpty()
 
     private var postAttackSkill: Skill? = null
 
@@ -70,6 +81,21 @@ class DamageMetaMechanic(
 
     override fun castAtEntity(meta: SkillMetadata, ae: AbstractEntity): SkillResult {
         val target = ae.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
+
+        val usableIds = Utils.resolveAttributeIds(usableAttribute)
+        val selected = if (usableAttribute == null) {
+            null
+        } else {
+            HandlerRegistry.select("damage") { subscriber ->
+                subscriber.attributeId in usableIds
+            }
+        }
+
+        // 指定了可用属性但没有对应 handler 时不执行后续流程
+        if (selected != null && selected.isEmpty()) return SkillResult.CONDITION_FAILED
+
+        val disabledIds = Utils.resolveAttributeIds(disableAttribute)
+
         val caster = meta.caster.entity.bukkitEntity
 
         // 找不到对应攻击者则默认施法者
@@ -98,9 +124,10 @@ class DamageMetaMechanic(
         val processor = DamageProcessor.ofSnapshot(
             attacker = attacker,
             defender = target,
+            subscribers = selected,
             attackerSnapshot = snapshotBuilder.build()
         ) { pcb ->
-            for (id in disableAttribute?.split(",").orEmpty()) {
+            for (id in disabledIds) {
                 pcb[CancellableAttributeComponent]!!.setCancelled(id)
             }
             pcb[CustomDataComponent.Key]?.putAll(parsed)
@@ -176,6 +203,7 @@ class DamageMetaMechanic(
             "clear", "c", "isClear",
             "signal", "s",
             "overwrite", "ow",
+            "usableAttribute", "ua",
             "disableAttribute", "da",
             "postAttackSkill", "postAttack", "pas"
         ).mapTo(hashSetOf()) { it.lowercase() }

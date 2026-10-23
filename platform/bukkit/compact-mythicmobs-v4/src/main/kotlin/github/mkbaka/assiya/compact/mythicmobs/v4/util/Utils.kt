@@ -92,4 +92,15 @@ object Utils {
         }.toMap(HashMap())
     }
 
+    fun resolveAttributeIds(entries: List<String>?): Set<String> {
+        if (entries.isNullOrEmpty()) return emptySet()
+
+        val ids = hashSetOf<String>()
+        for (entry in entries) {
+            val attribute = AttributeRegistry[entry] ?: AttributeRegistry.findByName(entry) ?: continue
+            ids += attribute.id
+        }
+        return ids
+    }
+
 }

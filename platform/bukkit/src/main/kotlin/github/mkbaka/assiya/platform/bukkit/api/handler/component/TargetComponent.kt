@@ -18,7 +18,7 @@ interface TargetComponent : ProcessorComponent, EntityProcessorComponent, Attrib
      * 比如 [TargetDefaultComponent] 和 [TargetLazyComponent]
      * 调用处只需要 processor[TargetComponent.Key]
      *
-     * 但如果希望调用像 [TargetLazyComponent]#set 这种专有行为要强转一下
+     * 但如果希望调用像 [TargetLazyComponent.set] 这种专有行为要强转一下
      * ```kotlin
      * (processor[TargetComponent.Key] as TargetLazyComponent).set(entity)
      * ```

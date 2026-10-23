@@ -117,7 +117,7 @@ class DamageMeta @JvmOverloads constructor(
 
         /**
          * 构造一个固定伤害的 DamageMeta 不会再触发属性逻辑
-         * 等价于 [LivingEntity]#damage(double amount, Entity source)
+         * 等价于 [LivingEntity.damage]
          * 但经过 Assiya 包装
          *
          * @param [attacker]

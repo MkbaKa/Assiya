@@ -11,7 +11,7 @@ import org.bukkit.event.HandlerList
 /**
  * [DamageMeta] 执行过程中的各个阶段
  * Start ->
- *      [DamageMeta]#process == true ->
+ *      [DamageMeta.process] == true ->
  *              PreProcess -> PostProcess ->
  *      PreDamage -> PostDamage ->
  *      End

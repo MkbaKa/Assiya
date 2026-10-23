@@ -12,7 +12,7 @@ object AttributeRegistration {
     private val refreshEnabled = AtomicBoolean(false)
 
     /**
-     * 见 [HandlerRegistry]#index
+     * 见 [HandlerRegistry.index]
      */
     fun begin() {
         refreshEnabled.set(false)

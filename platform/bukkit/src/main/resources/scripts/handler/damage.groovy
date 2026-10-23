@@ -82,7 +82,7 @@ class Damage {
 
         /**
          * 远程伤害以实际造成伤害的抛射物为 attacker
-         * 如果要获取发射者 应使用 [github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent]#shooter
+         * 如果要获取发射者 应使用 [github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent.shooter]
          * 取对应 TriggerComponent 实例
          */
         if (event.cause == EntityDamageEvent.DamageCause.PROJECTILE && event.damager instanceof Projectile) {

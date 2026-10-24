@@ -5,6 +5,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderCompon
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.format
 import org.bukkit.command.CommandSender
 
 object AttributeMessage {
@@ -37,6 +38,10 @@ object AttributeMessage {
         return if (padding > 0) " ".repeat(padding) + text else text
     }
 
+    private fun display(value: Any?): String {
+        return if (value is Number) value.format(2) else value.toString()
+    }
+
     /**
      * capture value
      */
@@ -45,7 +50,7 @@ object AttributeMessage {
         val ids = reader?.capture?.ids ?: status.entries.map { it.key }
         for (capture in ids) {
             val captured = status[capture] ?: reader?.defaultValue(capture)
-            values += MessageType.SOURCE_INFO_VALUE.asContent(mapOf("id" to capture, "value" to captured.toString()))
+            values += MessageType.SOURCE_INFO_VALUE.asContent(mapOf("id" to capture, "value" to display(captured)))
         }
         return values.ifEmpty { listOf(MessageType.SOURCE_INFO_NONE.asContent()) }.joinToString("\n")
     }
@@ -55,10 +60,11 @@ object AttributeMessage {
      */
     private fun placeholders(status: Status<*>, reader: Reader?): String {
         if (reader == null) return ""
+        val evaluation = reader.evaluate(status)
         val placeholderValues = arrayListOf<String>()
-        for ((placeholderId, placeholder) in reader.placeholders) {
+        for (placeholderId in reader.placeholders.keys) {
             placeholderValues += MessageType.SOURCE_INFO_VALUE.asContent(mapOf(
-                "id" to placeholderId, "value" to placeholder.resolve(status).toString()
+                "id" to placeholderId, "value" to display(evaluation.read(placeholderId))
             ))
         }
         return MessageType.SOURCE_INFO_PLACEHOLDERS.asContent(

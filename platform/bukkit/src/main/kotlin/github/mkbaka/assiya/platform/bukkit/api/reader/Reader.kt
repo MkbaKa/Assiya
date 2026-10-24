@@ -16,6 +16,15 @@ interface Reader {
     val placeholders: Map<String, Placeholder>
         get() = emptyMap()
 
+    /**
+     * 创建本次读取的求值对象
+     * 见 [ReaderEvaluation] 的注释
+     */
+    fun evaluate(status: Status<*>): ReaderEvaluation = ReaderEvaluation(this, status)
+
+    /**
+     * 不固定公式结果的快速读取
+     */
     fun read(status: Status<*>, captureId: String): Any? {
         return placeholders[captureId]?.resolve(status)
             ?: status[captureId]
@@ -32,4 +41,3 @@ interface Reader {
     }
 
 }
-

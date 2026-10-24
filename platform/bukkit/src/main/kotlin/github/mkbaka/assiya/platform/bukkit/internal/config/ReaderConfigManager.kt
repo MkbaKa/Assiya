@@ -1,11 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.common.base.Capture
-import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.operation.NumberOperations
 import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
-import github.mkbaka.assiya.platform.bukkit.api.reader.Placeholder
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigReader
@@ -55,51 +53,28 @@ internal object ReaderConfigManager {
 
         val patterns = node.getStrings("patterns").map(::TextPatternTemplate)
 
+        val numeric = captures.filterValues { it.operation is NumberOperations }.keys.toSet()
+        val formulas = parseFormulas(id, node.getNode("placeholders"))
+
         return ConfigReader(
             id = id,
             capture = Capture.of(captures),
             patterns = patterns,
-            placeholders = parsePlaceholders(id, node.getNode("placeholders"), captures)
+            numeric = numeric,
+            formulas = formulas
         )
     }
 
-    private fun parsePlaceholders(
-        id: String,
-        node: ConfigNode?,
-        captures: Map<String, Capture.Entry<*>>
-    ): Map<String, Placeholder> {
+    private fun parseFormulas(id: String, node: ConfigNode?): Map<String, Formula> {
         if (node == null) {
             return emptyMap()
         }
 
-        val numeric = captures.filterValues { it.operation is NumberOperations }
         val formulas = linkedMapOf<String, Formula>()
-
         for (key in node.keys()) {
             formulas[key] = FormulaCompiler.compile("${id}.placeholder.${key}", node.getString(key)!!)
         }
-
-        // 公式内的变量解析
-        fun evaluate(name: String, status: Status<*>, resolving: MutableSet<String>): Double {
-            check(resolving.add(name)) { "Placeholder $name in reader $id contains a circular reference" }
-            val formula = formulas[name]!!
-            return try {
-                formula.invoke { variable ->
-                    val capture = numeric[variable]
-                    if (capture != null) {
-                        status[variable] ?: if (capture.operation == NumberOperations.Multiply) 1.0 else 0.0
-                    } else if (variable in formulas) {
-                        evaluate(variable, status, resolving)
-                    } else {
-                        null
-                    }
-                }
-            } finally {
-                resolving.remove(name)
-            }
-        }
-
-        return formulas.mapValues { (name, _) -> Placeholder { status -> evaluate(name, status, hashSetOf()) } }
+        return formulas
     }
 
     private fun parseCapture(section: ConfigNode, capture: String): Capture.Entry<*> {

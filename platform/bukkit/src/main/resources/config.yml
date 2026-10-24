@@ -4,7 +4,7 @@ settings:
   # 是否将原版攻击伤害加入属性伤害计算
   vanilla-damage: true
   # 是否启用血量压缩
-  health-scale: false
+  health-scale: true
   # 当启用血量压缩时 压缩到多少血
   health-scale-value: 40
   # 定时属性的全局计数上限 (tick)

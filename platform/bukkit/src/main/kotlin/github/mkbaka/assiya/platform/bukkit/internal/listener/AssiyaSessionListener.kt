@@ -3,27 +3,85 @@ package github.mkbaka.assiya.platform.bukkit.internal.listener
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
+import github.mkbaka.bukkitksp.annotation.Awake
+import github.mkbaka.bukkitksp.annotation.CustomTask
+import github.mkbaka.bukkitksp.annotation.LifeCycle
 import github.mkbaka.bukkitksp.annotation.Listener
+import kotlinx.coroutines.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object AssiyaSessionListener {
 
-    @Listener
-    fun onJoin(event: PlayerJoinEvent) {
-        if (Config.global.HEALTH_SCALE) {
-            event.player.healthScale = Config.global.HEALTH_SCALE_VALUE
-        }
+    private val timeoutJobs = ConcurrentHashMap<UUID, Job>()
 
-        AssiyaAPI.getSessionOrCreate(event.player)
+    private var joinUnregister: EventUtils.Unregister? = null
+    private var quitUnregister: EventUtils.Unregister? = null
+
+    @CustomTask(taskId = "reload", priority = 3)
+    fun reload() {
+        unregisterListeners()
+        if (!Config.global.PLAYER_SESSION_LIFECYCLE) return
+
+        joinUnregister = EventUtils.on<PlayerJoinEvent> {
+            timeoutJobs.remove(player.uniqueId)?.cancel()
+            if (Config.global.HEALTH_SCALE) {
+                player.healthScale = Config.global.HEALTH_SCALE_VALUE
+            }
+
+            AssiyaAPI.getSessionOrCreate(player)
+        }
+        quitUnregister = EventUtils.on<PlayerQuitEvent> {
+            val timeout = Config.global.PLAYER_SESSION_TIMEOUT
+            if (timeout <= 0L) {
+                AssiyaSessionRegistry.remove(player.uniqueId)
+                return@on
+            }
+
+            timeoutJobs.remove(player.uniqueId)?.cancel()
+
+            val job = launch(
+                context = BukkitCoroutine.coroutineContext[BukkitDispatchers]!!.sync,
+                start = CoroutineStart.LAZY
+            ) {
+                delayTicks(timeout * 20L)
+                ensureActive()
+
+                if (!player.isOnline) {
+                    AssiyaSessionRegistry.remove(player.uniqueId)
+                }
+
+                timeoutJobs.remove(player.uniqueId, currentCoroutineContext().job)
+            }
+
+            timeoutJobs[player.uniqueId] = job
+        }
     }
 
-    @Listener
-    fun onQuit(event: PlayerQuitEvent) {
-        AssiyaSessionRegistry.remove(event.player.uniqueId)
+    @Awake(lifeCycle = LifeCycle.DISABLE)
+    fun close() {
+        for (job in timeoutJobs.values) {
+            job.cancel()
+        }
+        timeoutJobs.clear()
+        unregisterListeners()
+    }
+
+    private fun unregisterListeners() {
+        joinUnregister?.unregister()
+        quitUnregister?.unregister()
+        joinUnregister = null
+        quitUnregister = null
     }
 
     @Listener(priority = EventPriority.MONITOR)

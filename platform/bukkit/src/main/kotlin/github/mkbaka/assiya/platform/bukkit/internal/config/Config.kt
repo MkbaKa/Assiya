@@ -3,10 +3,10 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigGlobal
+import github.mkbaka.assiya.platform.bukkit.internal.message.Messages
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
-import github.mkbaka.assiya.platform.bukkit.internal.message.Messages
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import java.util.concurrent.atomic.AtomicBoolean

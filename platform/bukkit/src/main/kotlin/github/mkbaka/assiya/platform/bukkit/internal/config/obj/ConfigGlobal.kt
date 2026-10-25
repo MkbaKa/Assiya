@@ -14,6 +14,10 @@ class ConfigGlobal(
 
     val HEALTH_SCALE_VALUE = section.getDouble("settings.health-scale-value", 40.0)
 
+    val PLAYER_SESSION_LIFECYCLE = section.getBoolean("settings.player-session-lifecycle", true)
+
+    val PLAYER_SESSION_TIMEOUT = section.getLong("settings.player-session-timeout", 600L)
+
     val COMBAT_DURATION = section.getDouble("settings.combat-duration", 10.0)
 
     val TIMER_RESET_PERIOD = section.getLong("settings.timer-reset-period", 1200L).also {

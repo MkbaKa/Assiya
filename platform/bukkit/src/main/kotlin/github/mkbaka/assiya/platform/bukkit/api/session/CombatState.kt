@@ -5,18 +5,19 @@ import github.mkbaka.assiya.platform.bukkit.api.event.CombatJoinEvent
 import github.mkbaka.assiya.platform.bukkit.api.event.CombatLeaveEvent
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
+import github.mkbaka.assiya.platform.bukkit.internal.util.entityOrNull
 import org.bukkit.entity.Entity
-import java.lang.ref.WeakReference
+import java.util.*
 
 class CombatState(private val session: AssiyaSession) {
 
-    private var targetRef: WeakReference<Entity>? = null
+    private var targetUUID: UUID? = null
 
     var inCombat: Boolean = false
         private set
 
     val target: Entity?
-        get() = targetRef?.get()
+        get() = targetUUID?.entityOrNull
 
     @JvmOverloads
     fun join(target: Entity? = null) {
@@ -27,7 +28,7 @@ class CombatState(private val session: AssiyaSession) {
         if (changed) {
             if (CombatJoinEvent.Pre(session, target).call()) return
 
-            targetRef = target?.let { WeakReference(it) }
+            targetUUID = target?.uniqueId
             inCombat = true
         }
 
@@ -54,7 +55,7 @@ class CombatState(private val session: AssiyaSession) {
         if (!inCombat) return
 
         val previousTarget = target
-        targetRef = null
+        targetUUID = null
         inCombat = false
 
         CombatLeaveEvent(session, previousTarget).call()

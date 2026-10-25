@@ -2,20 +2,18 @@ package github.mkbaka.assiya.platform.bukkit.api.session
 
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
+import github.mkbaka.assiya.platform.bukkit.internal.util.entityOrNull
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 
 class AssiyaSession(
     entity: Entity
 ) {
 
-    private val entityRef = WeakReference(entity)
-
     val owner: Entity?
-        get() = entityRef.get()
+        get() = ownerUUID.entityOrNull
 
     val ownerUUID = entity.uniqueId
 

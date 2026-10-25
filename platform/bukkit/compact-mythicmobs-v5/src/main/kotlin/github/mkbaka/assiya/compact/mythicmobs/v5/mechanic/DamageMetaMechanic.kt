@@ -1,52 +1,31 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5.mechanic
 
-import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
-import github.mkbaka.assiya.compact.mythicmobs.v5.handler.component.TriggerBySkillComponent
-import github.mkbaka.assiya.compact.mythicmobs.v5.util.DamageMetadataFactory
-import github.mkbaka.assiya.compact.mythicmobs.v5.util.SignalUtils
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.Utils
-import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
-import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeSnapshotBuilder
-import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
-import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
 import github.mkbaka.mythicksp.annotation.MythicMechanic
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
-import io.lumine.mythic.api.skills.Skill
 import io.lumine.mythic.api.skills.SkillMetadata
 import io.lumine.mythic.api.skills.SkillResult
-import io.lumine.mythic.api.skills.placeholders.PlaceholderString
 import io.lumine.mythic.bukkit.BukkitAdapter
 import io.lumine.mythic.bukkit.MythicBukkit
-import io.lumine.mythic.core.skills.SkillMechanic
 import io.lumine.mythic.core.skills.mechanics.CustomMechanic
-import io.lumine.mythic.core.skills.variables.Variable
-import io.lumine.mythic.core.skills.variables.VariableType
 import org.bukkit.entity.LivingEntity
-import kotlin.jvm.optionals.getOrNull
 
-@MythicMechanic("assiya:damage-meta", "assiya:damagemeta")
+@MythicMechanic("assiya:damage-meta", "assiya:damagemeta", "assiya:dm")
 class DamageMetaMechanic(
     container: CustomMechanic,
     mlc: MythicLineConfig
-) : SkillMechanic(container.manager, container.file, mlc.line, mlc), ITargetedEntitySkill {
+) : AssiyaDamageMechanic(container, mlc, IGNORE), ITargetedEntitySkill {
 
     /**
      * - assiya:damage-meta{attack|min=100;attack|max=200} @EIR{r=10}
      */
 
     private val attacker = mlc.getPlaceholderString(arrayOf("attacker", "player", "from", "source"), "")
-    private val preventKnockback = mlc.getPlaceholderString(arrayOf("preventKnockback", "pkb", "pk"), "false")
-    private val ignoreImmunity = mlc.getPlaceholderString(arrayOf("ignoreImmunity", "im", "pi", "ii"), "false")
-    private val noDamageTicks = mlc.getPlaceholderString(arrayOf("noDamageTicks", "ndt"), "20")
     private val isClear = mlc.getPlaceholderString(arrayOf("clear", "c", "isClear"), "false")
-    private val signal = mlc.getPlaceholderString(arrayOf("signal", "s"), "")
     private val overwrite = mlc.getPlaceholderString(arrayOf("overwrite", "ow"), "false")
 
     private val usableAttribute = mlc.getString(arrayOf("usableAttribute", "ua"), null)
@@ -60,41 +39,14 @@ class DamageMetaMechanic(
         ?.filter { it.isNotEmpty() }
         .orEmpty()
 
-    private var postAttackSkill: Skill? = null
-
-    private val variables = mlc.entrySet().asSequence()
-        .filter { it.key !in IGNORE }
-        .associate { it.key to PlaceholderString.of(it.value) }
-
-    init {
-        val skillManager = MythicBukkit.inst().skillManager
-        val postAttack = mlc.getString(arrayOf("pas", "postAttack", "postAttackSkill"), "")
-
-        if (postAttack.isNotEmpty()) {
-            skillManager.queueAfterLoad {
-                postAttackSkill = skillManager.getSkill(postAttack).getOrNull()
-            }
-        }
-
-        isAsyncSafe = false
-    }
 
     override fun castAtEntity(meta: SkillMetadata, ae: AbstractEntity): SkillResult {
         val target = ae.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
 
-        val usableIds = Utils.resolveAttributeIds(usableAttribute)
-        val selected = if (usableAttribute == null) {
-            null
-        } else {
-            HandlerRegistry.select("damage") { subscriber ->
-                subscriber.attributeId in usableIds
-            }
-        }
+        val selected = Utils.selectDamageSubscribers(usableAttribute)
 
         // 指定了可用属性但没有对应 handler 时不执行后续流程
-        if (selected != null && selected.isEmpty()) return SkillResult.CONDITION_FAILED
-
-        val disabledIds = Utils.resolveAttributeIds(disableAttribute)
+        if (selected != null && selected.isEmpty()) return SkillResult.INVALID_CONFIG
 
         val caster = meta.caster.entity.bukkitEntity
 
@@ -103,35 +55,18 @@ class DamageMetaMechanic(
 
         // 解析参数和属性
         val parsed = Utils.parseAllEntries(variables, meta, ae)
-        val attributes = Utils.parseAttributes(attacker, parsed)
-
-        val baseSnapshot = if (isClear.get(meta, ae).toBoolean()) {
-            AttributeEngineSnapshot.EMPTY
-        } else {
-            AssiyaAPI.getSnapshot(attacker)
-        }
-        val snapshotBuilder = AttributeSnapshotBuilder(baseSnapshot)
         val overwrite = overwrite.get(meta, ae).toBoolean()
-        for ((id, status) in attributes) {
-            if (overwrite) {
-                snapshotBuilder.setAttribute(id, status)
-            } else {
-                snapshotBuilder.addAttribute(id, status)
-            }
-        }
+        val attackerSnapshot = Utils.buildDamageAttackerSnapshot(attacker, parsed, isClear.get(meta, ae).toBoolean(), overwrite)
 
         // 上下文
         val processor = DamageProcessor.ofSnapshot(
             attacker = attacker,
             defender = target,
             subscribers = selected,
-            attackerSnapshot = snapshotBuilder.build()
+            attackerSnapshot = attackerSnapshot
         ) { pcb ->
-            for (id in disabledIds) {
-                pcb[CancellableAttributeComponent]!!.setCancelled(id)
-            }
-            pcb[CustomDataComponent.Key]?.putAll(parsed)
-            pcb += TriggerBySkillComponent(meta)
+            Utils.disableAttributes(pcb, Utils.resolveAttributeIds(disableAttribute))
+            pcb.applyContext(meta, parsed)
         }
 
         val realCaster = when {
@@ -142,54 +77,7 @@ class DamageMetaMechanic(
             }
         }
 
-        val damageMetadata = DamageMetadataFactory.create(realCaster, meta)
-
-        // 伤害逻辑
-        val damageMeta = DamageMeta(processor).apply {
-            ignoreImmunity = this@DamageMetaMechanic.ignoreImmunity.get(meta, ae).toBoolean()
-            preventKnockback = this@DamageMetaMechanic.preventKnockback.get(meta, ae).toBoolean()
-            noDamageTicks = this@DamageMetaMechanic.noDamageTicks.get(meta, ae).toIntOrNull()
-
-            preDamage = {
-                var isCancelled = false
-                val damage = it.processor.getComponent(DamageMultipleComponent.Key).totalDamage
-
-                damageMetadata.amount = damage
-                damageMetadata.preventsImmunity = ignoreImmunity
-                damageMetadata.preventsKnockback = preventKnockback
-                ae.setMetadata("skill-damage", damageMetadata)
-
-                val signal = signal.get(meta, ae)
-                if (signal.isNotEmpty()) {
-                    isCancelled = SignalUtils.publish(
-                        ae, realCaster.entity, signal, hashMapOf(
-                            "damage-amount" to Variable.ofType(VariableType.FLOAT, damage)
-                        )
-                    )
-                }
-
-                isCancelled
-            }
-
-            postDamage = {
-                postAttackSkill?.let { skill ->
-                    val copied = meta.deepClone()
-                    copied.trigger = realCaster.entity
-                    skill.execute(copied)
-                }
-            }
-        }
-
-        // 造成伤害
-        try {
-            realCaster.isUsingDamageSkill = true
-            damageMeta.doDamage()
-        } finally {
-            realCaster.isUsingDamageSkill = false
-            ae.removeMetadata("skill-damage")
-        }
-
-        return SkillResult.SUCCESS
+        return dispatch(meta, ae, processor, realCaster)
     }
 
 

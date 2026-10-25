@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
+import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 
 /**
@@ -10,7 +11,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
  */
 class CancellableAttributeComponent(
     private val cancelled: MutableSet<String> = hashSetOf()
-) : ProcessorComponent {
+) : ProcessorComponent, ForkableComponent<CancellableAttributeComponent> {
 
     override val key: ProcessorComponent.Key<*> = Key
 
@@ -24,6 +25,8 @@ class CancellableAttributeComponent(
             cancelled.remove(attribute)
         }
     }
+
+    override fun fork(): CancellableAttributeComponent = CancellableAttributeComponent(HashSet(cancelled))
 
     companion object Key : ProcessorComponent.Key<CancellableAttributeComponent>
 

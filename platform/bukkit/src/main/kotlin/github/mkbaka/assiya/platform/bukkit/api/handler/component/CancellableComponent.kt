@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
+import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 
 /**
@@ -9,9 +10,11 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
  */
 class CancellableComponent(
     var isCancelled: Boolean = false
-) : ProcessorComponent {
+) : ProcessorComponent, ForkableComponent<CancellableComponent> {
 
     override val key: ProcessorComponent.Key<*> = Key
+
+    override fun fork(): CancellableComponent = CancellableComponent(isCancelled)
 
     companion object Key : ProcessorComponent.Key<CancellableComponent>
 

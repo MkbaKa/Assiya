@@ -2,6 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.api.handler.processor
 
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
+import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
@@ -42,6 +43,25 @@ class DamageProcessor(
             HandlerRegistry.publish(selected, this)
         }
         this[CallbackComponent.Key]?.invoke(this)
+    }
+
+    /**
+     * 基于当前组件数据创建新的 Processor
+     *
+     * 只有实现 [ForkableComponent] 接口的才参与创建
+     */
+    @JvmOverloads
+    fun fork(builder: Consumer<ProcessorComponentBuilder>? = null): DamageProcessor {
+        val pcb = ProcessorComponentBuilder()
+
+        for (component in components.values) {
+            val forkable = component as? ForkableComponent<*> ?: continue
+            pcb += forkable.fork()
+        }
+
+        builder?.accept(pcb)
+
+        return DamageProcessor(pcb.build(), subscribers)
     }
 
     companion object {
@@ -96,10 +116,11 @@ class DamageProcessor(
         @JvmOverloads
         fun ofLazyTarget(
             attacker: Entity,
+            subscribers: List<Subscriber>? = null,
             attackerSnapshot: AttributeEngineSnapshot = AssiyaAPI.getSnapshot(attacker),
             builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageProcessor {
-            return DamageProcessor { pcb ->
+            return DamageProcessor(subscribers) { pcb ->
                 pcb += Processor.defaults()
                 pcb += TriggerComponent(attacker, attackerSnapshot)
                 pcb += TargetLazyComponent()

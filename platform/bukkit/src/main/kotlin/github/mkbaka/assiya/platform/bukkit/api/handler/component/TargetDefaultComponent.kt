@@ -3,6 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.api.handler.component
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.platform.bukkit.api.handler.AttributeContainer
 import github.mkbaka.assiya.platform.bukkit.api.handler.DefaultAttributeContainer
+import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
 import org.bukkit.entity.LivingEntity
 
 /**
@@ -16,4 +17,8 @@ class TargetDefaultComponent(
     override val entity: LivingEntity,
     override val snapshot: AttributeEngineSnapshot,
     attribute: AttributeContainer = DefaultAttributeContainer(snapshot)
-) : TargetComponent, AttributeContainer by attribute
+) : TargetComponent, AttributeContainer by attribute, ForkableComponent<TargetDefaultComponent> {
+
+    override fun fork(): TargetDefaultComponent = TargetDefaultComponent(entity, snapshot)
+
+}

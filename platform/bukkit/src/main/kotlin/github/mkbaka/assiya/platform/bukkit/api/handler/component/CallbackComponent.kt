@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
+import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
@@ -12,9 +13,9 @@ import java.util.*
  */
 class CallbackComponent(
     callbacks: Map<String, Callback> = emptyMap()
-) : ProcessorComponent {
+) : ProcessorComponent, ForkableComponent<CallbackComponent> {
 
-    private val container = Container(HashMap(callbacks), ArrayList())
+    private val container = Container(HashMap(callbacks), ArrayList(callbacks.values))
 
     override val key: ProcessorComponent.Key<*> = Key
 
@@ -53,6 +54,8 @@ class CallbackComponent(
             }
         }
     }
+
+    override fun fork(): CallbackComponent = CallbackComponent(container.callbacks)
 
     private class Container(
         val callbacks: MutableMap<String, Callback>,

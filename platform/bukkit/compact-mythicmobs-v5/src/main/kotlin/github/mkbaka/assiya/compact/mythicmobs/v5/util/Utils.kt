@@ -2,10 +2,15 @@ package github.mkbaka.assiya.compact.mythicmobs.v5.util
 
 import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.base.Value
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
+import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeSnapshotBuilder
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.skills.SkillMetadata
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString
@@ -100,6 +105,37 @@ object Utils {
             ids += attribute.id
         }
         return ids
+    }
+
+    fun selectDamageSubscribers(usableAttribute: List<String>?): List<HandlerRegistry.Subscriber>? {
+        if (usableAttribute == null) return null
+
+        val usableIds = resolveAttributeIds(usableAttribute)
+        return HandlerRegistry.select("damage") { subscriber ->
+            subscriber.attributeId in usableIds
+        }
+    }
+
+    fun buildDamageAttackerSnapshot(
+        attacker: Entity,
+        parsed: Map<String, String>,
+        clear: Boolean,
+        overwrite: Boolean
+    ) = AttributeSnapshotBuilder(
+        if (clear) AttributeEngineSnapshot.EMPTY else AssiyaAPI.getSnapshot(attacker)
+    ).also { builder ->
+        for ((attributeId, status) in parseAttributes(
+            attacker,
+            parsed
+        )) {
+            if (overwrite) builder.setAttribute(attributeId, status) else builder.addAttribute(attributeId, status)
+        }
+    }.build()
+
+    fun disableAttributes(builder: ProcessorComponentBuilder, disabledIds: Set<String>) {
+        for (id in disabledIds) {
+            builder[CancellableAttributeComponent]!!.setCancelled(id)
+        }
     }
 
 }

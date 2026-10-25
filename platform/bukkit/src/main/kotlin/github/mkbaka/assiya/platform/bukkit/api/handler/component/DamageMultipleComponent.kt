@@ -1,10 +1,11 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
+import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 
 class DamageMultipleComponent(
     private val components: MutableMap<String, DamageComponent> = hashMapOf()
-) : ProcessorComponent {
+) : ProcessorComponent, ForkableComponent<DamageMultipleComponent> {
 
     override val key: ProcessorComponent.Key<*> = Key
 
@@ -32,6 +33,14 @@ class DamageMultipleComponent(
     }
 
     operator fun get(id: String) = components[id]
+
+    override fun fork(): DamageMultipleComponent {
+        val copied = hashMapOf<String, DamageComponent>()
+        for ((id, component) in components) {
+            copied[id] = component.fork()
+        }
+        return DamageMultipleComponent(copied)
+    }
 
     companion object Key : ProcessorComponent.Key<DamageMultipleComponent>
 

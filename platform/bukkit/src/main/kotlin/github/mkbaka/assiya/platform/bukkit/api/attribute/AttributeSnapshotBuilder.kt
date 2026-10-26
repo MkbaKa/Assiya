@@ -36,7 +36,7 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         sourceId: String = "snapshot:temporary",
         priority: Int? = null
     ) {
-        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent.Key)?.reader ?: return
+        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent)?.reader ?: return
         addAttribute(attributeId, status, sourceId, priority, reader.capture)
     }
 
@@ -47,7 +47,7 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         sourceId: String = "snapshot:temporary",
         priority: Int? = null
     ) {
-        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent.Key)?.reader ?: return
+        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent)?.reader ?: return
         val sourceIds = state.attributeIndex[attributeId]?.sourceIds().orEmpty()
         for (id in sourceIds) {
             state.removeAttributeContribution(id, attributeId)

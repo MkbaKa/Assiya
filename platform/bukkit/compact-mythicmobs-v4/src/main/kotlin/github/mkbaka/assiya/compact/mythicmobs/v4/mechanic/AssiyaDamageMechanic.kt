@@ -58,7 +58,7 @@ abstract class AssiyaDamageMechanic(
         meta: SkillMetadata,
         parsed: Map<String, String>
     ) {
-        this[CustomDataComponent.Key]?.putAll(parsed)
+        this[CustomDataComponent]?.putAll(parsed)
         this += TriggerBySkillComponent(meta)
     }
 
@@ -75,7 +75,7 @@ abstract class AssiyaDamageMechanic(
 
             preDamage = {
                 var isCancelled = false
-                val damage = it.processor.getComponent(DamageMultipleComponent.Key).totalDamage
+                val damage = it.processor.getComponent(DamageMultipleComponent).totalDamage
 
                 val signal = this@AssiyaDamageMechanic.signal.get(meta, ae)
                 if (signal.isNotEmpty()) {

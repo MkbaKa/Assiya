@@ -35,7 +35,7 @@ class DamageSnapshotDispatchMechanic(
         val parsed = Utils.parseAllEntries(variables, meta, ae)
 
         val processor = cached.fork { pcb ->
-            pcb[TargetComponent.Key] = TargetDefaultComponent(target, AssiyaAPI.getSnapshot(target))
+            pcb[TargetComponent] = TargetDefaultComponent(target, AssiyaAPI.getSnapshot(target))
             pcb.applyContext(meta, parsed)
         }
 

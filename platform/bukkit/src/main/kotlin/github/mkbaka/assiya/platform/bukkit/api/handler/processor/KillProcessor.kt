@@ -22,7 +22,7 @@ class KillProcessor(
 
     override fun process() {
         HandlerRegistry.publish("kill", this)
-        this[CallbackComponent.Key]?.invoke(this)
+        this[CallbackComponent]?.invoke(this)
     }
 
     companion object {

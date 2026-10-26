@@ -63,7 +63,7 @@ class DamageSnapshotMechanic(
             subscribers = selected,
             attackerSnapshot = attackerSnapshot
         ) { pcb ->
-            pcb[CustomDataComponent.Key]?.putAll(parsed)
+            pcb[CustomDataComponent]?.putAll(parsed)
             Utils.disableAttributes(pcb, disabledIds)
         }
 

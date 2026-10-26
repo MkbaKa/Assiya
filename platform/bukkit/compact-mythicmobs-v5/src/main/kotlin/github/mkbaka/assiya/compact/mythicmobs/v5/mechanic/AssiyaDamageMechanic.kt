@@ -50,7 +50,7 @@ abstract class AssiyaDamageMechanic(
     }
 
     protected fun ProcessorComponentBuilder.applyContext(meta: SkillMetadata, parsed: Map<String, String>) {
-        this[CustomDataComponent.Key]?.putAll(parsed)
+        this[CustomDataComponent]?.putAll(parsed)
         this += TriggerBySkillComponent(meta)
     }
 
@@ -66,7 +66,7 @@ abstract class AssiyaDamageMechanic(
             noDamageTicks = this@AssiyaDamageMechanic.noDamageTicks.get(meta, ae).toIntOrNull()
             preDamage = {
                 var cancelled = false
-                val damage = it.processor.getComponent(DamageMultipleComponent.Key).totalDamage
+                val damage = it.processor.getComponent(DamageMultipleComponent).totalDamage
                 val signal = this@AssiyaDamageMechanic.signal.get(meta, ae)
                 if (signal.isNotEmpty()) cancelled = SignalUtils.publish(
                     ae, realCaster.entity, signal,

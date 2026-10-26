@@ -134,12 +134,12 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
         for (index in subscribers.indices) {
             val subscriber = subscribers[index]
             // 属性直接阻止了整个 processor 触发
-            if (processor[CancellableComponent.Key]?.isCancelled == true) {
+            if (processor[CancellableComponent]?.isCancelled == true) {
                 break
             }
 
             // 阻止单个属性
-            if (processor[CancellableAttributeComponent.Key]
+            if (processor[CancellableAttributeComponent]
                     ?.isCancelled(subscriber.attributeId) == true
             ) {
                 continue

@@ -24,7 +24,7 @@ class UpdateProcessor(
 
     override fun process() {
         HandlerRegistry.publish("update", this)
-        this[CallbackComponent.Key]?.invoke(this)
+        this[CallbackComponent]?.invoke(this)
     }
 
     companion object {

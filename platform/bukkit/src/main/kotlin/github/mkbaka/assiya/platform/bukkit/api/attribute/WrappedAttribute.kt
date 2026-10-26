@@ -14,8 +14,8 @@ class WrappedAttribute(
     fun isProjectile(processor: Processor) = ProjectileComponent.Key in processor
 
     fun getRandomValue(entity: Entity, attribute: String, processor: Processor): Double {
-        val trigger = processor[TriggerComponent.Key]
-        val target = processor[TargetComponent.Key]
+        val trigger = processor[TriggerComponent]
+        val target = processor[TargetComponent]
         return when {
             trigger != null && entity.uniqueId == trigger.entity.uniqueId -> trigger.getValue(attribute, "total")
 
@@ -26,13 +26,13 @@ class WrappedAttribute(
     }
 
     fun addDamage(value: Double, processor: Processor) {
-        val multiple = processor[DamageMultipleComponent.Key]
+        val multiple = processor[DamageMultipleComponent]
         if (multiple != null) {
             multiple.addDamage("vanilla", value)
             return
         }
 
-        val single = processor[DamageComponent.Key]
+        val single = processor[DamageComponent]
         if (single != null) {
             single.value += value
         }

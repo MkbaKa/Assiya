@@ -42,19 +42,19 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
 
     init {
         register(Trigger.Base("attack", "onAttack", "damage")) { processor, id ->
-            processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
+            processor[TriggerComponent]?.hasAttribute(id) ?: false
         }
 
         register(Trigger.Base("defense", "onDefense", "damage")) { processor, id ->
-            processor[TargetComponent.Key]?.hasAttribute(id) ?: false
+            processor[TargetComponent]?.hasAttribute(id) ?: false
         }
 
         register(Trigger.Base("kill", "onKill")) { processor, id ->
-            processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
+            processor[TriggerComponent]?.hasAttribute(id) ?: false
         }
 
         register(Trigger.Base("update", "onUpdate")) { processor, id ->
-            processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
+            processor[TriggerComponent]?.hasAttribute(id) ?: false
         }
 
         register(
@@ -66,7 +66,7 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
                 }
             },
             { processor, id ->
-                processor[TriggerComponent.Key]?.hasAttribute(id) ?: false
+                processor[TriggerComponent]?.hasAttribute(id) ?: false
             },
         )
     }

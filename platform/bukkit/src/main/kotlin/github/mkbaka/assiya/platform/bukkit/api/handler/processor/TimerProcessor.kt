@@ -23,7 +23,7 @@ class TimerProcessor(
 
     override fun process() {
         HandlerRegistry.publish(subscribers, this)
-        this[CallbackComponent.Key]?.invoke(this)
+        this[CallbackComponent]?.invoke(this)
     }
 
     companion object {

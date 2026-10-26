@@ -35,7 +35,7 @@ object AssiyaPlaceholderAPIHook {
 
                                 // 若属性不存着或者没有 reader 返回默认值
                                 val attr = AttributeRegistry[attribute] ?: return@setExecutor default ?: ""
-                                val reader = attr[ReaderComponent.Key]?.reader
+                                val reader = attr[ReaderComponent]?.reader
                                     ?: return@setExecutor default ?: ""
 
                                 // 玩家没有这条属性 返回默认值

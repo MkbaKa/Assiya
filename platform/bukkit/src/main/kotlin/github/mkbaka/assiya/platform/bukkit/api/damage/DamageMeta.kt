@@ -135,7 +135,7 @@ class DamageMeta @JvmOverloads constructor(
         ): DamageMeta {
             return DamageMeta(process = false) {
                 DamageProcessor.of(attacker, defender) { pcb ->
-                    pcb[DamageMultipleComponent.Key]!!.setDamage("vanilla", damage)
+                    pcb[DamageMultipleComponent]!!.setDamage("vanilla", damage)
                     builder?.accept(pcb)
                 }
             }

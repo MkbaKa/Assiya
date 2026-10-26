@@ -40,8 +40,8 @@ object ScriptTools {
 
     @JvmStatic
     fun getAttacker(processor: Processor): Entity? {
-        return processor[ProjectileComponent.Key]?.shooter?.entity
-            ?: processor[TriggerComponent.Key]?.entity
+        return processor[ProjectileComponent]?.shooter?.entity
+            ?: processor[TriggerComponent]?.entity
     }
 
     @JvmStatic
@@ -58,13 +58,13 @@ object ScriptTools {
         processor: Processor,
         variables: Map<String, Any> = emptyMap()
     ) {
-        val messages = attribute[OptionsComponent.Key] ?: return
+        val messages = attribute[OptionsComponent] ?: return
 
         val attackerMessage = messages.getString("attacker")
         val entityMessage = messages.getString("entity")
 
         val attacker = getAttacker(processor)
-        val entity = processor[TargetComponent.Key]?.entity
+        val entity = processor[TargetComponent]?.entity
 
         val vars = hashMapOf<String, String>()
         if (attacker != null) {

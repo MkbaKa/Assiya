@@ -31,7 +31,7 @@ class CallbackComponent(
     fun invoke(id: String, processor: Processor) {
         val callback = container.callbacks[id] ?: return
 
-        if (processor[CancellableComponent.Key]?.isCancelled == true
+        if (processor[CancellableComponent]?.isCancelled == true
             && !callback.ignoreCancelled) return
 
         callback.action.run()
@@ -43,7 +43,7 @@ class CallbackComponent(
              * 若 processor 持有 [CancellableComponent] 且处于取消
              * 则仅 ignoreCancelled 为 true 的回调可以执行
              */
-            if (processor[CancellableComponent.Key]?.isCancelled == true
+            if (processor[CancellableComponent]?.isCancelled == true
                 && !callback.ignoreCancelled
             ) continue
 

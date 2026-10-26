@@ -42,7 +42,7 @@ class DamageProcessor(
         } else {
             HandlerRegistry.publish(selected, this)
         }
-        this[CallbackComponent.Key]?.invoke(this)
+        this[CallbackComponent]?.invoke(this)
     }
 
     /**
@@ -105,7 +105,7 @@ class DamageProcessor(
             return ofSnapshot(projectile, defender) { pcb ->
                 pcb += ProjectileComponent(
                     TriggerComponent(shooter, AssiyaAPI.getSnapshot(shooter)),
-                    pcb[TriggerComponent.Key]!!,
+                    pcb[TriggerComponent]!!,
                     force
                 )
                 builder?.accept(pcb)

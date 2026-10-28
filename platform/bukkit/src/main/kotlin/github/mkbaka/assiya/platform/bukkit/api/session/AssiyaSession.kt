@@ -2,7 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.api.session
 
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
-import github.mkbaka.assiya.platform.bukkit.internal.util.entityOrNull
+import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -13,7 +13,7 @@ class AssiyaSession(
 ) {
 
     val owner: Entity?
-        get() = ownerUUID.entityOrNull
+        get() = entityOf(ownerUUID)
 
     val ownerUUID = entity.uniqueId
 

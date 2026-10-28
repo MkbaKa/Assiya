@@ -5,6 +5,11 @@ build/
 !**/src/test/**/build/
 .kotlin
 
+### Documentation ###
+/assiya-docs/node_modules/
+/assiya-docs/.vitepress/cache/
+/assiya-docs/.vitepress/dist/
+
 ### IntelliJ IDEA ###
 /.idea/
 *.iws

@@ -1,9 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.processor
 
+import github.mkbaka.assiya.common.handler.ProcessorComponent
+import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetDefaultComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
@@ -16,7 +16,7 @@ import java.util.function.Consumer
 
 class KillProcessor(
     override val components: Map<ProcessorComponent.Key<*>, ProcessorComponent>,
-) : Processor {
+) : BukkitProcessor {
 
     constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(ProcessorComponentBuilder().apply(pcb::accept).build())
 
@@ -34,7 +34,7 @@ class KillProcessor(
             event: EntityDamageByEntityEvent,
         ): KillProcessor {
             return KillProcessor { pcb ->
-                pcb += Processor.defaults()
+                pcb += BukkitProcessor.defaults()
                 pcb += TriggerComponent(killer, AssiyaAPI.getSnapshot(killer))
                 pcb += TargetDefaultComponent(victim, AssiyaAPI.getSnapshot(victim))
                 pcb += TriggerByEventComponent(event)

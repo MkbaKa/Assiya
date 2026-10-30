@@ -13,7 +13,7 @@ import org.bukkit.entity.LivingEntity
  * 要执行逻辑时再设置目标
  * 用来实现一些奇奇怪怪的效果?
  *
- * **必须在调用 [github.mkbaka.assiya.platform.bukkit.api.handler.Processor.process] 前调用 [set]**
+ * **必须在调用 [github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor.process] 前调用 [set]**
  */
 class TargetLazyComponent : TargetComponent {
 

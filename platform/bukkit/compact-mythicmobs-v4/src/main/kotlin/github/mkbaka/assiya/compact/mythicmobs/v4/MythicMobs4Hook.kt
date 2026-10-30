@@ -12,10 +12,10 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig
 import io.lumine.xikage.mythicmobs.skills.SkillCondition
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic
+import org.bukkit.event.EventPriority
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
-import org.bukkit.event.EventPriority
 
 class MythicMobs4Hook : MythicMobsCompatibility {
 

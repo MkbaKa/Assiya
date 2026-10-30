@@ -2,7 +2,7 @@ package scripts.attribute.fight
 
 import github.mkbaka.assiya.platform.bukkit.api.EntityTaskAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
@@ -31,7 +31,7 @@ class Frozen {
         EntityTaskAPI.registerTask(MODIFIER_NAME, cleanup, cleanup)
     }
 
-    static void onAttack(Attribute attribute, Processor processor) {
+    static void onAttack(Attribute attribute, BukkitProcessor processor) {
         TriggerComponent attacker = processor.get(TriggerComponent.@Key)
         if (attacker == null) return
 
@@ -74,7 +74,7 @@ class Frozen {
         ScriptTools.sendCombatMessage(
                 attribute,
                 processor,
-                [frozen: StringUtils.format(rate * 100.0d, 2), duration: StringUtils.format(duration, 2)]
+                [frozen: StringUtils.format(rate * 100.0d, 2), duration: StringUtils.format(duration, 0)]
         )
     }
 

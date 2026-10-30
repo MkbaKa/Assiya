@@ -3,7 +3,7 @@ package scripts.attribute
 import github.mkbaka.assiya.platform.bukkit.api.CombatStateAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
@@ -12,7 +12,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 @CompileStatic
-static void onTimer(Attribute attribute, Processor processor) {
+static void onTimer(Attribute attribute, BukkitProcessor processor) {
     TriggerComponent trigger = processor.get(TriggerComponent.@Key)
     if (trigger == null) return
     if (!(trigger.entity instanceof LivingEntity)) return

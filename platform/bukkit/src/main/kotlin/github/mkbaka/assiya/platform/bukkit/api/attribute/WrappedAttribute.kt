@@ -1,6 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api.attribute
 
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import org.bukkit.entity.Entity
 
@@ -11,9 +11,9 @@ class WrappedAttribute(
     val attribute: Attribute
 ) : Attribute by attribute {
 
-    fun isProjectile(processor: Processor) = ProjectileComponent.Key in processor
+    fun isProjectile(processor: BukkitProcessor) = ProjectileComponent.Key in processor
 
-    fun getRandomValue(entity: Entity, attribute: String, processor: Processor): Double {
+    fun getRandomValue(entity: Entity, attribute: String, processor: BukkitProcessor): Double {
         val trigger = processor[TriggerComponent]
         val target = processor[TargetComponent]
         return when {
@@ -25,7 +25,7 @@ class WrappedAttribute(
         } ?: 0.0
     }
 
-    fun addDamage(value: Double, processor: Processor) {
+    fun addDamage(value: Double, processor: BukkitProcessor) {
         val multiple = processor[DamageMultipleComponent]
         if (multiple != null) {
             multiple.addDamage("vanilla", value)

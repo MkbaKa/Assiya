@@ -4,12 +4,12 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import groovy.transform.CompileStatic
 import org.bukkit.entity.Player
 
 @CompileStatic
-static void onAttack(Attribute attribute, Processor processor) {
+static void onAttack(Attribute attribute, BukkitProcessor processor) {
     TargetComponent target = processor.get(TargetComponent.@Key)
     if (target == null || target.entity instanceof Player) return
 

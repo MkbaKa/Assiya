@@ -1,7 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.formula
-
-import github.mkbaka.assiya.platform.bukkit.internal.util.TypeUtils.ofDouble
-import github.mkbaka.assiya.platform.bukkit.internal.util.severe
+package github.mkbaka.assiya.common.formula
 
 class Formula(
     val id: String,
@@ -18,8 +15,8 @@ class Formula(
                 // 解析变量后再入栈
                 is FormulaToken.Variable -> {
                     val value = resolve(token.name)
-                        ?: severe("Formula $id has invalid variable ${token.name}")
-                    stack.addLast(value.ofDouble())
+                        ?: throw IllegalArgumentException("Formula $id has invalid variable ${token.name}")
+                    stack.addLast(if (value is Double) value else value.toString().toDouble())
                 }
 
                 // 运算符

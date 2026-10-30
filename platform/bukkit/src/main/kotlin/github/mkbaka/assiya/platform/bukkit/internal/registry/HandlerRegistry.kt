@@ -4,7 +4,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.CustomFilterComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.begin
@@ -123,14 +123,14 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
     @JvmStatic
     fun publish(
         id: String,
-        processor: Processor,
+        processor: BukkitProcessor,
     ) {
         val subscribers = indexes[id.lowercase()] ?: return
         publish(subscribers, processor)
     }
 
     @JvmStatic
-    fun publish(subscribers: List<Subscriber>, processor: Processor) {
+    fun publish(subscribers: List<Subscriber>, processor: BukkitProcessor) {
         for (index in subscribers.indices) {
             val subscriber = subscribers[index]
             // 属性直接阻止了整个 processor 触发
@@ -186,8 +186,8 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
         val indexId: String,
         val attributeId: String,
         val settings: TriggerSettings,
-        val hasAttribute: BiPredicate<Processor, String>?,
-        val action: Consumer<Processor>,
+        val hasAttribute: BiPredicate<BukkitProcessor, String>?,
+        val action: Consumer<BukkitProcessor>,
     ) {
 
         val attribute: Attribute?

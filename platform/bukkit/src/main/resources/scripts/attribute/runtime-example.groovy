@@ -1,10 +1,10 @@
 package scripts.attribute
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import groovy.transform.CompileStatic
 
 @CompileStatic
-void onTimer(Attribute attribute, Processor processor) {
+void onTimer(Attribute attribute, BukkitProcessor processor) {
     println('onTimer!')
 }

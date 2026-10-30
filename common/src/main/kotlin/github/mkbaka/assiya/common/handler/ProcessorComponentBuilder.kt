@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.api.handler
+package github.mkbaka.assiya.common.handler
 
 class ProcessorComponentBuilder {
 

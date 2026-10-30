@@ -1,7 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs
 
-import github.mkbaka.assiya.platform.bukkit.internal.formula.Formula
-import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
+import github.mkbaka.assiya.common.formula.Formula
+import github.mkbaka.assiya.common.formula.FormulaCompiler
 import java.math.BigDecimal
 
 internal class MobAttributeTemplate(mobId: String, attributes: List<String>, calculator: Boolean) {

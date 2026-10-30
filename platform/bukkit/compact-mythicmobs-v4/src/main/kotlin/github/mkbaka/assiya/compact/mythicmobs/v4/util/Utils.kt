@@ -3,12 +3,12 @@ package github.mkbaka.assiya.compact.mythicmobs.v4.util
 import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.common.base.Value
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
+import github.mkbaka.assiya.common.formula.FormulaCompiler
+import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeSnapshotBuilder
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
-import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity

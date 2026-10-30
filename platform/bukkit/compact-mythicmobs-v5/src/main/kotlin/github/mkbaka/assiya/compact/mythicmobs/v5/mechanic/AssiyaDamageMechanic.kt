@@ -1,9 +1,9 @@
 package github.mkbaka.assiya.compact.mythicmobs.v5.mechanic
 
+import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.compact.mythicmobs.v5.handler.component.TriggerBySkillComponent
 import github.mkbaka.assiya.compact.mythicmobs.v5.util.SignalUtils
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor

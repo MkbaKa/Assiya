@@ -1,7 +1,7 @@
 package scripts.attribute.fight
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent
@@ -10,7 +10,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
 import groovy.transform.CompileStatic
 
 @CompileStatic
-static void onDefense(Attribute attribute, Processor processor) {
+static void onDefense(Attribute attribute, BukkitProcessor processor) {
     if (processor.get(ProjectileComponent.@Key) == null) return
 
     TargetComponent defender = processor.get(TargetComponent.@Key)

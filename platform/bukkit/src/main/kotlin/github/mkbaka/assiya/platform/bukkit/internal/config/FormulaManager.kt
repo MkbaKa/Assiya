@@ -1,8 +1,8 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
+import github.mkbaka.assiya.common.formula.Formula
+import github.mkbaka.assiya.common.formula.FormulaCompiler
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
-import github.mkbaka.assiya.platform.bukkit.internal.formula.Formula
-import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
 import github.mkbaka.bukkitksp.annotation.CustomTask
 
 object FormulaManager {

@@ -1,6 +1,5 @@
 package github.mkbaka.assiya.platform.bukkit.api.attribute.component
 
-import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry

@@ -2,12 +2,12 @@ package github.mkbaka.assiya.platform.bukkit.internal.config.obj
 
 import github.mkbaka.assiya.common.base.Capture
 import github.mkbaka.assiya.common.base.Status
+import github.mkbaka.assiya.common.formula.Formula
 import github.mkbaka.assiya.common.operation.NumberOperations
 import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.api.reader.Placeholder
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 import github.mkbaka.assiya.platform.bukkit.api.reader.ReaderEvaluation
-import github.mkbaka.assiya.platform.bukkit.internal.formula.Formula
 
 
 class ConfigReader(

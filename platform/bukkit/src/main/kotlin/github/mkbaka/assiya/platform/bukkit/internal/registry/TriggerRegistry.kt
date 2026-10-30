@@ -2,7 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.registry
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import java.util.function.BiPredicate
@@ -18,7 +18,7 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
 
     fun register(
         trigger: Trigger,
-        hasAttribute: BiPredicate<Processor, String>
+        hasAttribute: BiPredicate<BukkitProcessor, String>
     ) {
         register(trigger, NO_VALIDATION, hasAttribute)
     }
@@ -26,7 +26,7 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
     fun register(
         trigger: Trigger,
         validator: Consumer<TriggerSettings>,
-        hasAttribute: BiPredicate<Processor, String>?
+        hasAttribute: BiPredicate<BukkitProcessor, String>?
     ) {
         super.register(
             trigger.id,
@@ -37,7 +37,7 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
     data class TriggerType(
         val trigger: Trigger,
         val validator: Consumer<TriggerSettings>,
-        val hasAttribute: BiPredicate<Processor, String>?
+        val hasAttribute: BiPredicate<BukkitProcessor, String>?
     )
 
     init {

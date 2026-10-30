@@ -1,5 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler
 
+import github.mkbaka.assiya.common.handler.Processor
+import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
@@ -10,23 +12,7 @@ import java.util.function.Consumer
 /**
  * 属性执行流程
  */
-interface Processor {
-
-    val components: Map<ProcessorComponent.Key<*>, ProcessorComponent>
-
-    @Suppress("UNCHECKED_CAST")
-    fun <C : ProcessorComponent> getComponent(key: ProcessorComponent.Key<C>): C {
-        return get(key)!!
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    operator fun <C : ProcessorComponent> get(key: ProcessorComponent.Key<C>): C? {
-        return components[key] as? C
-    }
-
-    operator fun contains(key: ProcessorComponent.Key<*>): Boolean = key in components
-
-    fun process()
+interface BukkitProcessor : Processor {
 
     /**
      * 基于变量计算公式结果

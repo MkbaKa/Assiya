@@ -2,7 +2,7 @@ package scripts.attribute.fight
 
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 import org.bukkit.entity.LivingEntity
 
 @CompileStatic
-static void onDefense(Attribute attribute, Processor processor) {
+static void onDefense(Attribute attribute, BukkitProcessor processor) {
     TriggerComponent attacker = processor.get(TriggerComponent.@Key)
     ProjectileComponent projectile = processor.get(ProjectileComponent.@Key)
     if (projectile != null) attacker = projectile.shooter

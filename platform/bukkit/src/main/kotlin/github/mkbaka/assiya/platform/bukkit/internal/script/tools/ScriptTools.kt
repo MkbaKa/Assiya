@@ -3,7 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.script.tools
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
@@ -39,7 +39,7 @@ object ScriptTools {
     fun chance(target: Double): Boolean = random() <= (target / 100)
 
     @JvmStatic
-    fun getAttacker(processor: Processor): Entity? {
+    fun getAttacker(processor: BukkitProcessor): Entity? {
         return processor[ProjectileComponent]?.shooter?.entity
             ?: processor[TriggerComponent]?.entity
     }
@@ -55,7 +55,7 @@ object ScriptTools {
     @JvmOverloads
     fun sendCombatMessage(
         attribute: Attribute,
-        processor: Processor,
+        processor: BukkitProcessor,
         variables: Map<String, Any> = emptyMap()
     ) {
         val messages = attribute[OptionsComponent] ?: return

@@ -1,8 +1,8 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
+import github.mkbaka.assiya.common.handler.ProcessorComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.AttributeContainer
 import github.mkbaka.assiya.platform.bukkit.api.handler.EntityProcessorComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
 import org.bukkit.entity.LivingEntity
 
 interface TargetComponent : ProcessorComponent, EntityProcessorComponent, AttributeContainer {

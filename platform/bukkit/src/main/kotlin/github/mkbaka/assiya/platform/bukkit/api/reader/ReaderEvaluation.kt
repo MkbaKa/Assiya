@@ -5,7 +5,7 @@ import github.mkbaka.assiya.common.base.Status
 /**
  * 固定 [Status] 的返回结果
  * 可以用在 [github.mkbaka.assiya.platform.bukkit.internal.command.sub.StatusCommand] 这种需要两个公式结果之间相关联的地方
- * 如果不固定结果 那每次 [github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaFunction.RANDOM] 都会返回不同的结果
+ * 如果不固定结果 那每次 [github.mkbaka.assiya.common.formula.FormulaFunction.RANDOM] 都会返回不同的结果
  * 再如果 公式A 中使用了 公式B 恰好 公式B 里包含了 RANDOM 函数
  * 在不固定结果的情况下 random 的结果与 total 取值内再次执行的 random 会不一致
  */

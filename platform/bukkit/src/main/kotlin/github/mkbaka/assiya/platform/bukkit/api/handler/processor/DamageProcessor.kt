@@ -1,11 +1,11 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.processor
 
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
+import github.mkbaka.assiya.common.handler.ForkableComponent
+import github.mkbaka.assiya.common.handler.ProcessorComponent
+import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
-import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponentBuilder
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.Subscriber
@@ -21,7 +21,7 @@ import java.util.function.Consumer
 class DamageProcessor(
     override val components: Map<ProcessorComponent.Key<*>, ProcessorComponent>,
     val subscribers: List<Subscriber>? = null
-) : Processor {
+) : BukkitProcessor {
 
     constructor(pcb: Consumer<ProcessorComponentBuilder>) : this(
         ProcessorComponentBuilder().apply(pcb::accept).build()
@@ -46,7 +46,7 @@ class DamageProcessor(
     }
 
     /**
-     * 基于当前组件数据创建新的 Processor
+     * 基于当前组件数据创建新的 BukkitProcessor
      *
      * 只有实现 [ForkableComponent] 接口的才参与创建
      */
@@ -86,7 +86,7 @@ class DamageProcessor(
             builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageProcessor {
             return DamageProcessor(subscribers) { pcb ->
-                pcb += Processor.defaults()
+                pcb += BukkitProcessor.defaults()
                 pcb += TriggerComponent(attacker, attackerSnapshot)
                 pcb += TargetDefaultComponent(defender, defenderSnapshot)
                 pcb += DamageMultipleComponent()
@@ -121,7 +121,7 @@ class DamageProcessor(
             builder: Consumer<ProcessorComponentBuilder>? = null
         ): DamageProcessor {
             return DamageProcessor(subscribers) { pcb ->
-                pcb += Processor.defaults()
+                pcb += BukkitProcessor.defaults()
                 pcb += TriggerComponent(attacker, attackerSnapshot)
                 pcb += TargetLazyComponent()
                 pcb += DamageMultipleComponent()

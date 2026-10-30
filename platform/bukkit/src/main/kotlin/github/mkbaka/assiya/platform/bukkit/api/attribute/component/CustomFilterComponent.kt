@@ -1,7 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.attribute.component
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 
 @FunctionalInterface
 fun interface CustomFilterComponent : AttributeComponent {
@@ -13,7 +13,7 @@ fun interface CustomFilterComponent : AttributeComponent {
      * 返回 true 时才能执行
      * 反之跳过
      */
-    fun test(processor: Processor): Boolean
+    fun test(processor: BukkitProcessor): Boolean
 
     companion object Key : AttributeComponent.Key<CustomFilterComponent>
 

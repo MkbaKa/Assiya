@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.formula
+package github.mkbaka.assiya.common.formula
 
 object FormulaCompiler {
 

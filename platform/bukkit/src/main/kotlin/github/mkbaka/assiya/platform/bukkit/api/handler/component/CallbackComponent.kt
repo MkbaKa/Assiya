@@ -1,8 +1,8 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
-import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
+import github.mkbaka.assiya.common.handler.ForkableComponent
+import github.mkbaka.assiya.common.handler.ProcessorComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import java.util.*
 
@@ -28,16 +28,17 @@ class CallbackComponent(
         container.register(id, Callback(id, ignoreCancelled, runnable))
     }
 
-    fun invoke(id: String, processor: Processor) {
+    fun invoke(id: String, processor: BukkitProcessor) {
         val callback = container.callbacks[id] ?: return
 
         if (processor[CancellableComponent]?.isCancelled == true
-            && !callback.ignoreCancelled) return
+            && !callback.ignoreCancelled
+        ) return
 
         callback.action.run()
     }
 
-    fun invoke(processor: Processor) {
+    fun invoke(processor: BukkitProcessor) {
         for (callback in container.loop) {
             /**
              * 若 processor 持有 [CancellableComponent] 且处于取消

@@ -3,11 +3,11 @@ package scripts.attribute.fight
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.Processor
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import groovy.transform.CompileStatic
 
 @CompileStatic
-static void onDefense(Attribute attribute, Processor processor) {
+static void onDefense(Attribute attribute, BukkitProcessor processor) {
     TargetComponent defender = processor.get(TargetComponent.@Key)
     if (defender == null) return
 

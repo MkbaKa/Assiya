@@ -1,14 +1,14 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.common.base.Capture
+import github.mkbaka.assiya.common.formula.Formula
+import github.mkbaka.assiya.common.formula.FormulaCompiler
 import github.mkbaka.assiya.common.operation.NumberOperations
 import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigReader
-import github.mkbaka.assiya.platform.bukkit.internal.formula.Formula
-import github.mkbaka.assiya.platform.bukkit.internal.formula.FormulaCompiler
 import github.mkbaka.assiya.platform.bukkit.internal.registry.OperationsRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ValueRegistry

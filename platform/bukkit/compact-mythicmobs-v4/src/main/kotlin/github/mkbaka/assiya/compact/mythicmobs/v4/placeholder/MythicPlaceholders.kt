@@ -7,7 +7,7 @@ import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderMeta
 import io.lumine.xikage.mythicmobs.skills.placeholders.types.MetaPlaceholder
 import io.lumine.xikage.mythicmobs.skills.placeholders.types.TargetPlaceholder
 import org.bukkit.Bukkit
-import java.util.UUID
+import java.util.*
 
 object MythicPlaceholders {
 

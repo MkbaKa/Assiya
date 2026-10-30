@@ -1,7 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.handler.component
 
-import github.mkbaka.assiya.platform.bukkit.api.handler.ForkableComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.ProcessorComponent
+import github.mkbaka.assiya.common.handler.ForkableComponent
+import github.mkbaka.assiya.common.handler.ProcessorComponent
 
 /**
  * 整个 processor 的取消状态

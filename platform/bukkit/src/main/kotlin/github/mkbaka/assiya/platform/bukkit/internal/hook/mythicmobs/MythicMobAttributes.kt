@@ -4,6 +4,7 @@ import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
+import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.CustomTask
@@ -26,7 +27,7 @@ object MythicMobAttributes {
             AssiyaAPI.parse(levelAttribute.template.render(level))
         }
 
-        val values = AssiyaAPI.evaluate(entity, parsed)
+        val values = AssiyaAPI.evaluate(entity, parsed, ConditionContextImpl(sourceId = SOURCE_ID))
         val patch = AttributeSourcePatch(
             sourceId = SOURCE_ID,
             priority = Config.global.MYTHICMOBS_SOURCE_PRIORITY,

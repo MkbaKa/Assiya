@@ -7,6 +7,7 @@ import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.common.source.mergeAttributeValues
+import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
@@ -52,7 +53,7 @@ object AssiyaAPI {
     @JvmStatic
     fun parse(entity: Entity, lines: List<String>): Map<String, AttributeValue<*>> {
         val parsed = AttributeReadPipeline.parse(lines)
-        return AttributeReadPipeline.evaluate(entity, parsed)
+        return AttributeReadPipeline.evaluate(entity, parsed, ConditionContextImpl())
     }
 
     @JvmStatic
@@ -61,8 +62,10 @@ object AssiyaAPI {
     @JvmStatic
     fun evaluate(
         entity: Entity,
-        parsed: AttributeParsedSource
-    ): Map<String, AttributeValue<*>> = AttributeReadPipeline.evaluate(entity, parsed)
+        parsed: AttributeParsedSource,
+        context: ConditionContextImpl
+    ): Map<String, AttributeValue<*>> =
+        AttributeReadPipeline.evaluate(entity, parsed, context)
 
     @JvmStatic
     @JvmOverloads
@@ -86,11 +89,12 @@ object AssiyaAPI {
         itemStack: ItemStack,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
-        triggerEvent: Boolean = false
+        triggerEvent: Boolean = false,
+        context: ConditionContextImpl = ConditionContextImpl(itemStack = itemStack, sourceId = sourceId)
     ) {
-        val parts = AttributeReadPipeline.extract(itemStack)
+        val parts = AttributeReadPipeline.readItem(itemStack)
         val parsed = AttributeReadPipeline.parseParts(parts)
-        addAttribute(session, sourceId, parsed, priority, lifeCycle, triggerEvent)
+        addAttribute(session, sourceId, parsed, priority, lifeCycle, triggerEvent, context)
     }
 
     @JvmStatic
@@ -121,7 +125,8 @@ object AssiyaAPI {
         parsed: AttributeParsedSource,
         priority: Int,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
-        triggerEvent: Boolean = false
+        triggerEvent: Boolean = false,
+        context: ConditionContextImpl = ConditionContextImpl(sourceId = sourceId)
     ) {
         val entity = session.owner ?: return
 
@@ -129,7 +134,7 @@ object AssiyaAPI {
             sourceId,
             priority,
             lifeCycle,
-            AttributeReadPipeline.evaluate(entity, parsed)
+            AttributeReadPipeline.evaluate(entity, parsed, context)
         )
 
         session.attribute.submitPatches(triggerEvent, patch)
@@ -148,11 +153,12 @@ object AssiyaAPI {
         val entity = session.owner ?: return
 
         val values = items.flatMap { item ->
-            val parts = AttributeReadPipeline.extract(item)
+            val parts = AttributeReadPipeline.readItem(item)
 
             val parsed = AttributeReadPipeline.parseParts(parts)
 
-            val result = AttributeReadPipeline.evaluate(entity, parsed)
+            val context = ConditionContextImpl(itemStack = item, sourceId = sourceId)
+            val result = AttributeReadPipeline.evaluate(entity, parsed, context)
 
             result.values
         }

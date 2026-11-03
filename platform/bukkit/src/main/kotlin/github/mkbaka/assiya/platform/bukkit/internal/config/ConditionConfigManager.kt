@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
+import github.mkbaka.assiya.platform.bukkit.api.condition.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigCondition
@@ -51,7 +52,8 @@ object ConditionConfigManager {
             )
         }
 
-        return ConfigCondition(id = id, names = names, reader = readerName, handler = handler)
+        val options = node.getNode("options")?.let(::OptionsComponent)
+        return ConfigCondition(id = id, names = names, reader = readerName, handler = handler, options = options)
     }
 
 }

@@ -3,7 +3,7 @@ package github.mkbaka.assiya.common.condition
 /**
  * 待判断条件的解析上下文
  */
-data class ConditionContext(
+open class ConditionContext(
     val captures: Map<String, Any>
 ) {
 

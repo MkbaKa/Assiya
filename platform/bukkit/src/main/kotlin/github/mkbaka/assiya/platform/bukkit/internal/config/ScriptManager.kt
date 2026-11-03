@@ -69,6 +69,7 @@ object ScriptManager {
             "scripts/attribute/fight/fire.groovy",
             "scripts/attribute/fight/Frozen.groovy",
             "scripts/condition/level-require.groovy",
+            "scripts/condition/equipment-slot.groovy",
             "scripts/condition/permission.groovy",
             "scripts/feature/CombatStateListener.groovy"
         )

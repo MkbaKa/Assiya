@@ -4,6 +4,7 @@ import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.parser.part.AttributeSourcePart
 import github.mkbaka.assiya.common.parser.part.TextAttributeSourcePart
 import github.mkbaka.assiya.common.source.AttributeValue
+import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ItemReaderRegistry
@@ -15,7 +16,7 @@ import org.bukkit.inventory.ItemStack
 
 object AttributeReadPipeline {
 
-    fun extract(item: ItemStack?): List<AttributeSourcePart> {
+    fun readItem(item: ItemStack?): List<AttributeSourcePart> {
         return ItemReaderRegistry.read(item)
     }
 
@@ -47,21 +48,23 @@ object AttributeReadPipeline {
 
     fun evaluate(
         entity: Entity,
-        parsed: AttributeParsedSource
+        parsed: AttributeParsedSource,
+        context: ConditionContextImpl
     ): Map<String, AttributeValue<*>> {
         val conditions = parsed.evaluateConditions {
-            ConditionRegistry.eval(entity, it)
+            ConditionRegistry.eval(entity, it, context)
         }
         return parsed.resolve(conditions)
     }
 
     suspend fun evaluateAsync(
         entity: Entity,
-        parsed: AttributeParsedSource
+        parsed: AttributeParsedSource,
+        context: ConditionContextImpl
     ): Map<String, AttributeValue<*>> {
         val conditions = withSync {
             parsed.evaluateConditions {
-                ConditionRegistry.eval(entity, it)
+                ConditionRegistry.eval(entity, it, context)
             }
         }
         return withAsync {

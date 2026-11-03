@@ -5,6 +5,7 @@ import github.mkbaka.assiya.common.engine.AttributeEngineAction
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
+import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
 import org.bukkit.entity.Player
@@ -33,7 +34,8 @@ class AttributeSession(
             submitRemove(DEFAULT_SOURCE)
             return
         }
-        val attributes = AttributeReadPipeline.evaluate(owner, parsed)
+        val context = ConditionContextImpl(sourceId = DEFAULT_SOURCE)
+        val attributes = AttributeReadPipeline.evaluate(owner, parsed, context)
         val patch = AttributeSourcePatch(
             sourceId = DEFAULT_SOURCE,
             priority = config.DEFAULT_ATTRIBUTES_PRIORITY,

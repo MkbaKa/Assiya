@@ -3,6 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.equipment
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
+import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
@@ -72,28 +73,32 @@ object EquipmentPipeline {
     ) {
         val priority = Config.global.EQUIPMENT_SOURCE_PRIORITY
         val equipment = entity.equipment
-        val inputs = BukkitEquipmentSlot.entries.associate { slot ->
-            slot.sourceId to AttributeReadPipeline.extract(
-                slot.getSlotItem(equipment)
-            )
+        val items = BukkitEquipmentSlot.entries.associateWith { slot ->
+            slot.getSlotItem(equipment)
+        }
+        val inputs = items.mapValues { (_, item) ->
+            AttributeReadPipeline.readItem(item)
         }
 
         // 把基于物品拿到的 part 塞进异步处理
         val parsedSources = withAsync {
             val sources = linkedMapOf<String, AttributeParsedSource>()
-            for ((sourceId, parts) in inputs) {
+            for ((slot, parts) in inputs) {
                 currentCoroutineContext().ensureActive()
-                sources[sourceId] = AttributeReadPipeline.parseParts(parts)
+                sources[slot.sourceId] = AttributeReadPipeline.parseParts(parts)
             }
             sources
         }
 
         // 条件判断结果
         val conditionResults = linkedMapOf<String, BooleanArray>()
-        for ((sourceId, parsed) in parsedSources) {
+        for ((slot, item) in items) {
+            val sourceId = slot.sourceId
+            val parsed = parsedSources.getValue(sourceId)
+            val context = ConditionContextImpl(equipmentSlot = slot, itemStack = item, sourceId = sourceId)
             currentCoroutineContext().ensureActive()
             conditionResults[sourceId] = parsed.evaluateConditions {
-                ConditionRegistry.eval(entity, it)
+                ConditionRegistry.eval(entity, it, context)
             }
         }
 

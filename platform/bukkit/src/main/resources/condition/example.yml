@@ -16,3 +16,18 @@ permission:
   names: ["权限需求", "职业"]
   reader: text
   handler: 'condition/permission'
+
+# 多个槽位用 / 分隔  满足任意一个即可
+# "装备槽位: 头盔/鞋子"
+# 双持表示主手或副手.
+equipment-slot:
+  names: ["装备槽位", "装备类型"]
+  reader: text
+  handler: 'condition/equipment-slot'
+  options:
+    MAIN_HAND: ['主手', '双持']
+    OFF_HAND: ['副手', '双持']
+    HEAD: ['头盔']
+    CHEST: ['衣服']
+    LEGS: ['裤子']
+    FEET: ['鞋子']

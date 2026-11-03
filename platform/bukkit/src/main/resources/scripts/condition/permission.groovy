@@ -1,12 +1,13 @@
 package scripts.condition
 
-import github.mkbaka.assiya.common.condition.ConditionContext
+import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
+import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
 import groovy.transform.CompileStatic
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
 @CompileStatic
-static boolean check(Entity entity, ConditionContext context) {
+static boolean check(Condition condition, Entity entity, ConditionContextImpl context) {
     if (!(entity instanceof Player)) return true
 
     Player player = (Player) entity

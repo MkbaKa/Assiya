@@ -33,7 +33,7 @@ static void onDefense(Attribute attribute, BukkitProcessor processor) {
         variables.put('armor', defender.getValue(attribute.id, 'total', 0.0d))
         variables.put('penetration', attacker.getValue('see-through', 'total', 0.0d))
     }
-    damage.takeDamage('armor', reduction)
+    damage.setDamage('armor', -reduction)
 
     if (customData != null) {
         customData.put("armor-reduction", reduction)

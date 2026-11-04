@@ -3,8 +3,8 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.internal.script.Script
 import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptEngineAdapter
-import github.mkbaka.assiya.platform.bukkit.internal.script.impl.GroovyEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.NashornEngineAdapter
+import github.mkbaka.assiya.platform.bukkit.internal.script.impl.groovy.GroovyEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptScheduler
 import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils.getSubFiles
@@ -97,7 +97,8 @@ object ScriptManager {
             val relativePath = file.invariantSeparatorsPath.substringAfterLast("scripts/")
             val id = relativePath.substringBeforeLast('.')
             try {
-                if (scripts.putIfAbsent(id.lowercase(), engine.compile(id, file)) != null) {
+                val script = engine.compile(id, file)
+                if (scripts.putIfAbsent(id.lowercase(), script) != null) {
                     warning("Duplicate key $id found in scripts")
                 }
             } catch (e: Throwable) {

@@ -1,7 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.api.session
 
+import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSessionInitEvent
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
+import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -29,10 +31,15 @@ class AssiyaSession(
     val metadata = ConcurrentHashMap<String, Any>()
 
     fun initAttribute(engine: BukkitAttributeEngine) {
+        val entity = owner ?: return
+
         attribute = AttributeSession(this, engine)
 
-        val living = owner as? LivingEntity ?: return
-        EquipmentPipeline.refresh(living)
+        if (entity is LivingEntity) {
+            EquipmentPipeline.refresh(entity)
+        }
+
+        AttributeSessionInitEvent(attribute, entity).call()
     }
 
     @Suppress("UNCHECKED_CAST")

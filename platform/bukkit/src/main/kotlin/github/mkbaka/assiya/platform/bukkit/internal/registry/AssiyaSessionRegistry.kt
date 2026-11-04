@@ -1,6 +1,8 @@
 package github.mkbaka.assiya.platform.bukkit.internal.registry
 
+import github.mkbaka.assiya.platform.bukkit.api.event.AssiyaSessionInitEvent
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
+import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import org.bukkit.entity.Entity
@@ -18,7 +20,9 @@ object AssiyaSessionRegistry : Registry<UUID, AssiyaSession>() {
     fun getOrCreate(
         owner: Entity
     ): AssiyaSession {
-        return elements.computeIfAbsent(owner.uniqueId) { AssiyaSession(owner) }
+        return elements.computeIfAbsent(owner.uniqueId) {
+            AssiyaSession(owner).also { AssiyaSessionInitEvent(it, owner).call() }
+        }
     }
 
     fun remove(ownerId: UUID): AssiyaSession? =

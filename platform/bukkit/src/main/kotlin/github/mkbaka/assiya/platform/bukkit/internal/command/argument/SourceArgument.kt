@@ -21,9 +21,8 @@ class SourceArgument(private val playerArgument: String) : Argument<CommandSende
     override fun tab(context: Context<CommandSender, Unit>, remaining: String): List<String> {
         val player = context.nodeChain.getArgument<Player>(playerArgument) ?: return emptyList()
 
-        val remaining = remaining.lowercase()
         return AssiyaAPI.getSnapshot(player).sources.keys
-            .filter { it.lowercase().startsWith(remaining) }
+            .filter { it.startsWith(remaining, ignoreCase = true) }
     }
 
 }

@@ -2,7 +2,9 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadModule
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigGlobal
+import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadResult
 import github.mkbaka.assiya.platform.bukkit.internal.message.Messages
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
@@ -30,9 +32,11 @@ object Config {
     }
 
     @Awake(lifeCycle = LifeCycle.ENABLE)
-    fun reload(): Boolean {
+    fun reload(): Boolean = reloadAll() == ReloadResult.SUCCESS
+
+    fun reloadAll(): ReloadResult {
         if (!reloading.compareAndSet(false, true)) {
-            return false
+            return ReloadResult.BUSY
         }
 
         try {
@@ -42,20 +46,36 @@ object Config {
             try {
                 CustomTasks.run("reload")
             } finally {
-                try {
-                    AttributeRegistration.complete()
-                } catch (e: Exception) {
-                    logEx(e, "Failed to rebuild attribute parser after configuration reload")
-                    return false
-                }
+                AttributeRegistration.complete()
             }
 
             global.parseDefaultAttributes()
             AssiyaSessionRegistry.refresh()
+            return ReloadResult.SUCCESS
+        } catch (e: Exception) {
+            logEx(e, "Failed to reload configuration")
+            return ReloadResult.FAILED
         } finally {
             reloading.set(false)
         }
-        return true
+    }
+
+    fun reloadModule(module: ReloadModule): ReloadResult {
+        if (module == ReloadModule.ALL) {
+            return reloadAll()
+        }
+        if (!reloading.compareAndSet(false, true)) {
+            return ReloadResult.BUSY
+        }
+
+        try {
+            return if (module.reload()) ReloadResult.SUCCESS else ReloadResult.FAILED
+        } catch (e: Exception) {
+            logEx(e, "Failed to reload module ${module.id}")
+            return ReloadResult.FAILED
+        } finally {
+            reloading.set(false)
+        }
     }
 
 }

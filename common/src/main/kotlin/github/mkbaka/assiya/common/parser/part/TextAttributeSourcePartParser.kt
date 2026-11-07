@@ -10,6 +10,7 @@ import github.mkbaka.assiya.common.parser.text.TextRule
 import github.mkbaka.assiya.common.parser.text.TextRuleMatched
 import github.mkbaka.assiya.common.parser.text.Trie
 import github.mkbaka.assiya.common.source.AttributeValue
+import java.util.regex.Matcher
 
 /**
  * 对文本的解析实现
@@ -74,61 +75,61 @@ class TextAttributeSourcePartParser(
     }
 
     fun parseLine(line: String): List<TextRuleMatched> {
-        // 按起点位置排序后就是从左到右遍历候选结果
-        val candidates = trie.find(line).sortedBy { it.startIndex }
+        // 命中属性名的候选
+        val candidates = trie.find(line)
+            .asSequence()
+            .sortedBy { it.startIndex }
+            .map { it.rule }
+            .distinct()
+
         val matches = arrayListOf<TextRuleMatched>()
+        var cursor = 0
 
-        var consumed = -1
-        var index = 0
-
-        while (index < candidates.size) {
-            val start = candidates[index].startIndex
-            // 若 start 被其他 rule 匹配通过则退出
-            // 比如 "伤害类型 火焰" 和 "火焰 100"
-            if (start <= consumed) {
-                index++
-                continue
-            }
-
-            // 如果 start 存在多个可以命中的候选
-            // 就取最长的那一个
-            // "攻击力 100" 和 "攻击力加成 100"
+        while (cursor < line.length) {
             var best: TextRuleMatched? = null
-            while (index < candidates.size && candidates[index].startIndex == start) {
-                val rule = candidates[index].rule
-                index++
-                // 看看正则能不能通过
-                val match = match(line, start, rule) ?: continue
-                // 如果 match 的 last 和 best 相等就只能先来后到了
-                if (best == null || match.range.last > best.range.last) {
+            for (rule in candidates) {
+                val match = match(line, cursor, rule) ?: continue
+                // 优先使用更靠左的规则
+                // 用来解决 "物理伤害 100 护甲" 这种情况
+                if (best == null || match.range.first < best.range.first ||
+                    (match.range.first == best.range.first && match.range.last > best.range.last)
+                ) {
                     best = match
                 }
             }
 
-            // 所有候选的正则都不通过才会是 null
-            if (best != null) {
-                matches += best
-                consumed = best.range.last
-            }
+            val accepted = best ?: break
+            matches += accepted
+
+            cursor = accepted.range.last + 1
         }
 
         return matches
     }
 
     private fun match(line: String, start: Int, rule: TextRule): TextRuleMatched? {
+        var best: TextRuleMatched? = null
         for (pattern in rule.compiled) {
-            // 基于限定范围重新匹配
-            val result = pattern.regex.matchAt(line, start) ?: continue
+            val matcher = pattern.regex.toPattern().matcher(line)
+                // 限制匹配区域
+                .region(start, line.length)
+                .useTransparentBounds(false)
+                .useAnchoringBounds(false)
 
-            val parseValues = parseValues(pattern, result) ?: continue
-            return TextRuleMatched(
-                rule = rule,
-                range = result.range,
-                captures = parseValues
-            )
+            while (matcher.find()) {
+                if (matcher.start() == matcher.end()) continue
+                if (best != null && matcher.start() >= best.range.first) break
+                val values = parseValues(pattern, matcher) ?: continue
+                best = TextRuleMatched(
+                    rule = rule,
+                    range = matcher.start() until matcher.end(),
+                    captures = values
+                )
+                break
+            }
         }
 
-        return null
+        return best
     }
 
     companion object {
@@ -159,12 +160,12 @@ class TextAttributeSourcePartParser(
 
     private fun parseValues(
         pattern: TextPatternTemplate.Compiled,
-        matcher: MatchResult
+        matcher: Matcher
     ): Map<String, Any>? {
         val values = hashMapOf<String, Any>()
 
         for ((id, value) in pattern.captures) {
-            val raw = matcher.groups[id]?.value ?: return null
+            val raw = matcher.group(id) ?: return null
             val parsed = value.value.parse(raw) ?: return null
             values[id] = parsed
         }

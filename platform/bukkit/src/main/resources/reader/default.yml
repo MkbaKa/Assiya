@@ -7,27 +7,56 @@ default:
     # 这里的 value 是一个自定义的名字
     # add 代表重复读取时 两个值会相加
     value: add
-    percent: add
+    valueAddition: add
     min: add
     max: add
+    percent: add
+    percentAddition: add
+    percentMin: add
+    percentMax: add
+    # multiply 的默认值是 1
+    mul: multiply
   # 实际取值时的正则表达式
   # 上面声明的 captures 可以在这里以 <key> 的形式作为占位符
   # 同时存在一个内部占位符 {name} 代表实际执行规则的属性名
   # 实际读取时会从上往下挨个判断 所以可能重叠的规则要把容易匹配的放在后面
   patterns:
+    # 百分比范围  "物理伤害: 10-20%"
+    - '{name}[\s:：]*<percentMin>\s*-\s*<percentMax>\s*%'
     # 范围数值  "物理伤害: 100-200"
     - '{name}[\s:：]*<min>\s*-\s*<max>'
+    # 百分比 + 括号追加  "物理伤害: 10 (+20)%"
+    - '{name}[\s:：]*<percent>\s*\(\s*\+?\s*<percentAddition>\s*\)\s*%'
+    # 数值 + 括号追加  "物理伤害: 100 (+50)"
+    - '{name}[\s:：]*<value>\s*\(\s*\+?\s*<valueAddition>\s*\)'
     # 百分比    "物理伤害: 50%"
-    - '{name}[\s:：]*<percent>%'
+    - '{name}[\s:：]*<percent>\s*%'
+    # 乘算    "物理伤害*2"
+    - '{name}[\s:：]*\*[\s:：]*<mul>'
     # 普通数值  "物理伤害: 100"
     - '{name}[\s:：]*<value>'
+    # 百分比范围  "10-20% 物理伤害"
+    - '<percentMin>\s*-\s*<percentMax>\s*%\s*{name}'
+    # 范围数值  "100-200 物理伤害"
+    - '<min>\s*-\s*<max>\s*{name}'
+    # 百分比 + 括号追加  "10 (+20)% 物理伤害"
+    - '<percent>\s*\(\s*\+?\s*<percentAddition>\s*\)\s*%\s*{name}'
+    # 数值 + 括号追加  "100 (+50) 物理伤害"
+    - '<value>\s*\(\s*\+?\s*<valueAddition>\s*\)\s*{name}'
+    # 百分比    "50% 物理伤害"
+    - '<percent>\s*%\s*{name}'
+    # 乘算    "2* 物理伤害"
+    - '<mul>\s*\*\s*{name}'
+    # 普通数值  "100 物理伤害"
+    - '<value>\s*{name}'
   # 提前对读取后的值做一些运算 方便执行时/papi变量直接拿出结果
   # 这里可以使用 captures 里的捕获名称
   placeholders:
     random: 'random(<min>, <max>)'
-    rate: '<percent> / 100'
-    # 可以使用上面的计算结果
-    total: '(<value> + <random>) * (1 + <rate>)'
+    percentRandom: 'random(<percentMin>, <percentMax>)'
+    rate: '(<percent> + <percentAddition> + <percentRandom>) / 100'
+    valueRandom: '<value> + <valueAddition> + <random>'
+    total: '<valueRandom> * (1 + <rate>) * <mul>'
 
 # 罗马数字的读取示例
 roman:
@@ -46,3 +75,5 @@ roman:
   patterns:
     # "力量: V"
     - '{name}[\s:：]*<value>'
+    # "V 力量"
+    - '<value>\s*{name}'

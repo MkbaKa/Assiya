@@ -7,6 +7,19 @@ import java.math.RoundingMode
 object StringUtils {
 
     @JvmStatic
+    fun String.isUUIDEZ(): Boolean {
+        if (length != 36) return false
+
+        if (this[8] != '-'
+            || this[13] != '-'
+            || this[18] != '-'
+            || this[23] != '-'
+        ) return false
+
+        return true
+    }
+
+    @JvmStatic
     fun Number.format(digits: Int): String = BigDecimal(toString()).setScale(digits, RoundingMode.HALF_UP).toString()
 
     @JvmStatic

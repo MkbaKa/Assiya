@@ -8,6 +8,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultiple
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
+import github.mkbaka.assiya.platform.bukkit.api.session.DamageProcessorStack
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
 import groovy.transform.CompileStatic
@@ -57,9 +58,16 @@ class Damage {
 
         ScriptListener.create(EntityDamageByEntityEvent)
                 .setEventPriority(EventPriority.MONITOR)
-                .setIgnoreCancelled(true)
+                .setIgnoreCancelled(false)
                 .setHandler { EntityDamageByEntityEvent event ->
-                    AssiyaAPI.getSession(event.damager)?.damageProcessorStack?.pop()
+                    DamageProcessorStack stack = AssiyaAPI.getSession(event.damager)?.damageProcessorStack
+                    if (stack == null) return
+
+                    DamageProcessor processor = stack.current
+                    TriggerByEventComponent component = processor?.get(TriggerByEventComponent.@Key)
+                    if (component != null && component.event.is(event)) {
+                        stack.pop()
+                    }
                 }
                 .register()
     }

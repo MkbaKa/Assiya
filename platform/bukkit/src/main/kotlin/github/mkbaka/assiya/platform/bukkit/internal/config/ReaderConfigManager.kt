@@ -23,6 +23,7 @@ internal object ReaderConfigManager {
     private fun defaultResources(): List<String> {
         return listOf(
             "reader/default.yml",
+            "reader/percent.yml",
             "reader/text.yml"
         )
     }

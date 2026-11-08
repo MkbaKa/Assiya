@@ -2,6 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.api.reader
 
 import github.mkbaka.assiya.common.base.Capture
 import github.mkbaka.assiya.common.base.Status
+import github.mkbaka.assiya.common.operation.NumberOperations
 import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 
@@ -30,7 +31,10 @@ interface Reader {
             ?: status[captureId]
     }
 
-    fun defaultValue(captureId: String): Any? = capture[captureId]?.value?.defaultValue
+    fun defaultValue(captureId: String): Any? {
+        val entry = capture[captureId] ?: return null
+        return if (entry.operation == NumberOperations.Multiply) 1.0 else entry.value.defaultValue
+    }
 
     fun register() {
         ReaderRegistry.register(this)

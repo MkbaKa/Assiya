@@ -4,7 +4,6 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.format
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
@@ -34,12 +33,12 @@ object AssiyaPlaceholderAPIHook {
                                 val capture = context.getArgument<String>("capture")
 
                                 // 若属性不存着或者没有 reader 返回默认值
-                                val attr = AttributeRegistry[attribute] ?: return@setExecutor default ?: ""
+                                val attr = AssiyaAPI.getAttribute(attribute) ?: return@setExecutor default ?: ""
                                 val reader = attr[ReaderComponent]?.reader
                                     ?: return@setExecutor default ?: ""
 
                                 // 玩家没有这条属性 返回默认值
-                                val status = AssiyaAPI.getSession(player.uniqueId)?.attribute?.snapshot?.get(attribute)
+                                val status = AssiyaAPI.getSession(player.uniqueId)?.attribute?.snapshot?.get(attr.id)
                                 if (status == null && default != null) return@setExecutor default
 
                                 // 如果 capture 读到的是 null 则使用 default

@@ -9,7 +9,6 @@ import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeSnapshotBuilder
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata
@@ -30,14 +29,14 @@ object Utils {
         val captures = hashMapOf<String, String>()
 
         for ((name, value) in variables) {
-            // 带 | 说明是指定 "attribute id | capture id" 的组合
+            // 带 | 说明是指定 "属性 id 或读取名 | capture id" 的组合
             // 如 "attack|min"
             // 反之默认为 "属性名" = "属性值"
             if ('|' in name) {
                 captures[name] = value
             } else {
-                val attribute = AttributeRegistry.findByName(name)
-                // 自定义参数不参与公式计算, 仍按原样保留.
+                val attribute = AssiyaAPI.getAttribute(name)
+                // 自定义参数不参与公式计算
                 val text = if (attribute == null) value else calculate(name, value)
                 lines += "$name $text"
             }
@@ -57,11 +56,12 @@ object Utils {
 
         for ((name, raw) in captures) {
             // "attack|min"  ->  "attack" , "min"
-            val attributeId = name.substringBefore("|")
+            val attributeKey = name.substringBefore("|")
             val captureId = name.substringAfter("|")
 
             // TODO 待优化
-            val attribute = AttributeRegistry[attributeId] ?: error("Unknown attribute: $attributeId")
+            val attribute = AssiyaAPI.getAttribute(attributeKey) ?: error("Unknown attribute: $attributeKey")
+            val attributeId = attribute.id
             val reader = attribute[ReaderComponent]?.reader ?: error("$attributeId has no reader")
             val capture = reader.capture[captureId] ?: error("$attributeId#${reader.id} not has capture: $captureId")
             val text = if (capture.value == Value.Number) calculate(name, raw) else raw
@@ -102,7 +102,7 @@ object Utils {
 
         val ids = hashSetOf<String>()
         for (entry in entries) {
-            val attribute = AttributeRegistry[entry] ?: AttributeRegistry.findByName(entry) ?: continue
+            val attribute = AssiyaAPI.getAttribute(entry) ?: continue
             ids += attribute.id
         }
         return ids

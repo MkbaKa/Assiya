@@ -3,7 +3,6 @@ package github.mkbaka.assiya.compact.mythicmobs.v5.condition
 import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.NashornEngineAdapter
 import github.mkbaka.mythicksp.annotation.MythicCondition
 import io.lumine.mythic.api.adapters.AbstractEntity
@@ -20,11 +19,12 @@ class AttributeValueCondition(mlc: MythicLineConfig) : SkillCondition(mlc.line),
 
     override fun check(ae: AbstractEntity): Boolean {
         val entity = ae.bukkitEntity
-        val attributeId = attribute.get(ae)
+        val attributeKey = attribute.get(ae)
         val captureId = capture.get(ae)
         val action = expression.get(ae)
 
-        val attribute = AttributeRegistry[attributeId] ?: error("Unknown attribute: $attributeId")
+        val attribute = AssiyaAPI.getAttribute(attributeKey) ?: error("Unknown attribute: $attributeKey")
+        val attributeId = attribute.id
         val reader = attribute[ReaderComponent]?.reader ?: error("$attributeId has no reader")
         require(captureId in reader.capture || captureId in reader.placeholders) {
             "Unknown attribute value: $attributeId:$captureId"

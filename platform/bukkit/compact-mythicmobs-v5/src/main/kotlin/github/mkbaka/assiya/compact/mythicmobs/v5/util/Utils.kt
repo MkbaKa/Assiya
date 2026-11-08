@@ -9,7 +9,6 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderCompon
 import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.common.formula.FormulaCompiler
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.skills.SkillMetadata
@@ -35,8 +34,8 @@ object Utils {
             if ('|' in name) {
                 captures[name] = value
             } else {
-                val attribute = AttributeRegistry.findByName(name)
-                // 自定义参数不参与公式计算, 仍按原样保留.
+                val attribute = AssiyaAPI.getAttribute(name)
+                // 自定义参数不参与公式计算
                 val text = if (attribute == null) value else calculate(name, value)
                 lines += "$name $text"
             }
@@ -56,11 +55,12 @@ object Utils {
 
         for ((name, raw) in captures) {
             // "attack|min"  ->  "attack" , "min"
-            val attributeId = name.substringBefore("|")
+            val attributeKey = name.substringBefore("|")
             val captureId = name.substringAfter("|")
 
             // TODO 待优化
-            val attribute = AttributeRegistry[attributeId] ?: error("Unknown attribute: $attributeId")
+            val attribute = AssiyaAPI.getAttribute(attributeKey) ?: error("Unknown attribute: $attributeKey")
+            val attributeId = attribute.id
             val reader = attribute[ReaderComponent]?.reader ?: error("$attributeId has no reader")
             val capture = reader.capture[captureId] ?: error("$attributeId#${reader.id} not has capture: $captureId")
             val text = if (capture.value == Value.Number) calculate(name, raw) else raw
@@ -101,7 +101,7 @@ object Utils {
 
         val ids = hashSetOf<String>()
         for (entry in entries) {
-            val attribute = AttributeRegistry[entry] ?: AttributeRegistry.findByName(entry) ?: continue
+            val attribute = AssiyaAPI.getAttribute(entry) ?: continue
             ids += attribute.id
         }
         return ids

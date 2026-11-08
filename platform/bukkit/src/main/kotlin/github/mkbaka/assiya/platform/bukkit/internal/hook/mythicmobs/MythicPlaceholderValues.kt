@@ -4,18 +4,18 @@ import github.mkbaka.assiya.common.base.Status
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComponent
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import java.util.*
 
 object MythicPlaceholderValues {
 
     fun attribute(uuid: UUID?, args: String): String {
         val parts = args.split(":")
-        val attributeId = parts[0]
+        val attributeKey = parts[0]
         val captureId = parts.getOrNull(1)?.ifEmpty { "total" } ?: "total"
         val digits = parts.getOrNull(2)?.toInt() ?: 2
 
-        val attribute = AttributeRegistry[attributeId] ?: error("Unknown attribute: $attributeId")
+        val attribute = AssiyaAPI.getAttribute(attributeKey) ?: error("Unknown attribute: $attributeKey")
+        val attributeId = attribute.id
         val reader = attribute[ReaderComponent]?.reader ?: error("$attributeId has no reader")
 
         require(captureId in reader.capture || captureId in reader.placeholders) {

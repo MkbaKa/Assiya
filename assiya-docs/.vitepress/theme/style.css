@@ -1,0 +1,57 @@
+/* 让 Mermaid 图在深色模式下保持透明背景 */
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent !important;
+}
+
+.vp-doc h1 {
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+.vp-doc h2 {
+  margin-top: 36px;
+  padding-bottom: 8px;
+  border-top: none;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc p {
+  line-height: 1.75;
+}
+
+/* 美化剩余的轻量级 Markdown 表格，变成圆角卡片风格 */
+.vp-doc table {
+  display: table;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-alt);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--vp-c-text-2);
+  text-align: left;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc td {
+  padding: 11px 16px;
+  font-size: 14px;
+  border: none;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg);
+}
+
+.vp-doc tr:last-child td {
+  border-bottom: none;
+}

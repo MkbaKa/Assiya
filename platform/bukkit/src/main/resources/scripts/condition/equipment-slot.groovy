@@ -20,7 +20,7 @@ static boolean check(Condition condition, Entity entity, ConditionContextImpl co
     if (value == null) return false
 
     for (String require : value.split("/")) {
-        if (slotNames.contains(require)) return true
+        if (slotNames.contains(require.trim())) return true
     }
     return false
 }

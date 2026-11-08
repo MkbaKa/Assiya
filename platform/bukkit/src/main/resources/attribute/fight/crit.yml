@@ -1,6 +1,6 @@
 crit:
   names: ["暴击几率"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/crit'
   priority: 300
   triggers: attack

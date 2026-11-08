@@ -45,6 +45,8 @@ example:
       # 即 example 里的 priority 114514 + handler attribute/fight/attack
       # priority: 1919810
       # handler: 'attribute/kill-example'
+      # 不过 attack.groovy 里面没有 kill 触发器需要的 onKill 函数
+      # 实际上也没法执行
 
 runtime-example:
   names: ['测试定时触发']

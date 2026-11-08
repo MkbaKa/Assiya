@@ -1,6 +1,6 @@
 lightning:
   names: ["雷击几率"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/lightning'
   priority: 150
   triggers: attack

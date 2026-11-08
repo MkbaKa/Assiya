@@ -21,7 +21,7 @@ vampire: '<damage> * <rate> / 100'
 #      <damage>  -  当前总伤害
 #      <armor>  -  受击者护甲
 #      <penetration>  -  攻击者护甲穿透
-armor: '<damage> * (<armor> - <penetration>) / 100'
+armor: 'max(0, <damage> * (<armor> - <penetration>) / 100)'
 
 # 反弹公式
 #   可用变量:

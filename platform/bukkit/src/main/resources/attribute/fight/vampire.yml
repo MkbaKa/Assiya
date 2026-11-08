@@ -1,6 +1,6 @@
 vampire:
   names: ["吸血几率"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/vampire'
   priority: 160
   triggers: attack

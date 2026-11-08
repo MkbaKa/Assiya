@@ -43,7 +43,7 @@ moving:
 
 reflection:
   names: ["反弹几率"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/reflection'
   priority: 310
   triggers: defense
@@ -57,7 +57,7 @@ reflection-rate:
 
 fire:
   names: ["燃烧几率"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/fire'
   priority: 320
   triggers: attack
@@ -76,7 +76,7 @@ fire-time:
 
 frozen:
   names: ["冰冻几率"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/frozen'
   priority: 330
   triggers: attack
@@ -95,7 +95,7 @@ frozen-time:
 
 remote-immune:
   names: ["远程免疫"]
-  reader: default
+  reader: percent
   handler: 'attribute/fight/remote-immune'
   priority: 10
   triggers: defense

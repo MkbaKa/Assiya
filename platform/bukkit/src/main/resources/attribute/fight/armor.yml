@@ -3,12 +3,11 @@ armor:
   reader: default
   handler: 'attribute/fight/armor'
   priority: 250
-  always-run: true
   triggers: defense
 
 sunder-armor:
   names: ["破甲几率"]
-  reader: default
+  reader: percent
 
 see-through:
   names: ["护甲穿透"]

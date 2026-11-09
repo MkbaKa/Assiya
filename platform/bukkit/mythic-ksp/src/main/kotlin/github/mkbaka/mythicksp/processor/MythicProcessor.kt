@@ -1,5 +1,6 @@
 package github.mkbaka.mythicksp.processor
 
+import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -10,6 +11,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.validate
 
@@ -21,6 +23,7 @@ class MythicProcessor(
 
     private val mechanics = linkedMapOf<String, String>()
     private val conditions = linkedMapOf<String, String>()
+    private val variants = linkedMapOf<String, ConditionVariant>()
     private val sourceFiles = linkedSetOf<KSFile>()
     private var invalid = false
     private var skipGeneration = false
@@ -44,7 +47,68 @@ class MythicProcessor(
         val deferred = mutableListOf<KSAnnotated>()
         collect(resolver, "MythicMechanic", mechanics, deferred)
         collect(resolver, "MythicCondition", conditions, deferred)
+        collectVariants(resolver, deferred)
         return deferred
+    }
+
+    private fun collectVariants(resolver: Resolver, deferred: MutableList<KSAnnotated>) {
+        val annotationType = "github.mkbaka.mythicksp.annotation.MythicConditionVariant"
+        for (symbol in resolver.getSymbolsWithAnnotation(annotationType)) {
+            if (!symbol.validate()) {
+                deferred.add(symbol)
+                continue
+            }
+            val declaration = symbol as? KSClassDeclaration
+            if (declaration == null || declaration.classKind != ClassKind.CLASS ||
+                Modifier.ABSTRACT in declaration.modifiers || Modifier.INNER in declaration.modifiers ||
+                declaration.typeParameters.isNotEmpty() || !isAccessible(declaration)
+            ) {
+                fail("@MythicConditionVariant requires an accessible, concrete, non-inner class without type parameters", symbol)
+                continue
+            }
+            val annotation = declaration.annotations.first {
+                it.annotationType.resolve().declaration.qualifiedName?.asString() == annotationType
+            }
+            val base = (annotation.arguments.first { it.name?.asString() == "base" }.value as? KSType)
+                ?.declaration as? KSClassDeclaration
+            val baseName = base?.qualifiedName?.asString()
+            val required = annotation.arguments.first { it.name?.asString() == "requiresClass" }.value as String
+            if (baseName == null || base.annotations.none {
+                    it.annotationType.resolve().declaration.qualifiedName?.asString() ==
+                        "github.mkbaka.mythicksp.annotation.MythicCondition"
+                } || declaration.getAllSuperTypes().none { it.declaration.qualifiedName?.asString() == baseName }
+            ) {
+                fail("@MythicConditionVariant must extend a @MythicCondition base class", symbol)
+                continue
+            }
+            if (required.isBlank()) {
+                fail("@MythicConditionVariant requiresClass must not be blank", symbol)
+                continue
+            }
+            if (declaration.annotations.any {
+                    it.annotationType.resolve().declaration.qualifiedName?.asString() ==
+                        "github.mkbaka.mythicksp.annotation.MythicCondition"
+                }) {
+                fail("A condition variant must not declare @MythicCondition names", symbol)
+                continue
+            }
+            val variant = ConditionVariant(binaryName(declaration), required)
+            val previous = variants.putIfAbsent(baseName, variant)
+            if (previous != null && previous != variant) {
+                fail("Only one condition variant is allowed for $baseName", symbol)
+            }
+            declaration.containingFile?.let(sourceFiles::add)
+            base?.containingFile?.let(sourceFiles::add)
+        }
+    }
+
+    private fun binaryName(declaration: KSClassDeclaration): String {
+        val parent = declaration.parentDeclaration as? KSClassDeclaration
+        return if (parent == null) {
+            declaration.qualifiedName!!.asString()
+        } else {
+            binaryName(parent) + "$" + declaration.simpleName.asString()
+        }
     }
 
     private fun collect(
@@ -107,11 +171,17 @@ class MythicProcessor(
 
     override fun finish() {
         if (invalid || skipGeneration) return
+        for (base in variants.keys) {
+            if (base !in conditions.values) {
+                logger.error("Condition variant base $base must be registered in the same compilation")
+                return
+            }
+        }
         val generatedPackage = options["mythicksp.generatedPackage"] ?: return
         codeGenerator.createNewFile(
             Dependencies(true, *sourceFiles.toTypedArray()), generatedPackage, "MythicRegistration"
         ).bufferedWriter().use {
-            it.write(renderRegistrations(generatedPackage, options.getValue("mythicksp.hookClass"), mechanics, conditions))
+            it.write(renderRegistrations(generatedPackage, options.getValue("mythicksp.hookClass"), mechanics, conditions, variants))
         }
     }
 }

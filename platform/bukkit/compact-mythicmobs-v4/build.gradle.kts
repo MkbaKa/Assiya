@@ -7,6 +7,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly(project(":fake-api"))
     compileOnly(project(":platform:bukkit:mythic-ksp-annotations"))
     ksp(project(":platform:bukkit:mythic-ksp"))
     compileOnly(project(":platform:bukkit"))
@@ -16,6 +17,6 @@ dependencies {
 }
 
 ksp {
-    arg("mythicksp.hookClass", "github.mkbaka.assiya.compact.mythicmobs.v4.MythicMobs4Hook")
-    arg("mythicksp.generatedPackage", "github.mkbaka.assiya.compact.mythicmobs.v4.generated")
+    arg("mythicksp.hookClass", "github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v4.MythicMobs4Hook")
+    arg("mythicksp.generatedPackage", "github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v4.generated")
 }

@@ -12,10 +12,10 @@ object MythicMobsHook {
 
         val implementation = when (plugin.javaClass.name) {
             "io.lumine.xikage.mythicmobs.MythicMobs" ->
-                "github.mkbaka.assiya.compact.mythicmobs.v4.MythicMobs4Hook"
+                "github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v4.MythicMobs4Hook"
 
             "io.lumine.mythic.bukkit.MythicBukkit" ->
-                "github.mkbaka.assiya.compact.mythicmobs.v5.MythicMobs5Hook"
+                "github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v5.MythicMobs5Hook"
 
             else -> error("Unsupported MythicMobs entry: ${plugin.javaClass.name}")
         }

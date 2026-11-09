@@ -16,6 +16,6 @@ dependencies {
 }
 
 ksp {
-    arg("mythicksp.hookClass", "github.mkbaka.assiya.compact.mythicmobs.v5.MythicMobs5Hook")
-    arg("mythicksp.generatedPackage", "github.mkbaka.assiya.compact.mythicmobs.v5.generated")
+    arg("mythicksp.hookClass", "github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v5.MythicMobs5Hook")
+    arg("mythicksp.generatedPackage", "github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v5.generated")
 }

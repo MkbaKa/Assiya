@@ -50,7 +50,7 @@ object MythicPlaceholderValues {
         val default = args.substringAfter("|", "null")
 
         val session = uuid?.let { AssiyaAPI.getSession(it) } ?: return default
-        return session.getMetadata(key) ?: default
+        return session.getMetadata<Any>(key)?.toString() ?: default
     }
 
 }

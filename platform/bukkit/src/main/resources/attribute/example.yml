@@ -63,5 +63,5 @@ kill-example:
   priority: 100
   triggers: kill
   options:
-    attacker: '你击杀了 {entity}.'
-    entity: '{attacker} 击杀了你.'
+    attacker: '你击杀了 {entity}, 并将其复活至 {health} 点生命值.'
+    entity: '{attacker} 将你复活至 {health} 点生命值.'

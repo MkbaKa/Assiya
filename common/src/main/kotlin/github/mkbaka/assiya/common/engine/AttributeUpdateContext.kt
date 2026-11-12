@@ -7,8 +7,11 @@ import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 
 /**
- * update 事件触发中对属性的操作
- * 如果单独做命令提交会反复触发 update  应该攒攒在当前提交中一块执行
+ * 本轮刷新的属性草稿与来源操作记录
+ * submit, modify 和 remove 立即修改 workingState, 让同一轮后续 handler 读取到修改结果.
+ * 来源操作在更新事件未取消时统一回放到引擎, 再发布快照; 取消时整轮草稿丢弃.
+ * 单独提交 Refresh(false) 可以避免再次触发 update, 但会排队到后续刷新,
+ * 不会修改当前草稿, 也不受本轮更新事件的取消结果约束.
  */
 class AttributeUpdateContext(
     val workingState: AttributeEngineState

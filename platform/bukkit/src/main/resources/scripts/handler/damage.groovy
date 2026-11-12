@@ -1,8 +1,8 @@
 package scripts.handler
 
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
-import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerByEventComponent
@@ -24,7 +24,7 @@ import org.bukkit.projectiles.ProjectileSource
 @CompileStatic
 class Damage {
 
-    private static final String FORCE_METADATA_KEY = "Assiya:force"
+    private static final String FORCE_METADATA_KEY = "assiya:force"
 
     static void onEnable() {
         ScriptListener.create(ProjectileLaunchEvent)

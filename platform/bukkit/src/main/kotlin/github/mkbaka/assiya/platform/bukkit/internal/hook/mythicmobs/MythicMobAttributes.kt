@@ -13,7 +13,7 @@ import org.bukkit.entity.Entity
 
 object MythicMobAttributes {
 
-    private const val SOURCE_ID = "Assiya:MythicMobs:Attributes"
+    private const val SOURCE_ID = "assiya:mythic-mobs:attributes"
     private val levelAttributes = hashMapOf<String, LevelAttribute>()
 
     fun apply(entity: Entity, mobId: String, level: Double, attributes: List<String>, calculator: Boolean) {

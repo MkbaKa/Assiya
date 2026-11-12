@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitepress'
+import {defineConfig} from 'vitepress'
 
 // 把 ```mermaid 代码块交给 Mermaid 组件在浏览器中渲染
 function mermaidFence(md) {
@@ -23,10 +23,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
-      { text: '开始', link: '/content/guide/intro' },
-      { text: '配置指南', link: '/content/config/defaults' },
-      { text: 'MythicMobs 拓展', link: '/content/mythicmobs/mob-attributes' },
-      { text: '脚本与开发', link: '/content/advanced/damage-flow' }
+      { text: '开始', link: '/content/guide/intro' }
     ],
     sidebar: [
       {
@@ -47,6 +44,24 @@ export default defineConfig({
           { text: '使用条件与生效范围', link: '/content/config/conditions' },
           { text: '调整计算公式', link: '/content/config/formulas' },
           { text: '在 NBT 中编写属性', link: '/content/config/nbt' }
+        ]
+      },
+      {
+        text: '创造属于自己的蒙娜丽莎',
+        items: [
+          { text: '编写一个增伤属性', link: '/content/tutorial/attribute' },
+          {
+            text: '属性触发器与优先级',
+            items: [
+              { text: '触发器', link: '/content/tutorial/trigger' },
+              { text: 'attack & defense', link: '/content/tutorial/trigger-attack' },
+              { text: 'kill', link: '/content/tutorial/trigger-kill' },
+              { text: 'update', link: '/content/tutorial/trigger-update' },
+              { text: 'timer', link: '/content/tutorial/trigger-timer' },
+            ]
+          },
+          { text: '增加一条新的读取格式', link: '/content/tutorial/reader' },
+          { text: '创建一个新的条件', link: '/content/tutorial/condition' },
         ]
       },
       {

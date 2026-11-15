@@ -1,9 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
-import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
-import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadModule
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigGlobal
+import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadModule
 import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadResult
 import github.mkbaka.assiya.platform.bukkit.internal.message.Messages
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
@@ -27,7 +27,7 @@ object Config {
 
     @Awake(lifeCycle = LifeCycle.LOAD)
     fun load() {
-        global = ConfigGlobal(ConfigLoader.loadConfig("config.yml"))
+        global = ConfigGlobal(FileLoader.loadConfig("config.yml"))
         messages = Messages.load()
     }
 

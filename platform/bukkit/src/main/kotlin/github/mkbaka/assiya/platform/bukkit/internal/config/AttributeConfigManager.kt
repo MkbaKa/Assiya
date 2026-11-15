@@ -6,7 +6,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderCompon
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
-import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigAttribute
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
@@ -20,19 +20,6 @@ object AttributeConfigManager {
 
     val size: Int get() = attributes.size
 
-    private fun defaultResources(): List<String> {
-        return listOf(
-            "attribute/example.yml",
-            "attribute/misc.yml",
-            "attribute/fight/attack.yml",
-            "attribute/fight/crit.yml",
-            "attribute/fight/lightning.yml",
-            "attribute/fight/vampire.yml",
-            "attribute/fight/armor.yml",
-            "attribute/fight/dodge.yml",
-        )
-    }
-
     @CustomTask(taskId = "reload", priority = 30)
     fun reload() {
         AttributeRegistration.batch {
@@ -40,7 +27,7 @@ object AttributeConfigManager {
                 attribute.unregister()
             }
             attributes.clear()
-            ConfigLoader.load("attribute", defaultResources()) { id, root ->
+            FileLoader.load("attribute") { id, root ->
                 val node = root.getNode(id) ?: error("Attribute $id must be a configuration section")
                 val attribute = parseAttribute(id, node)
                 attribute.register()

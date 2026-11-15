@@ -2,7 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.common.formula.Formula
 import github.mkbaka.assiya.common.formula.FormulaCompiler
-import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.bukkitksp.annotation.CustomTask
 
 object FormulaManager {
@@ -20,7 +20,7 @@ object FormulaManager {
     @CustomTask(taskId = "reload", priority = 15)
     fun reload() {
         formulas.clear()
-        ConfigLoader.load("formula", listOf("formula/example.yml", "formula/attributes.yml")) { id, root ->
+        FileLoader.load("formula") { id, root ->
             val expression = root.getString(id) ?: error("Formula $id must have an expression")
             formulas[id] = FormulaCompiler.compile(id, expression)
         }

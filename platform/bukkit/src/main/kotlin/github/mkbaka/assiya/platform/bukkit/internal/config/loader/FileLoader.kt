@@ -8,8 +8,9 @@ import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils.getSubFiles
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import java.io.File
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 
-object ConfigLoader {
+object FileLoader {
 
     @JvmStatic
     @JvmOverloads
@@ -24,6 +25,28 @@ object ConfigLoader {
         val defaults = ConfigYaml.parse(default, comments)
         val file = FileUtils.saveIfNotExists(path) { ConfigYaml.render(defaults, comments) }
         return DefaultConfigNode(BukkitConfigNode(FileUtils.readYaml(file)), BukkitConfigNode(defaults))
+    }
+
+    @JvmStatic
+    fun load(resourceDir: String, processor: Consumer<File>) {
+        load(FileUtils.saveDirectoryIfNotExists(resourceDir), processor)
+    }
+
+    @JvmStatic
+    fun load(target: File, processor: Consumer<File>) {
+        val files = if (target.isDirectory) {
+            target.getSubFiles()
+        } else {
+            sequenceOf(target)
+        }
+        for (file in files) {
+            processor.accept(file)
+        }
+    }
+
+    @JvmStatic
+    fun load(resourceDir: String, processor: BiConsumer<String, ConfigNode>) {
+        load(FileUtils.saveDirectoryIfNotExists(resourceDir), processor)
     }
 
     @JvmStatic
@@ -43,16 +66,15 @@ object ConfigLoader {
     }
 
     private fun load(target: File, processor: BiConsumer<String, ConfigNode>) {
-        val files = if (target.isDirectory) target.getSubFiles() else listOf(target)
         val loadedIds = hashSetOf<String>()
 
-        for (file in files) {
-            if (file.extension != "yml" && file.extension != "yaml") continue
+        load(target) { file ->
+            if (file.extension != "yml" && file.extension != "yaml") return@load
             val root = try {
                 BukkitConfigNode(FileUtils.readYaml(file))
             } catch (e: Exception) {
                 logEx(e, "Failed to read configuration $file")
-                continue
+                return@load
             }
             for (id in root.keys()) {
                 try {

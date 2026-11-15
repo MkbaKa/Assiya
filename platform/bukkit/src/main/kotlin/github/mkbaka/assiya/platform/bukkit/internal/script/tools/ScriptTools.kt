@@ -7,7 +7,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.ProjectileComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
-import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.colored
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.replaceVariables
 import org.bukkit.entity.Entity
@@ -17,7 +17,7 @@ import java.util.function.BiConsumer
 object ScriptTools {
 
     @JvmStatic
-    fun loadConfig(path: String, defaults: Map<String, *>): ConfigNode = ConfigLoader.loadConfig(path, defaults)
+    fun loadConfig(path: String, defaults: Map<String, *>): ConfigNode = FileLoader.loadConfig(path, defaults)
 
     @JvmStatic
     fun loadConfigs(
@@ -26,7 +26,7 @@ object ScriptTools {
         defaults: Map<String, *>,
         processor: BiConsumer<String, ConfigNode>
     ) {
-        ConfigLoader.load(path, defaultFile, defaults, processor)
+        FileLoader.load(path, defaultFile, defaults, processor)
     }
 
     @JvmStatic

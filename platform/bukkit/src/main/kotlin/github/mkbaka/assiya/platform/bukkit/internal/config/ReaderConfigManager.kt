@@ -7,7 +7,7 @@ import github.mkbaka.assiya.common.operation.NumberOperations
 import github.mkbaka.assiya.common.parser.text.TextPatternTemplate
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
-import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigReader
 import github.mkbaka.assiya.platform.bukkit.internal.registry.OperationsRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
@@ -20,21 +20,13 @@ internal object ReaderConfigManager {
 
     val size: Int get() = readers.size
 
-    private fun defaultResources(): List<String> {
-        return listOf(
-            "reader/default.yml",
-            "reader/percent.yml",
-            "reader/text.yml"
-        )
-    }
-
     @CustomTask(taskId = "reload", priority = 10)
     fun reload() {
         for (reader in readers.values) {
             ReaderRegistry.unregister(reader)
         }
         readers.clear()
-        ConfigLoader.load("reader", defaultResources()) { id, root ->
+        FileLoader.load("reader") { id, root ->
             val node = root.getNode(id) ?: error("Reader $id must be a configuration section")
             val reader = parseReader(id, node)
             ReaderRegistry.register(reader)

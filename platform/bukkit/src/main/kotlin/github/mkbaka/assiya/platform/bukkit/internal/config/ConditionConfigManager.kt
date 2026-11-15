@@ -3,7 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
 import github.mkbaka.assiya.platform.bukkit.api.condition.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
-import github.mkbaka.assiya.platform.bukkit.internal.config.loader.ConfigLoader
+import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigCondition
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
@@ -16,17 +16,13 @@ object ConditionConfigManager {
 
     val size: Int get() = conditions.size
 
-    private fun defaultResources(): List<String> {
-        return listOf("condition/example.yml")
-    }
-
     @CustomTask(taskId = "reload", priority = 20)
     fun reload() {
         for (condition in conditions.values) {
             ConditionRegistry.unregister(condition)
         }
         conditions.clear()
-        ConfigLoader.load("condition", defaultResources()) { id, root ->
+        FileLoader.load("condition") { id, root ->
             val node = root.getNode(id) ?: error("Condition $id must be a configuration section")
             val condition = parseCondition(id, node)
             ConditionRegistry.register(condition)

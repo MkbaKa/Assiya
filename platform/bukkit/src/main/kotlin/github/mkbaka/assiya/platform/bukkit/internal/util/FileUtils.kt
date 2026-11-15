@@ -1,28 +1,16 @@
 package github.mkbaka.assiya.platform.bukkit.internal.util
 
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
-import org.bukkit.configuration.InvalidConfigurationException
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
-import java.io.IOException
 import java.util.function.Supplier
+import java.util.jar.JarFile
 
 object FileUtils {
 
     @JvmStatic
-    fun File.getSubFiles(): List<File> {
-        val files = listFiles() ?: return emptyList()
-
-        val result = ArrayList<File>()
-        for (file in files) {
-            if (file.isDirectory) {
-                result += file.getSubFiles()
-            } else {
-                result += file
-            }
-        }
-
-        return result
+    fun File.getSubFiles(): Sequence<File> {
+        return walk().filter { it.isFile }
     }
 
     fun saveIfNotExists(resource: String): File {
@@ -56,6 +44,28 @@ object FileUtils {
     fun saveIfNotExists(path: String, resource: String): File {
         if (path == resource) return saveIfNotExists(resource)
         return saveIfNotExists(path) { readResource(resource) }
+    }
+
+    fun saveDirectoryIfNotExists(path: String): File {
+        val directory = File(AssiyaBukkitPlugin.INSTANCE.dataFolder, path)
+        if (directory.exists()) return directory
+
+        val source = File(
+            AssiyaBukkitPlugin::class.java.protectionDomain.codeSource.location.toURI()
+        )
+        val prefix = "$path/"
+        val resources = JarFile(source).use { jar ->
+            jar.entries().asSequence()
+                .filter { !it.isDirectory && it.name.startsWith(prefix) }
+                .map { it.name }
+                .toList()
+        }
+
+        directory.mkdirs()
+        for (resource in resources) {
+            saveIfNotExists(resource)
+        }
+        return directory
     }
 
     fun saveDirectoryIfNotExists(path: String, resources: List<String>): File {

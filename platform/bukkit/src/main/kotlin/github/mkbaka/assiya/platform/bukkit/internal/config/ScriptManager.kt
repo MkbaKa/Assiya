@@ -71,7 +71,8 @@ object ScriptManager {
             "scripts/condition/level-require.groovy",
             "scripts/condition/equipment-slot.groovy",
             "scripts/condition/permission.groovy",
-            "scripts/feature/CombatStateListener.groovy"
+            "scripts/feature/CombatStateListener.groovy",
+            "scripts/feature/EquipmentListener.groovy"
         )
     }
 

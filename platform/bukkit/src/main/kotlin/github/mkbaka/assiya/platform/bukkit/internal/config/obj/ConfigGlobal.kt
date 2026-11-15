@@ -3,6 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.config.obj
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
+import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 
 class ConfigGlobal(
     private val section: ConfigNode
@@ -26,7 +27,9 @@ class ConfigGlobal(
 
     val EQUIPMENT_REFRESH_DELAY_TICKS = section.getLong("equipment.refresh-delay-ticks", 8L)
 
-    val EQUIPMENT_SOURCE_PRIORITY = section.getInt("equipment.source-priority", 100)
+    val EQUIPMENT_SOURCE_PRIORITY = BukkitEquipmentSlot.entries.associateWith { slot ->
+        section.getInt("equipment.source-priority.${slot.name}", 100 + slot.ordinal * 10)
+    }
 
     val PARSER_CACHE_MAXIMUM_SIZE = section.getLong("parser.cache.maximum-size", 10_000L)
 

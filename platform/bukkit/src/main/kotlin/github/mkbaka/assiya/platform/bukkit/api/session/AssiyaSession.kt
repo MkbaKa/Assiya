@@ -1,7 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.api.session
 
+import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSessionInitEvent
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
@@ -30,6 +32,9 @@ class AssiyaSession(
 
     val metadata = ConcurrentHashMap<String, Any>()
 
+    internal val dirtyEquipmentSlots = BukkitEquipmentSlot.entries.toMutableSet()
+    internal val parsedEquipment = hashMapOf<BukkitEquipmentSlot, AttributeParsedSource>()
+
     fun initAttribute(engine: BukkitAttributeEngine) {
         val entity = owner ?: return
 
@@ -53,8 +58,10 @@ class AssiyaSession(
 
     fun close() {
         combatState?.leave()
+        EquipmentPipeline.cancel(ownerUUID)
+        dirtyEquipmentSlots.clear()
+        parsedEquipment.clear()
         if (this::attribute.isInitialized) {
-            EquipmentPipeline.cancel(ownerUUID)
             attribute.close()
         }
     }

@@ -63,7 +63,7 @@ class AttributeEngineState {
         val maybe = sourceIndex.remove(sourceId)
             ?: return AttributeSourceRemoveResult(false, emptySet())
 
-        val affected = maybe.attributes.keys.toSet()
+        val affected = maybe.attributes.keys.toHashSet()
         for (attributeId in maybe.attributes.keys) {
             removeAttr(attributeId, sourceId)
         }

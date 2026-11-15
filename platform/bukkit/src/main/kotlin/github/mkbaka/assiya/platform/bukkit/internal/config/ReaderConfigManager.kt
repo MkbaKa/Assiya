@@ -54,7 +54,7 @@ internal object ReaderConfigManager {
 
         val patterns = node.getStrings("patterns").map(::TextPatternTemplate)
 
-        val numeric = captures.filterValues { it.operation is NumberOperations }.keys.toSet()
+        val numeric = captures.filterValues { it.operation is NumberOperations }.keys.toHashSet()
         val formulas = parseFormulas(id, node.getNode("placeholders"))
 
         return ConfigReader(

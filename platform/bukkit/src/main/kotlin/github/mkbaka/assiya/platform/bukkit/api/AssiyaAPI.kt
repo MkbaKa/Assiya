@@ -12,6 +12,7 @@ import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
+import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
@@ -33,6 +34,11 @@ object AssiyaAPI {
 
     @JvmStatic
     fun getSession(uuid: UUID): AssiyaSession? = AssiyaSessionRegistry[uuid]
+
+    @JvmStatic
+    fun refreshEquipment(entity: LivingEntity) {
+        EquipmentPipeline.refresh(entity)
+    }
 
     @JvmStatic
     @JvmOverloads

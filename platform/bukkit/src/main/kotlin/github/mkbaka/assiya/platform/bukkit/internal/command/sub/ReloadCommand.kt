@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.internal.command.sub
 
+import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.command.argument.ReloadModuleArgument
 import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadModule
@@ -39,7 +40,10 @@ object ReloadCommand {
                         module == ReloadModule.ALL -> {
                             MessageType.RELOAD_SUCCESS.sendTo(
                                 sender,
-                                mapOf("time" to elapsed.inWholeMilliseconds.toString())
+                                mapOf(
+                                    "name" to AssiyaBukkitPlugin.PLUGIN_NAME,
+                                    "time" to elapsed.inWholeMilliseconds.toString()
+                                )
                             )
                         }
 
@@ -47,6 +51,7 @@ object ReloadCommand {
                             MessageType.RELOAD_MODULE_SUCCESS.sendTo(
                                 sender,
                                 mapOf(
+                                    "name" to AssiyaBukkitPlugin.PLUGIN_NAME,
                                     "module" to module.id,
                                     "time" to elapsed.inWholeMilliseconds.toString()
                                 )

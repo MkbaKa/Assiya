@@ -9,10 +9,12 @@ import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigReader
+import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
 import github.mkbaka.assiya.platform.bukkit.internal.registry.OperationsRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ValueRegistry
 import github.mkbaka.bukkitksp.annotation.CustomTask
+import org.bukkit.Bukkit
 
 internal object ReaderConfigManager {
 
@@ -32,6 +34,7 @@ internal object ReaderConfigManager {
             ReaderRegistry.register(reader)
             readers[id] = reader
         }
+        MessageType.LOAD_READERS.sendTo(Bukkit.getConsoleSender(), mapOf("count" to size.toString()))
     }
 
     private fun parseReader(id: String, node: ConfigNode): Reader {

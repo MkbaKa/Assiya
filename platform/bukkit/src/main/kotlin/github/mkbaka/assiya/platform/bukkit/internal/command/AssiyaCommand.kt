@@ -31,7 +31,10 @@ object AssiyaCommand {
             },
             { context ->
                 val sender = context.source ?: return@processCommand
-                MessageType.USAGE.sendTo(sender, mapOf("version" to AssiyaBukkitPlugin.INSTANCE.description.version))
+                MessageType.USAGE.sendTo(sender, mapOf(
+                    "name" to AssiyaBukkitPlugin.PLUGIN_NAME,
+                    "version" to AssiyaBukkitPlugin.INSTANCE.description.version)
+                )
             }
         )
         return command

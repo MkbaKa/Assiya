@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config
 
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
+import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
 import github.mkbaka.assiya.platform.bukkit.internal.script.Script
 import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptEngineAdapter
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.NashornEngineAdapter
@@ -9,6 +10,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptListener
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptScheduler
 import github.mkbaka.assiya.platform.bukkit.internal.util.warning
 import github.mkbaka.bukkitksp.annotation.CustomTask
+import org.bukkit.Bukkit
 import java.util.concurrent.ConcurrentHashMap
 
 object ScriptManager {
@@ -65,6 +67,7 @@ object ScriptManager {
             }
         }
         invokeAll("onEnable")
+        MessageType.LOAD_SCRIPTS.sendTo(Bukkit.getConsoleSender(), mapOf("count" to size.toString()))
     }
 
     private fun invokeAll(function: String) {

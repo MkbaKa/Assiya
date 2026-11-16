@@ -3,7 +3,9 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 import github.mkbaka.assiya.common.formula.Formula
 import github.mkbaka.assiya.common.formula.FormulaCompiler
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
+import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
 import github.mkbaka.bukkitksp.annotation.CustomTask
+import org.bukkit.Bukkit
 
 object FormulaManager {
 
@@ -24,5 +26,6 @@ object FormulaManager {
             val expression = root.getString(id) ?: error("Formula $id must have an expression")
             formulas[id] = FormulaCompiler.compile(id, expression)
         }
+        MessageType.LOAD_FORMULAS.sendTo(Bukkit.getConsoleSender(), mapOf("count" to size.toString()))
     }
 }

@@ -5,10 +5,12 @@ import github.mkbaka.assiya.platform.bukkit.api.condition.component.OptionsCompo
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigCondition
+import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 
 import github.mkbaka.bukkitksp.annotation.CustomTask
+import org.bukkit.Bukkit
 
 object ConditionConfigManager {
 
@@ -28,6 +30,7 @@ object ConditionConfigManager {
             ConditionRegistry.register(condition)
             conditions[id] = condition
         }
+        MessageType.LOAD_CONDITIONS.sendTo(Bukkit.getConsoleSender(), mapOf("count" to size.toString()))
     }
 
     private fun parseCondition(id: String, node: ConfigNode): Condition {

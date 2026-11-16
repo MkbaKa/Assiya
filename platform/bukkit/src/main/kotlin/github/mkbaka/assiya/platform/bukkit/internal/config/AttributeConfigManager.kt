@@ -8,11 +8,13 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSetting
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigAttribute
+import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ReaderRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.TriggerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.bukkitksp.annotation.CustomTask
+import org.bukkit.Bukkit
 
 object AttributeConfigManager {
 
@@ -34,6 +36,7 @@ object AttributeConfigManager {
                 attributes[id] = attribute
             }
         }
+        MessageType.LOAD_ATTRIBUTES.sendTo(Bukkit.getConsoleSender(), mapOf("count" to size.toString()))
     }
 
     private fun parseAttribute(id: String, value: ConfigNode): Attribute {

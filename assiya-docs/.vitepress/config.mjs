@@ -52,6 +52,7 @@ export default defineConfig({
           { text: '编写一个增伤属性', link: '/content/tutorial/attribute' },
           {
             text: '属性触发器与优先级',
+            collapsed: true,
             items: [
               { text: '触发器', link: '/content/tutorial/trigger' },
               { text: 'attack & defense', link: '/content/tutorial/trigger-attack' },
@@ -62,6 +63,7 @@ export default defineConfig({
           },
           { text: '增加一条新的读取格式', link: '/content/tutorial/reader' },
           { text: '创建一个新的条件', link: '/content/tutorial/condition' },
+          { text: '战斗状态', link: '/content/tutorial/combat-state' },
         ]
       },
       {
@@ -85,6 +87,7 @@ export default defineConfig({
             items: [
               { text: '属性值 · AttributeValue', link: '/content/mythicmobs/condition/cond-attribute-value' },
               { text: '属性源 · HasAttributeSource', link: '/content/mythicmobs/condition/cond-has-source' },
+              { text: '战斗状态 · InCombat', link: '/content/mythicmobs/condition/cond-in-combat' },
               { text: '伤害数据 · DamageData', link: '/content/mythicmobs/condition/cond-damage-data' }
             ]
           },

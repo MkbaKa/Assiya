@@ -64,6 +64,7 @@ export default defineConfig({
           { text: '增加一条新的读取格式', link: '/content/tutorial/reader' },
           { text: '创建一个新的条件', link: '/content/tutorial/condition' },
           { text: '战斗状态', link: '/content/tutorial/combat-state' },
+          { text: '脚本环境', link: '/content/tutorial/script' },
         ]
       },
       {
@@ -93,7 +94,17 @@ export default defineConfig({
           },
           { text: '占位符', link: '/content/mythicmobs/placeholders' }
         ]
-      }
+      },
+      {
+        text: '进阶知识',
+        collapsed: true,
+        items: [
+          { text: '前言', link: '/content/advanced/readme' },
+          { text: 'Processor', link: '/content/advanced/processor' },
+          { text: '已实现的组件', link: '/content/advanced/components' },
+          { text: '属性管理', link: '/content/advanced/engine' },
+        ]
+      },
     ],
     search: {
       provider: 'local'

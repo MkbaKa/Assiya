@@ -69,6 +69,6 @@ class ProcessorComponentBuilder {
         return this
     }
 
-    fun build() = components.toMap()
+    fun build() = HashMap(components)
 
 }

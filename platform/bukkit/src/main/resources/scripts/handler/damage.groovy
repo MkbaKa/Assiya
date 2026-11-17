@@ -35,8 +35,10 @@ class Damage {
                     ProjectileSource shooter = projectile.shooter
                     if (!(shooter instanceof LivingEntity)) return
 
+                    AssiyaSession session = AssiyaAPI.getSessionOrCreate(projectile)
                     AttributeEngineSnapshot shooterSnapshot = AssiyaAPI.getSnapshot((LivingEntity) shooter)
-                    AssiyaAPI.getSessionOrCreate(projectile).attribute.submitSnapshot(shooterSnapshot)
+
+                    AssiyaAPI.addAttributeSnapshot(session, shooterSnapshot)
                 }
                 .register()
 

@@ -32,7 +32,9 @@ class ExtendAttributeMechanic(
         val source = if (reverse) caster else target
         val receiver = if (reverse) target else caster
         val snapshot = AssiyaAPI.getSnapshot(source)
-        AssiyaAPI.getSessionOrCreate(receiver).attribute.submitSnapshot(snapshot, lifeCycle)
+
+        val session = AssiyaAPI.getSessionOrCreate(receiver)
+        AssiyaAPI.addAttributeSnapshot(session, snapshot, lifeCycle)
         return true
     }
 

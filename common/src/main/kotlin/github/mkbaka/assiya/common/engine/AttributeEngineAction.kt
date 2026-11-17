@@ -1,8 +1,10 @@
 package github.mkbaka.assiya.common.engine
 
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
+import kotlinx.coroutines.CompletableDeferred
 
 /**
  * 消息类型
@@ -32,7 +34,10 @@ interface AttributeEngineAction {
 
     data class RemoveSource(val sourceId: String) : AttributeEngineAction
 
-    data class Refresh(val triggerEvent: Boolean = true) : AttributeEngineAction
+    data class Refresh(
+        val triggerEvent: Boolean = true,
+        val reply: CompletableDeferred<AttributeEngineSnapshot>? = null
+    ) : AttributeEngineAction
 
     data object CheckExpiration : AttributeEngineAction
 

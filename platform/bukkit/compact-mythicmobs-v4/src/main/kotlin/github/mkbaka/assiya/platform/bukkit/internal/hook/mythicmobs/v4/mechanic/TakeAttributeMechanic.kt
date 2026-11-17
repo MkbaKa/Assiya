@@ -19,7 +19,7 @@ class TakeAttributeMechanic(
         val target = ae.bukkitEntity
         val sourceId = source.get(meta, ae)
 
-        AssiyaAPI.getSession(target)?.attribute?.submitRemove(sourceId)
+        AssiyaAPI.takeAttribute(target, sourceId)
         return true
     }
 

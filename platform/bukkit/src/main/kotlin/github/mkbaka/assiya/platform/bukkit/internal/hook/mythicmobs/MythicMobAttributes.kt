@@ -35,7 +35,7 @@ object MythicMobAttributes {
             attributes = values
         )
 
-        session.attribute.submitPatches(true, patch)
+        AssiyaAPI.addAttribute(session, true, patch)
     }
 
     @Awake(lifeCycle = LifeCycle.DISABLE)

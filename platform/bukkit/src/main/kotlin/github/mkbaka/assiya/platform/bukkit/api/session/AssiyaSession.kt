@@ -24,8 +24,7 @@ class AssiyaSession(
     val combatState: CombatState? = if (entity is Player) CombatState(this) else null
 
     lateinit var attribute: AttributeSession
-    val hasAttribute: Boolean
-        get() = this::attribute.isInitialized
+    val hasAttribute: Boolean get() = this::attribute.isInitialized
 
     val damageMetaStack = DamageMetaStack()
     val damageProcessorStack = DamageProcessorStack()

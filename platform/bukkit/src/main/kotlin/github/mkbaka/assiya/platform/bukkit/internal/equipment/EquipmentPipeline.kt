@@ -2,6 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.equipment
 
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
@@ -142,7 +143,7 @@ object EquipmentPipeline {
             currentCoroutineContext().ensureActive()
             if (AssiyaSessionRegistry[session.ownerUUID] !== session) return@withAsync
 
-            session.attribute.submitPatches(true, *results.toTypedArray())
+            AssiyaAPI.addAttribute(session,*results.toTypedArray())
         }
     }
 }

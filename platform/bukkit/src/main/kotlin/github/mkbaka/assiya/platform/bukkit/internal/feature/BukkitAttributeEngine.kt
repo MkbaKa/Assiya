@@ -3,6 +3,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.feature
 import github.mkbaka.assiya.common.engine.AttributeEngineAction
 import github.mkbaka.assiya.common.engine.AttributeUpdateContext
 import github.mkbaka.assiya.common.engine.DefaultAttributeEngine
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublisher
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSourceRemoveEvent
@@ -22,18 +23,19 @@ class BukkitAttributeEngine(
     override fun refresh(
         action: AttributeEngineAction.Refresh,
         context: AttributeUpdateContext
-    ) {
-        val entity = assiyaSession.owner ?: return
+    ): AttributeEngineSnapshot {
+        val entity = assiyaSession.owner ?: return snapshot()
 
         if (action.triggerEvent && AttributeUpdateEvent.Pre(entity, context).call()) {
-            return
+            return snapshot()
         }
 
-        super.refresh(action, context)
+        val snapshot = super.refresh(action, context)
 
         if (action.triggerEvent) {
             AttributeUpdateEvent.Post(entity, context).call()
         }
+        return snapshot
     }
 
     override fun removeSource(

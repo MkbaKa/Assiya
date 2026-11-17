@@ -1,11 +1,12 @@
 package github.mkbaka.assiya.common.engine
 
 import github.mkbaka.assiya.common.engine.expiration.AttributeExpirationScheduler
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublisher
 import github.mkbaka.assiya.common.engine.state.AttributeEngineState
-
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -36,8 +37,14 @@ open class DefaultAttributeEngine(
      */
     private val pending = arrayListOf<AttributeEngineAction>()
 
+    // refresh 期间的上下文
+    private var workingContext: AttributeUpdateContext? = null
+
+    private val replies = ConcurrentHashMap.newKeySet<CompletableDeferred<AttributeEngineSnapshot>>()
+
     /**
-     * 在不存在弱智附属代码库库改属性的前提下  MC的使用场景应该做不到撑爆消息队列
+     * 在不存在弱智附属代码库库改属性的前提下
+     * MC 的使用场景应该做不到撑爆消息队列
      */
     protected val channel = Channel<AttributeEngineAction>(Channel.UNLIMITED)
 
@@ -62,6 +69,28 @@ open class DefaultAttributeEngine(
         }
     }
 
+    init {
+        actorJob.invokeOnCompletion { cause ->
+            closed.set(true)
+            channel.close()
+            failReplies(cause ?: CancellationException("The engine has stopped"))
+            engineJob.cancel()
+        }
+    }
+
+    private fun visitReplies(action: AttributeEngineAction, visitor: (CompletableDeferred<AttributeEngineSnapshot>) -> Unit) {
+        when (action) {
+            is AttributeEngineAction.Refresh -> action.reply?.let(visitor)
+            is AttributeEngineAction.Batch -> {
+                for (child in action.actions) visitReplies(child, visitor)
+            }
+        }
+    }
+
+    private fun failReplies(cause: Throwable) {
+        for (reply in replies) reply.completeExceptionally(cause)
+    }
+
     protected fun ensureOpen() {
         check(!closed.get()) { "The engine is closed and cannot process more tasks" }
     }
@@ -71,8 +100,23 @@ open class DefaultAttributeEngine(
     }
 
     override fun push(vararg action: AttributeEngineAction) {
-        ensureOpen()
-        send(AttributeEngineAction.Batch(action.toList()))
+        // 保证单次提交多条命令的连续性
+        val batch = AttributeEngineAction.Batch(action.toList())
+
+        // 找出 batch 里那条可能存在的 refresh
+        // 然后保存它的 reply 以实现 batch 里有命令执行失败时统一结束
+        visitReplies(batch) { reply ->
+            replies += reply
+            reply.invokeOnCompletion { replies.remove(reply) }
+        }
+
+        try {
+            ensureOpen()
+            send(batch)
+        } catch (cause: Throwable) {
+            visitReplies(batch) { it.completeExceptionally(cause) }
+            throw cause
+        }
     }
 
     override fun snapshot() = publisher.current()
@@ -82,12 +126,7 @@ open class DefaultAttributeEngine(
             channel.close()
             actorJob.cancel()
             scope.cancel()
-        }
-    }
-
-    protected fun publish(affectedAttributes: Set<String>, changedSources: Set<String>) {
-        if (affectedAttributes.isNotEmpty() || changedSources.isNotEmpty()) {
-            publisher.publish(affectedAttributes, changedSources, state.sourceIndex, state.attributeIndex)
+            failReplies(CancellationException("The engine is closed"))
         }
     }
 
@@ -112,29 +151,45 @@ open class DefaultAttributeEngine(
                 }
             }
 
-            is AttributeEngineAction.UpdateSource,
-            is AttributeEngineAction.ModifySource,
-            is AttributeEngineAction.RemoveSource -> pending += action
+            is AttributeEngineAction.UpdateSource -> {
+                val context = workingContext
+                if (context == null) pending += action else context.submit(action.patch)
+            }
+
+            is AttributeEngineAction.ModifySource -> {
+                val context = workingContext
+                if (context == null) {
+                    pending += action
+                } else {
+                    context.modify(
+                        sourceId = action.sourceId,
+                        attributes = action.attributes,
+                        priority = action.priority,
+                        create = action.create,
+                        lifeCycle = action.lifeCycle
+                    )
+                }
+            }
+
+            is AttributeEngineAction.RemoveSource -> {
+                val context = workingContext
+                if (context == null) pending += action else context.remove(action.sourceId)
+            }
 
             is AttributeEngineAction.Refresh -> {
                 val commands = pending.toList()
                 pending.clear()
                 val context = AttributeUpdateContext(state.copy())
-                for (command in commands) {
-                    when (command) {
-                        is AttributeEngineAction.UpdateSource -> context.submit(command.patch)
-                        is AttributeEngineAction.ModifySource -> context.modify(
-                            sourceId = command.sourceId,
-                            attributes = command.attributes,
-                            priority = command.priority,
-                            create = command.create,
-                            lifeCycle = command.lifeCycle
-                        )
-
-                        is AttributeEngineAction.RemoveSource -> context.remove(command.sourceId)
+                workingContext = context
+                try {
+                    for (command in commands) {
+                        execute(command)
                     }
+                } finally {
+                    workingContext = null
                 }
-                refresh(action, context)
+                val snapshot = refresh(action, context)
+                action.reply?.complete(snapshot)
             }
 
             AttributeEngineAction.CheckExpiration -> {
@@ -151,7 +206,7 @@ open class DefaultAttributeEngine(
     protected open fun refresh(
         action: AttributeEngineAction.Refresh,
         context: AttributeUpdateContext
-    ) {
+    ): AttributeEngineSnapshot {
         val affectedAttributes = linkedSetOf<String>()
         val changedSources = linkedSetOf<String>()
         for (command in context.commands()) {
@@ -159,6 +214,13 @@ open class DefaultAttributeEngine(
         }
 
         publisher.publish(affectedAttributes, changedSources, state.sourceIndex, state.attributeIndex)
+        return publisher.current()
+    }
+
+    protected fun publish(affectedAttributes: Set<String>, changedSources: Set<String>) {
+        if (affectedAttributes.isNotEmpty() || changedSources.isNotEmpty()) {
+            publisher.publish(affectedAttributes, changedSources, state.sourceIndex, state.attributeIndex)
+        }
     }
 
     protected fun apply(
@@ -193,8 +255,10 @@ open class DefaultAttributeEngine(
         try {
             execute(action)
         } catch (e: CancellationException) {
+            visitReplies(action) { it.completeExceptionally(e) }
             throw e
         } catch (e: Throwable) {
+            visitReplies(action) { it.completeExceptionally(e) }
             logger.log(Level.WARNING, "Failed to process engine action $action", e)
         } finally {
             expiration.reschedule()

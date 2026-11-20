@@ -1,4 +1,4 @@
-package github.mkbaka.assiya.platform.bukkit.internal.listener
+package github.mkbaka.assiya.platform.bukkit.api.session
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
@@ -7,9 +7,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callSync
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.CustomTask
 import github.mkbaka.bukkitksp.annotation.LifeCycle
@@ -31,7 +29,7 @@ object AssiyaSessionListener {
 
     @CustomTask(taskId = "reload", priority = 3)
     fun reload() {
-        callSync {
+        SchedulerUtils.callSync {
 
             unregisterListeners()
             if (!Config.global.PLAYER_SESSION_LIFECYCLE) return@callSync
@@ -54,11 +52,11 @@ object AssiyaSessionListener {
 
                 timeoutJobs.remove(player.uniqueId)?.cancel()
 
-                val job = launch(
-                    context = BukkitCoroutine.coroutineContext[BukkitDispatchers]!!.sync,
+                val job = SchedulerUtils.launch(
+                    context = BukkitCoroutine.coroutineContext[BukkitDispatchers.Key]!!.sync,
                     start = CoroutineStart.LAZY
                 ) {
-                    delayTicks(timeout * 20L)
+                    SchedulerUtils.delayTicks(timeout * 20L)
                     ensureActive()
 
                     if (!player.isOnline) {

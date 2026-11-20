@@ -1,0 +1,7 @@
+scriptTools:
+  Utils: org.serverct.ersha.script.AttrScriptUtils
+  AttributeAPI: org.serverct.ersha.api.AttributeAPI
+  Bukkit: org.bukkit.Bukkit
+  EntityType: org.bukkit.entity.EntityType
+  Arrays: java.util.Arrays
+  Data: org.serverct.ersha.manager.data.Data

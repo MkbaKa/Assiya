@@ -1,0 +1,9 @@
+name: ${name}
+main: org.serverct.ersha.AttributePlus
+version: ${version}
+authors:
+  - iNanmu
+  - Mkbakaa
+depend:
+  - Assiya
+api-version: 1.13

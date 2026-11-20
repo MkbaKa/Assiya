@@ -1,11 +1,12 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config.loader
 
+import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.api.config.BukkitConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.config.DefaultConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils
-import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils.getSubFiles
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -14,8 +15,12 @@ object FileLoader {
 
     @JvmStatic
     @JvmOverloads
-    fun loadConfig(path: String, resource: String = path): ConfigNode {
-        val file = FileUtils.saveIfNotExists(path, resource)
+    fun loadConfig(
+        path: String,
+        resource: String = path,
+        plugin: JavaPlugin = AssiyaBukkitPlugin.INSTANCE
+    ): ConfigNode {
+        val file = FileUtils.saveIfNotExists(path, resource, plugin)
         return BukkitConfigNode(FileUtils.readYaml(file))
     }
 
@@ -35,7 +40,7 @@ object FileLoader {
     @JvmStatic
     fun load(target: File, processor: Consumer<File>) {
         val files = if (target.isDirectory) {
-            target.getSubFiles()
+            target.walkTopDown().filter { it.isFile }
         } else {
             sequenceOf(target)
         }

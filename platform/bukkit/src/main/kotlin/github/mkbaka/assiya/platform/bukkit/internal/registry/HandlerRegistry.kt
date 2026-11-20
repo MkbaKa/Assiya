@@ -134,8 +134,8 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
         for (index in subscribers.indices) {
             val subscriber = subscribers[index]
             // 属性直接阻止了整个 processor 触发
-            if (processor[CancellableComponent]?.isCancelled == true) {
-                break
+            if (processor[CancellableComponent]?.isCancelled == true && !subscriber.settings.ignoreCancelled) {
+                continue
             }
 
             // 阻止单个属性

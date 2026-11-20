@@ -7,8 +7,10 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderCompon
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.format
 import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.LifeCycle
+import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
+import org.bukkit.entity.Player
 import pers.neige.colonel.argument
 import pers.neige.colonel.arguments.impl.StringArgument
 import pers.neige.colonel.literal
@@ -78,6 +80,10 @@ object AssiyaPlaceholderAPIHook {
             if (player == null) ""
             else node.execute(StringReader.of(params, '_', '\\'), player) { "Invalid action: $params" } ?: ""
         }
+    }
+
+    fun String.parsePAPI(player: Player): String {
+        return if (hooked) PlaceholderAPI.setPlaceholders(player, this) else this
     }
 
     @Awake(lifeCycle = LifeCycle.ENABLE)

@@ -9,3 +9,5 @@ include("platform:bukkit:compact-mythicmobs-v5")
 
 include("platform:bukkit:mythic-ksp-annotations")
 include("platform:bukkit:mythic-ksp")
+
+include("platform:bukkit:compact-attributeplus")

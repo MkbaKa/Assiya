@@ -143,7 +143,7 @@ object EquipmentPipeline {
             currentCoroutineContext().ensureActive()
             if (AssiyaSessionRegistry[session.ownerUUID] !== session) return@withAsync
 
-            AssiyaAPI.addAttribute(session,*results.toTypedArray())
+            AssiyaAPI.addAttribute(session, triggerEvent = true, *results.toTypedArray())
         }
     }
 }

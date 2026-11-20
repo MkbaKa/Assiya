@@ -1,6 +1,8 @@
 package github.mkbaka.assiya.platform.bukkit.api.session
 
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
+import github.mkbaka.assiya.platform.bukkit.api.cooldown.Cooldown
+import github.mkbaka.assiya.platform.bukkit.api.counter.CounterStore
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSessionInitEvent
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
@@ -29,6 +31,9 @@ class AssiyaSession(
     val damageMetaStack = DamageMetaStack()
     val damageProcessorStack = DamageProcessorStack()
 
+    val cooldown = Cooldown()
+    val counter = CounterStore()
+
     val metadata = ConcurrentHashMap<String, Any>()
 
     internal val dirtyEquipmentSlots = BukkitEquipmentSlot.entries.toMutableSet()
@@ -56,6 +61,8 @@ class AssiyaSession(
     }
 
     fun close() {
+        cooldown.clear()
+        counter.clear()
         combatState?.leave()
         EquipmentPipeline.cancel(ownerUUID)
         dirtyEquipmentSlots.clear()

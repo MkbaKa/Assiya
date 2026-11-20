@@ -1,0 +1,3 @@
+package org.serverct.ersha
+
+class AssiyaAttributePlusCompact

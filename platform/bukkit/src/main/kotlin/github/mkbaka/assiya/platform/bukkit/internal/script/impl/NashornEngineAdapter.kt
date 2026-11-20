@@ -2,13 +2,8 @@ package github.mkbaka.assiya.platform.bukkit.internal.script.impl
 
 import github.mkbaka.assiya.platform.bukkit.internal.script.Script
 import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptEngineAdapter
-import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import java.io.File
-import javax.script.Compilable
-import javax.script.CompiledScript
-import javax.script.Invocable
-import javax.script.ScriptEngine
-import javax.script.SimpleBindings
+import javax.script.*
 import github.mkbaka.assiya.libs.nashorn.api.scripting.NashornScriptEngineFactory as RelocatedFactory
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory as BuiltinFactory
 
@@ -47,12 +42,14 @@ object NashornEngineAdapter : ScriptEngineAdapter {
     }
 
     override fun compile(id: String, file: File): Script {
-        val engine = newEngine(ENGINE_ARGS, javaClass.classLoader)
+        val engine = createEngine(javaClass.classLoader)
         file.reader(Charsets.UTF_8).use { reader ->
             (engine as Compilable).compile(reader).eval()
         }
         return NashornScript(id, engine)
     }
+
+    fun createEngine(loader: ClassLoader): ScriptEngine = newEngine(ENGINE_ARGS, loader)
 
     private class NashornScript(
         override val id: String,

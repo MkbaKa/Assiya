@@ -13,6 +13,9 @@ class TriggerSettings private constructor(
     val alwaysRun: Boolean
         get() = get<Boolean>("always-run") ?: false
 
+    val ignoreCancelled: Boolean
+        get() = get<Boolean>("ignore-cancelled") ?: false
+
     val handler: String?
         get() = get("handler")
 

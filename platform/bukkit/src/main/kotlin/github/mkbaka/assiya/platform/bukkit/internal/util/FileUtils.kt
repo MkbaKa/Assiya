@@ -2,6 +2,7 @@ package github.mkbaka.assiya.platform.bukkit.internal.util
 
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.function.Supplier
 import java.util.jar.JarFile
@@ -13,10 +14,10 @@ object FileUtils {
         return walk().filter { it.isFile }
     }
 
-    fun saveIfNotExists(resource: String): File {
-        val file = File(AssiyaBukkitPlugin.INSTANCE.dataFolder, resource)
+    fun saveIfNotExists(resource: String, plugin: JavaPlugin = AssiyaBukkitPlugin.INSTANCE): File {
+        val file = File(plugin.dataFolder, resource)
         if (!file.exists()) {
-            AssiyaBukkitPlugin.INSTANCE.saveResource(resource, false)
+            plugin.saveResource(resource, false)
         }
         return file
     }
@@ -41,9 +42,16 @@ object FileUtils {
         return file
     }
 
-    fun saveIfNotExists(path: String, resource: String): File {
-        if (path == resource) return saveIfNotExists(resource)
-        return saveIfNotExists(path) { readResource(resource) }
+    fun saveIfNotExists(path: String, resource: String, plugin: JavaPlugin = AssiyaBukkitPlugin.INSTANCE): File {
+        if (path == resource) return saveIfNotExists(resource, plugin)
+        val file = File(plugin.dataFolder, path)
+        if (!file.exists()) {
+            val content = requireNotNull(plugin.getResource(resource)) { "Missing resource $resource" }
+                .bufferedReader(Charsets.UTF_8).use { it.readText() }
+            file.parentFile.mkdirs()
+            file.writeText(content, Charsets.UTF_8)
+        }
+        return file
     }
 
     fun saveDirectoryIfNotExists(path: String): File {

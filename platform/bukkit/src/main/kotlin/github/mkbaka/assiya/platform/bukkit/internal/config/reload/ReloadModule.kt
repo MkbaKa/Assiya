@@ -1,58 +1,72 @@
 package github.mkbaka.assiya.platform.bukkit.internal.config.reload
 
-import github.mkbaka.assiya.platform.bukkit.internal.config.AttributeConfigManager
-import github.mkbaka.assiya.platform.bukkit.internal.config.ConditionConfigManager
-import github.mkbaka.assiya.platform.bukkit.internal.config.Config
-import github.mkbaka.assiya.platform.bukkit.internal.config.FormulaManager
-import github.mkbaka.assiya.platform.bukkit.internal.config.ReaderConfigManager
-import github.mkbaka.assiya.platform.bukkit.internal.config.ScriptManager
+import github.mkbaka.assiya.platform.bukkit.api.event.ModuleReloadEvent
+import github.mkbaka.assiya.platform.bukkit.internal.CustomTasks
+import github.mkbaka.assiya.platform.bukkit.internal.config.*
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.MythicMobAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.groovy.GroovyEngineAdapter
-import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
+import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
 
-enum class ReloadModule {
+enum class ReloadModule(private val requiresAttributeRefresh: Boolean = false) {
 
-    ALL {
-        override fun reload(): Boolean = Config.reload()
+    ALL(requiresAttributeRefresh = true) {
+        override fun reload0() {
+            CustomTasks.run("reload")
+        }
     },
 
     SCRIPT {
-        override fun reload(): Boolean {
+        override fun reload0() {
             GroovyEngineAdapter.reload()
             ScriptManager.reload()
-            return true
         }
     },
 
-    READER {
-        override fun reload(): Boolean = reloadWithIndex(name) { ReaderConfigManager.reload() }
+    READER(requiresAttributeRefresh = true) {
+        override fun reload0() {
+            ReaderConfigManager.reload()
+        }
     },
 
     FORMULA {
-        override fun reload(): Boolean {
+        override fun reload0() {
             FormulaManager.reload()
-            return true
         }
     },
 
-    CONDITION {
-        override fun reload(): Boolean = reloadWithIndex(name) { ConditionConfigManager.reload() }
+    CONDITION(requiresAttributeRefresh = true) {
+        override fun reload0() {
+            ConditionConfigManager.reload()
+        }
     },
 
-    ATTRIBUTE {
-        override fun reload(): Boolean = reloadWithIndex(name) { AttributeConfigManager.reload() }
+    ATTRIBUTE(requiresAttributeRefresh = true) {
+        override fun reload0() {
+            AttributeConfigManager.reload()
+        }
     },
 
     MYTHICMOBS_CACHE {
-        override fun reload(): Boolean {
+        override fun reload0() {
             MythicMobAttributes.clear()
-            return true
         }
     };
 
-    abstract fun reload(): Boolean
+    protected abstract fun reload0()
+
+    fun reload() {
+        val pre = ModuleReloadEvent.Pre(this, requiresAttributeRefresh)
+        pre.call()
+        if (this == ALL) Config.load()
+        if (pre.requiresAttributeRefresh) {
+            reloadWithIndex(name) { reload0() }
+        } else {
+            reload0()
+        }
+        ModuleReloadEvent.Post(this).call()
+    }
 
     val id: String
         get() = name.lowercase()
@@ -64,22 +78,18 @@ enum class ReloadModule {
             return entries.firstOrNull { it.id == key }
         }
 
-        private fun reloadWithIndex(module: String, action: () -> Unit): Boolean {
+        private fun reloadWithIndex(module: String, action: () -> Unit) {
             AttributeRegistration.begin()
-            var loaded = true
+
             try {
                 action()
-            } catch (e: Exception) {
-                loaded = false
-                logEx(e, "Failed to reload module $module")
             } finally {
                 AttributeRegistration.complete()
-            }
+                Config.global.parseDefaultAttributes()
+                AssiyaSessionRegistry.refresh()
 
-            Config.global.parseDefaultAttributes()
-            AssiyaSessionRegistry.refresh()
-            MythicMobAttributes.clear()
-            return loaded
+                if (module != ALL.name) MythicMobAttributes.clear()
+            }
         }
 
     }

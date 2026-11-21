@@ -23,9 +23,9 @@ object NashornEngineAdapter : ScriptEngineAdapter {
 
     val globalEngine = newEngine(arrayOf("--global-per-engine", *ENGINE_ARGS), this::class.java.classLoader)
 
-    fun eval(expression: String, args: Map<String, Any>): Any? {
+    override fun eval(content: String, args: Map<String, Any?>): Any? {
         return try {
-            globalEngine.eval(expression, SimpleBindings(args))
+            globalEngine.eval(content, SimpleBindings(args))
         } catch (e: Exception) {
             e.printStackTrace()
             null

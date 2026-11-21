@@ -5,6 +5,8 @@ import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptEngineAdapter
 import github.mkbaka.bukkitksp.annotation.CustomTask
 import groovy.lang.Binding
 import groovy.lang.GroovyObject
+import groovy.lang.GroovyShell
+import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.runtime.InvokerHelper
 import java.io.File
 import java.nio.file.Files
@@ -58,6 +60,15 @@ object GroovyEngineAdapter : ScriptEngineAdapter {
         }
 
         return GroovyScript(id, instance)
+    }
+
+    override fun eval(content: String, args: Map<String, Any?>): Any? {
+        val config = CompilerConfiguration().apply {
+            sourceEncoding = "UTF-8"
+            targetBytecode = CompilerConfiguration.JDK8
+        }
+        val shell = GroovyShell(loader, Binding(args.toMutableMap()), config)
+        return shell.classLoader.use { shell.evaluate(content) }
     }
 
     private class GroovyScript(

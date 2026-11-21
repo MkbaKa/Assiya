@@ -37,6 +37,11 @@ object ScriptManager {
         }
     }
 
+    val engineTypes: List<String>
+        get() = engines.keys.toList()
+
+    fun getEngine(type: String): ScriptEngineAdapter? = engines[type.lowercase()]
+
     fun containsScript(script: String): Boolean {
         return scripts.containsKey(script.lowercase())
     }

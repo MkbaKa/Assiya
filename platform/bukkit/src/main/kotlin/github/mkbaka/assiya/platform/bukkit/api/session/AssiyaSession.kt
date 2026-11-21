@@ -43,6 +43,7 @@ class AssiyaSession(
         val entity = owner ?: return
 
         attribute = AttributeSession(this, engine)
+        attribute.refreshDefaultAttributes()
 
         if (entity is LivingEntity) {
             EquipmentPipeline.refresh(entity)

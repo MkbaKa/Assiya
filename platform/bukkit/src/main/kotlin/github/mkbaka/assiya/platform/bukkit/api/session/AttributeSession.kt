@@ -22,10 +22,6 @@ class AttributeSession(
     val snapshot: AttributeEngineSnapshot
         get() = engine.snapshot()
 
-    init {
-        refreshDefaultAttributes()
-    }
-
     fun refreshDefaultAttributes() {
         val owner = assiyaSession.owner ?: return
 

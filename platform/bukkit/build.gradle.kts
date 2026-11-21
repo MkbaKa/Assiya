@@ -21,7 +21,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT") {
+        attributes {
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+        }
+    }
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly(fileTree("libs"))
     compileOnly(project(":fake-api"))

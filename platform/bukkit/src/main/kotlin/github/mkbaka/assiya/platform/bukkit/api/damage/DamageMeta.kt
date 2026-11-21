@@ -7,12 +7,11 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultiple
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.DamageProcessor
+import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
-import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
-import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
 
@@ -87,17 +86,11 @@ class DamageMeta @JvmOverloads constructor(
 
             when {
                 preventKnockback -> {
-                    val uuid = UUID.randomUUID()
-                    val modifier = AttributeModifier(
-                        uuid,
-                        "Assiya:damage-meta:prevent-knockback",
-                        1.0,
-                        AttributeModifier.Operation.ADD_NUMBER
-                    )
-                    val attribute = target.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)
-                    attribute?.addModifier(modifier)
+                    val knockbackResistance = VanillaAttributes.of(target).knockbackResistance
+                    val source = "Assiya:damage-meta:prevent-knockback"
+                    knockbackResistance.setTransient(source, 1.0, AttributeModifier.Operation.ADD_NUMBER)
                     block()
-                    attribute?.removeModifier(modifier)
+                    knockbackResistance.removeModifier(source)
                 }
 
                 else -> block()

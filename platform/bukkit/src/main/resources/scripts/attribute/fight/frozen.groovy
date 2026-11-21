@@ -7,11 +7,11 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CustomDataComp
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.task.EntityTaskBuilder
+import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributeView
+import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils
 import groovy.transform.CompileStatic
-import org.bukkit.attribute.Attribute as VanillaAttribute
-import org.bukkit.attribute.AttributeInstance
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -22,11 +22,10 @@ import java.util.function.BiConsumer
 class Frozen {
 
     private static final String MODIFIER_NAME = 'assiya:frozen'
-    private static final UUID MODIFIER_UUID = UUID.nameUUIDFromBytes(MODIFIER_NAME.getBytes())
 
     static void onEnable() {
         BiConsumer<Entity, Map<String, Object>> cleanup = { Entity entity, Map<String, Object> params ->
-            removeFrozen(((LivingEntity) entity).getAttribute(VanillaAttribute.GENERIC_MOVEMENT_SPEED))
+            VanillaAttributes.of((LivingEntity) entity).movementSpeed.removeModifier(MODIFIER_NAME)
         }
         EntityTaskAPI.registerTask(MODIFIER_NAME, cleanup, cleanup)
     }
@@ -41,23 +40,20 @@ class Frozen {
         double chance = attacker.getValue(attribute.id, 'total', 0.0d)
         if (!ScriptTools.chance(chance)) return
 
-        AttributeInstance instance = target.entity.getAttribute(VanillaAttribute.GENERIC_MOVEMENT_SPEED)
-        if (instance == null) return
+        VanillaAttributeView instance = VanillaAttributes.of(target.entity).movementSpeed
 
         double rate = processor.formula('frozen') { Map<String, Object> variables ->
             variables.put('intensity', attacker.getValue('frozen-intensity', 'total', 0.0d))
         }
         double duration = 3.0d + attacker.getValue('frozen-time', 'total', 0.0d)
 
-        removeFrozen(instance)
-
         if (duration <= 0.0d || rate <= 0.0d) {
+            instance.removeModifier(MODIFIER_NAME)
             EntityTaskAPI.cancelTask(target.entity, MODIFIER_NAME)
             return
         }
 
-        AttributeModifier modifier = new AttributeModifier(MODIFIER_UUID, MODIFIER_NAME, -rate, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
-        instance.addModifier(modifier)
+        instance.setTransient(MODIFIER_NAME, -rate, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
 
         long ticks = (long) Math.ceil(duration * 20.0d)
         EntityTaskAPI.runTask(target.entity, MODIFIER_NAME) { EntityTaskBuilder builder ->
@@ -76,16 +72,6 @@ class Frozen {
                 processor,
                 [frozen: StringUtils.format(rate * 100.0d, 2), duration: StringUtils.format(duration, 0)]
         )
-    }
-
-    private static void removeFrozen(AttributeInstance instance) {
-        if (instance == null) return
-        for (AttributeModifier modifier : instance.modifiers) {
-            if (modifier.uniqueId == MODIFIER_UUID) {
-                instance.removeModifier(modifier)
-                return
-            }
-        }
     }
 
 }

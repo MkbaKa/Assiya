@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.internal.equipment
 
+import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
@@ -20,6 +21,7 @@ import kotlinx.coroutines.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 object EquipmentPipeline {
 
@@ -32,18 +34,23 @@ object EquipmentPipeline {
     fun refresh(
         entity: LivingEntity,
         vararg changedSlots: BukkitEquipmentSlot = BukkitEquipmentSlot.entries.toTypedArray()
-    ) {
-        refresh(entity, Config.global.EQUIPMENT_REFRESH_DELAY_TICKS, *changedSlots)
+    ): CompletableFuture<AttributeEngineSnapshot> {
+        return refresh(entity, Config.global.EQUIPMENT_REFRESH_DELAY_TICKS, *changedSlots)
     }
 
     fun refresh(
         entity: LivingEntity,
         refreshDelay: Long,
         vararg changedSlots: BukkitEquipmentSlot
-    ) {
+    ): CompletableFuture<AttributeEngineSnapshot> {
         val ownerId = entity.uniqueId
-        val session = AssiyaSessionRegistry[ownerId] ?: return
-        if (!session.hasAttribute) return
+        val session = AssiyaSessionRegistry[ownerId]
+            ?: return CompletableFuture.completedFuture(AttributeEngineSnapshot.EMPTY)
+        if (!session.hasAttribute) {
+            return CompletableFuture.completedFuture(AttributeEngineSnapshot.EMPTY)
+        }
+
+        val result = CompletableFuture<AttributeEngineSnapshot>()
 
         // 追加受影响的槽位
         session.dirtyEquipmentSlots.addAll(changedSlots)
@@ -61,14 +68,19 @@ object EquipmentPipeline {
                 if (refreshDelay > 0) delayTicks(refreshDelay)
 
                 if (AssiyaSessionRegistry[ownerId] !== session || entity is Player && !entity.isOnline) {
+                    result.complete(session.attribute.snapshot)
                     return@launch
                 }
 
-                readAndSubmit(entity, session)
+                readAndSubmit(entity, session).whenComplete { snapshot, cause ->
+                    if (cause == null) result.complete(snapshot) else result.completeExceptionally(cause)
+                }
             } catch (e: CancellationException) {
+                result.completeExceptionally(e)
                 throw e
             } catch (e: Throwable) {
                 logEx(e, "Failed to refresh equipment for $ownerId")
+                result.completeExceptionally(e)
             } finally {
                 pending.remove(ownerId, task)
             }
@@ -76,12 +88,13 @@ object EquipmentPipeline {
 
         pending[ownerId] = job
         job.start()
+        return result
     }
 
     private suspend fun readAndSubmit(
         entity: LivingEntity,
         session: AssiyaSession
-    ) {
+    ): CompletableFuture<AttributeEngineSnapshot> {
         val priorities = Config.global.EQUIPMENT_SOURCE_PRIORITY
         val changedSlots = session.dirtyEquipmentSlots.toHashSet()
         val equipment = entity.equipment
@@ -98,7 +111,9 @@ object EquipmentPipeline {
         }
 
         currentCoroutineContext().ensureActive()
-        if (AssiyaSessionRegistry[session.ownerUUID] !== session || entity is Player && !entity.isOnline) return
+        if (AssiyaSessionRegistry[session.ownerUUID] !== session || entity is Player && !entity.isOnline) {
+            return CompletableFuture.completedFuture(session.attribute.snapshot)
+        }
 
         // 塞进缓存
         session.parsedEquipment.putAll(updates)
@@ -123,7 +138,7 @@ object EquipmentPipeline {
         }
 
         // 满足条件/无条件的可用属性结果
-        withAsync {
+        return withAsync {
             val results = arrayListOf<AttributeSourcePatch>()
             for (slot in BukkitEquipmentSlot.entries) {
                 val sourceId = slot.sourceId
@@ -141,7 +156,9 @@ object EquipmentPipeline {
                 )
             }
             currentCoroutineContext().ensureActive()
-            if (AssiyaSessionRegistry[session.ownerUUID] !== session) return@withAsync
+            if (AssiyaSessionRegistry[session.ownerUUID] !== session) {
+                return@withAsync CompletableFuture.completedFuture(session.attribute.snapshot)
+            }
 
             AssiyaAPI.addAttribute(session, triggerEvent = true, *results.toTypedArray())
         }

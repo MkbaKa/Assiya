@@ -31,6 +31,10 @@ tasks {
         archiveBaseName.set("Assiya-AttributePlus")
         archiveClassifier.set("")
 
+        if (!isDev) {
+            relocate("kotlin.", "${rootProject.group}.libs.kotlin.")
+        }
+
         exclude("org/intellij/lang/annotations/**")
         exclude("org/jetbrains/annotations/**")
         exclude("org/jspecify/annotations/**")

@@ -40,17 +40,20 @@ object AssiyaSessionListener {
                     player.healthScale = Config.global.HEALTH_SCALE_VALUE
                 }
 
-                AssiyaAPI.getSessionOrCreate(player)
+                AssiyaAPI.getSessionOrCreate(player).bindOwner(player)
                 AssiyaAPI.refreshEquipment(player)
             }
             quitUnregister = EventUtils.on<PlayerQuitEvent> {
+                val ownerId = player.uniqueId
+                val session = AssiyaSessionRegistry[ownerId]
+                session?.unbindOwner(player)
                 val timeout = Config.global.PLAYER_SESSION_TIMEOUT
                 if (timeout <= 0L) {
-                    AssiyaSessionRegistry.remove(player.uniqueId)
+                    AssiyaSessionRegistry.remove(ownerId)
                     return@on
                 }
 
-                timeoutJobs.remove(player.uniqueId)?.cancel()
+                timeoutJobs.remove(ownerId)?.cancel()
 
                 val job = SchedulerUtils.launch(
                     context = BukkitCoroutine.coroutineContext[BukkitDispatchers.Key]!!.sync,
@@ -59,14 +62,14 @@ object AssiyaSessionListener {
                     SchedulerUtils.delayTicks(timeout * 20L)
                     ensureActive()
 
-                    if (!player.isOnline) {
-                        AssiyaSessionRegistry.remove(player.uniqueId)
+                    if (session != null && AssiyaSessionRegistry[ownerId] === session && session.owner == null) {
+                        AssiyaSessionRegistry.remove(ownerId)
                     }
 
-                    timeoutJobs.remove(player.uniqueId, currentCoroutineContext().job)
+                    timeoutJobs.remove(ownerId, currentCoroutineContext().job)
                 }
 
-                timeoutJobs[player.uniqueId] = job
+                timeoutJobs[ownerId] = job
             }
 
         }

@@ -8,18 +8,21 @@ import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils.call
-import github.mkbaka.assiya.platform.bukkit.internal.util.entityOf
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 
 class AssiyaSession(
     entity: Entity
 ) {
 
+    @Volatile
+    private var ownerReference = WeakReference(entity)
+
     val owner: Entity?
-        get() = entityOf(ownerUUID)
+        get() = ownerReference.get()
 
     val ownerUUID = entity.uniqueId
 
@@ -62,6 +65,7 @@ class AssiyaSession(
     }
 
     fun close() {
+        ownerReference.clear()
         cooldown.clear()
         counter.clear()
         combatState?.leave()
@@ -70,6 +74,17 @@ class AssiyaSession(
         parsedEquipment.clear()
         if (this::attribute.isInitialized) {
             attribute.close()
+        }
+    }
+
+    internal fun bindOwner(entity: Entity) {
+        require(entity.uniqueId == ownerUUID) { "The entity does not belong to this session" }
+        ownerReference = WeakReference(entity)
+    }
+
+    internal fun unbindOwner(entity: Entity) {
+        if (ownerReference.get() === entity) {
+            ownerReference.clear()
         }
     }
 

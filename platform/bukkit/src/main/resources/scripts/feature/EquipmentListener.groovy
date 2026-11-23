@@ -197,7 +197,7 @@ class EquipmentListener {
                     // 死亡掉落的装备不会触发 PlayerDropItemEvent
                     callSyncLater(1L, {
                         if (!player.isOnline()) return
-                        EquipmentPipeline.INSTANCE.refresh(player)
+                        EquipmentPipeline.INSTANCE.refresh(player, BukkitEquipmentSlot.values())
                     })
                 }
                 .register()

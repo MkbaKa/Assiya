@@ -19,7 +19,7 @@ class ConfigGlobal(
 
     val PLAYER_SESSION_TIMEOUT = section.getLong("settings.player-session-timeout", 600L)
 
-    val COMBAT_DURATION = section.getDouble("settings.combat-duration", 10.0)
+    val COMBAT_DURATION = section.getDouble("settings.combat-duration", 10.0).let { (it * 20).toLong() }
 
     val TIMER_RESET_PERIOD = section.getLong("settings.timer-reset-period", 1200L).also {
         require(it > 0) { "settings.timer-reset-period must be positive" }

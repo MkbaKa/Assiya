@@ -20,7 +20,7 @@ class CombatState(private val session: AssiyaSession) {
         get() = targetUUID?.entityOrNull
 
     @JvmOverloads
-    fun join(target: Entity? = null, durationTicks: Long? = null) {
+    fun join(target: Entity? = null, durationTicks: Long = Config.global.COMBAT_DURATION) {
         val owner = session.owner ?: return
 
         // 如果没换目标就不用重复触发事件
@@ -35,7 +35,7 @@ class CombatState(private val session: AssiyaSession) {
         // 重复触发可以延后战斗结束的时间
         EntityTaskAPI.runTaskKt(owner, TASK_ID) {
             key = TASK_ID
-            delay = durationTicks ?: (Config.global.COMBAT_DURATION * 20).toLong()
+            delay = durationTicks
             params = hashMapOf(
                 "state" to this@CombatState
             )

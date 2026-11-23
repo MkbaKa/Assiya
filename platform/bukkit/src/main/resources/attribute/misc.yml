@@ -34,7 +34,7 @@ health-regain:
     regain-in-combat: false
 
 moving:
-  names: ["移动速度"]
+  names: ["移动速度", "移速加成"]
   reader: default
   handler: 'attribute/moving'
   priority: 110
@@ -94,7 +94,7 @@ frozen-time:
   reader: default
 
 remote-immune:
-  names: ["远程免疫"]
+  names: ["远程免疫", "箭伤免疫率"]
   reader: percent
   handler: 'attribute/fight/remote-immune'
   priority: 10

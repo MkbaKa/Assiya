@@ -1,5 +1,5 @@
 armor:
-  names: ["护甲"]
+  names: ["护甲", "护甲值"]
   reader: default
   handler: 'attribute/fight/armor'
   priority: 250

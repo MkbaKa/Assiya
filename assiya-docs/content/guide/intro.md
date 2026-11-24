@@ -1,3 +1,5 @@
+![logo.png](../../public/logo.png)
+
 # 这是什么？
 
 Assiya 是一款服务于 RPG 玩法的属性系统。

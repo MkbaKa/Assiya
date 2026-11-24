@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="24" viewBox="0 0 1200 24"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Assiya 章节分割线</title>
+  <desc id="desc">呼应 Assiya 涂鸦 Logo 的青紫渐变液态水滴分割线。</desc>
+
+  <defs>
+    <linearGradient id="line-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0"/>
+      <stop offset="18%" stop-color="#00E5FF" stop-opacity="0.75"/>
+      <stop offset="50%" stop-color="#A855F7" stop-opacity="0.95"/>
+      <stop offset="82%" stop-color="#D946EF" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#D946EF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Gradient Line -->
+  <rect x="60" y="11" width="1080" height="2" rx="1" fill="url(#line-grad)"/>
+
+  <!-- Center Droplet Motifs echoing the Logo splashes -->
+  <circle cx="556" cy="12" r="2.5" fill="#00E5FF" opacity="0.85"/>
+  <rect x="572" y="9" width="56" height="6" rx="3" fill="url(#line-grad)"/>
+  <circle cx="600" cy="12" r="4.5" fill="#0E1020" stroke="#00E5FF" stroke-width="2"/>
+  <circle cx="644" cy="12" r="2.5" fill="#D946EF" opacity="0.85"/>
+</svg>

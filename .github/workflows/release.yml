@@ -1,0 +1,137 @@
+name: Release plugins
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - gradle.properties
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.version.outputs.changed }}
+      version: ${{ steps.version.outputs.version }}
+      ap-version: ${{ steps.version.outputs.ap-version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Detect Assiya version change
+        id: version
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('node:fs');
+            const { execFileSync } = require('node:child_process');
+            function readVersion(text) {
+              const matches = [...text.matchAll(/^version\s*=\s*(\S+)\s*$/gm)];
+              if (matches.length !== 1 || !/^[0-9][0-9A-Za-z.+_-]*$/.test(matches[0][1])) {
+                throw new Error('Expected one valid version= entry in the Gradle properties file.');
+              }
+              return matches[0][1];
+            }
+            const version = readVersion(fs.readFileSync('gradle.properties', 'utf8'));
+            const apVersion = readVersion(fs.readFileSync('platform/bukkit/compact-attributeplus/gradle.properties', 'utf8'));
+            const before = context.payload.before;
+            let previous;
+            if (context.eventName === 'push' && before && !/^0+$/.test(before)) {
+              previous = readVersion(execFileSync('git', ['show', `${before}:gradle.properties`], { encoding: 'utf8' }));
+            }
+            const changed = context.eventName === 'workflow_dispatch' || version !== previous;
+            core.setOutput('changed', String(changed));
+            core.setOutput('version', version);
+            core.setOutput('ap-version', apVersion);
+            core.setOutput('prerelease', String(version.includes('-')));
+            await core.summary.addRaw(`Assiya: ${previous ?? '(manual or initial push)'} -> ${version}. AttributePlus: ${apVersion}. Release: ${changed}.`).write();
+
+  release:
+    needs: version
+    if: needs.version.outputs.changed == 'true'
+    name: Release Assiya with AttributePlus
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    concurrency:
+      group: release-assiya-v${{ needs.version.outputs.version }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build both plugins
+        run: bash ./gradlew :platform:bukkit:shadowJar :platform:bukkit:compact-attributeplus:shadowJar --no-daemon --console=plain
+      - name: Publish GitHub Release
+        uses: actions/github-script@v8
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          AP_VERSION: ${{ needs.version.outputs.ap-version }}
+          PRERELEASE: ${{ needs.version.outputs.prerelease }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const { VERSION, AP_VERSION } = process.env;
+            const tag = `assiya-v${VERSION}`;
+            const artifacts = [
+              { directory: 'platform/bukkit/build/libs', name: `Assiya-${VERSION}.jar` },
+              { directory: 'platform/bukkit/compact-attributeplus/build/libs', name: `Assiya-AttributePlus-${AP_VERSION}.jar` },
+            ].map(artifact => ({ ...artifact, data: fs.readFileSync(path.join(artifact.directory, artifact.name)) }));
+            const repo = context.repo;
+            async function find(operation) {
+              try { return (await operation()).data; }
+              catch (error) { if (error.status === 404) return undefined; throw error; }
+            }
+            const ref = await find(() => github.rest.git.getRef({ ...repo, ref: `tags/${tag}` }));
+            if (ref && (ref.object.type !== 'commit' || ref.object.sha !== context.sha)) {
+              throw new Error(`Tag ${tag} already points to another commit. Bump Assiya version instead of replacing a release.`);
+            }
+            let release = await find(() => github.rest.repos.getReleaseByTag({ ...repo, tag }));
+            if (release?.draft && release.target_commitish !== context.sha) {
+              throw new Error(`Draft ${tag} belongs to another commit. Resume its original run or bump Assiya version.`);
+            }
+            if (release && !release.draft) {
+              core.notice(`Release ${tag} is already published for this commit. Leaving it unchanged.`);
+              await core.summary.addLink(`Assiya ${VERSION}`, release.html_url).write();
+              return;
+            }
+            const prerelease = process.env.PRERELEASE === 'true';
+            if (!release) {
+              release = (await github.rest.repos.createRelease({
+                ...repo,
+                tag_name: tag,
+                target_commitish: context.sha,
+                name: `Assiya ${VERSION}`,
+                body: `Assiya ${VERSION}\nAttributePlus compatibility plugin ${AP_VERSION}\n\nSource commit: ${context.sha}`,
+                draft: true,
+                prerelease,
+              })).data;
+            }
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, { ...repo, release_id: release.id });
+            for (const artifact of artifacts) {
+              for (const asset of assets) {
+                if (asset.name === artifact.name) await github.rest.repos.deleteReleaseAsset({ ...repo, asset_id: asset.id });
+              }
+              await github.rest.repos.uploadReleaseAsset({
+                ...repo, release_id: release.id, name: artifact.name, data: artifact.data,
+                headers: { 'content-type': 'application/java-archive', 'content-length': artifact.data.length },
+              });
+            }
+            const published = await github.rest.repos.updateRelease({
+              ...repo, release_id: release.id, draft: false, prerelease,
+              make_latest: prerelease ? 'false' : 'true',
+            });
+            await core.summary.addLink(`Assiya ${VERSION}`, published.data.html_url).write();

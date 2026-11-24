@@ -3,7 +3,7 @@
 *鉴于 NBT 层级较深，建议通过物品库插件在配置文件中编写，而不是用游戏内命令手搓。*
 
 ::: info 前置说明与知识储备
-鉴于 NBT 跨版本兼容要做的事情太多，Assiya 本体不提供底层 NBT 解析，目前内置了基于 **[NeigeItems](https://github.com/ankhorg/NeigeItems-Kotlin)** 的读取实现（安装后自动启用）。如果你需要对接其他物品库或 PDC 数据，可以查阅 [对外接口与事件 · 注册自定义物品读取器](../advanced/api.md#常见对接代码示例)。
+鉴于 NBT 跨版本兼容要做的事情太多，Assiya 本体不提供底层 NBT 解析，目前内置了基于 **[NeigeItems](https://github.com/ankhorg/NeigeItems-Kotlin)** 的读取实现（安装后自动启用）。
 
 如果你只是想先让一件物品提供属性，建议先阅读 [为物品添加属性](../guide/quick-start.md)。在编写 NBT 属性前，请确保你已经了解：
 - [属性配置](./attributes.md)：什么是属性的`索引 ID`（而非中文`读取名`）。

@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="./assiya-docs/content/guide/intro.md">项目介绍</a>&ensp;·&ensp;<a href="./assiya-docs/content/guide/quick-start.md">快速开始</a>&ensp;·&ensp;<a href="./assiya-docs/content/mythicmobs/mob-attributes.md">MythicMobs</a>
+  <a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/intro.html">项目介绍</a>&ensp;·&ensp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/quick-start.html">快速开始</a>&ensp;·&ensp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/mythicmobs/mob-attributes.html">MythicMobs</a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
 
 <p align="center">
   执行 <code>/assiya status &lt;玩家名&gt;</code> 查看当前属性，悬停查看读到的数值和计算结果。<br>
-  <sub>百分比、随机范围和自定义格式的写法，见<a href="./assiya-docs/content/guide/quick-start.md">为物品添加属性</a>。</sub>
+  <sub>百分比、随机范围和自定义格式的写法，见<a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/quick-start.html">为物品添加属性</a>。</sub>
 </p>
 
 <br>
@@ -49,7 +49,7 @@
 </p>
 
 <p align="center">
-  <a href="./assiya-docs/content/config/readers.md">读取组与自定义格式</a>&emsp;·&emsp;<a href="./assiya-docs/content/config/conditions.md">使用条件与生效范围</a>
+  <a href="https://assiya-docs.mkbakaa3.workers.dev/content/config/readers.html">读取组与自定义格式</a>&emsp;·&emsp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/config/conditions.html">使用条件与生效范围</a>
 </p>
 
 <br>
@@ -62,7 +62,7 @@
 </p>
 
 <p align="center">
-  <a href="./assiya-docs/content/tutorial/attribute.md">编写一个增伤属性</a>&emsp;·&emsp;<a href="./assiya-docs/content/mythicmobs/mob-attributes.md">为 MythicMobs 怪物添加属性</a>
+  <a href="https://assiya-docs.mkbakaa3.workers.dev/content/tutorial/attribute.html">编写一个增伤属性</a>&emsp;·&emsp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/mythicmobs/mob-attributes.html">为 MythicMobs 怪物添加属性</a>
 </p>
 
 <br>
@@ -74,14 +74,14 @@
 <a id="download"></a>
 <h3 align="center">下载 Assiya</h3>
 
-<p align="center">前往 GitHub Releases 下载。</p>
+<p align="center">前往 <a href="https://github.com/MkbaKa/Assiya/releases/latest">GitHub Releases</a> 下载。</p>
 
 <p align="center">
-  <img alt="GitHub Releases 下载 JAR" src="https://img.shields.io/badge/GitHub%20Releases-%E4%B8%8B%E8%BD%BD%20JAR%20%C2%B7%20TODO-527AAB?style=for-the-badge&logo=github&logoColor=white&labelColor=29354D">
+  <a href="https://github.com/MkbaKa/Assiya/releases/latest"><img alt="GitHub Releases 下载 JAR" src="https://img.shields.io/badge/GitHub%20Releases-%E4%B8%8B%E8%BD%BD%20JAR-527AAB?style=for-the-badge&logo=github&logoColor=white&labelColor=29354D"></a>
 </p>
 
 <p align="center">
-  <sub>首次使用请先阅读<a href="./assiya-docs/content/guide/quick-start.md">快速开始</a>，了解依赖插件与安装步骤。</sub>
+  <sub>首次使用请先阅读<a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/quick-start.html">快速开始</a>，了解依赖插件与安装步骤。</sub>
 </p>
 
 <br>

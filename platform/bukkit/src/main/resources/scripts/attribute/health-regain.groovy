@@ -1,5 +1,6 @@
 package scripts.attribute
 
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.CombatStateAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
@@ -28,7 +29,7 @@ static void onTimer(Attribute attribute, BukkitProcessor processor) {
             if (!entity.isValid() || entity.isDead()) return
             if (!regainInCombat && CombatStateAPI.inCombat(entity)) return
 
-            entity.health = Math.min(entity.maxHealth, entity.health + amount)
+            AssiyaAPI.heal(entity, amount)
         }
     }
 }

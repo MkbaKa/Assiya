@@ -33,6 +33,13 @@ health-regain:
     # 为 false 则只在脱战状态恢复
     regain-in-combat: false
 
+health-regain-addition:
+  names: ['额外恢复值']
+  reader: default
+  handler: 'attribute/health-regain-addition'
+  priority: 100
+  triggers: heal
+
 moving:
   names: ["移动速度", "移速加成"]
   reader: default

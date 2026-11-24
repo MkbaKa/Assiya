@@ -7,7 +7,7 @@ import org.bukkit.entity.LivingEntity
 /**
  * 非线程安全的原版属性操作包装
  */
-class VanillaAttributes(val entity: LivingEntity) {
+open class VanillaAttributes(val entity: LivingEntity) {
 
     companion object {
         @JvmStatic

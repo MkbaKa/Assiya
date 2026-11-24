@@ -3,17 +3,21 @@ package github.mkbaka.assiya.platform.bukkit.api
 import github.mkbaka.assiya.common.engine.AttributeEngineAction
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublisherBase
+import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.common.source.mergeAttributeValues
-import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI.evaluate
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.damage.DamageMeta
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.HealMultipleComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.VanillaAttributesComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.processor.HealProcessor
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.api.session.AttributeSession
+import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
@@ -28,6 +32,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 
 object AssiyaAPI {
 
@@ -437,6 +442,26 @@ object AssiyaAPI {
      */
     @JvmStatic
     fun isDamaging(attacker: Entity) = getSession(attacker)?.damageMetaStack?.current != null
+
+    @JvmStatic
+    @JvmOverloads
+    fun heal(
+        entity: LivingEntity,
+        value: Double,
+        builder: Consumer<ProcessorComponentBuilder>? = null
+    ) {
+        val vanilla = VanillaAttributes.of(entity)
+        val processor = HealProcessor.of(entity, value) { pcb ->
+            pcb += VanillaAttributesComponent(vanilla)
+            builder?.accept(pcb)
+        }
+
+        processor.process()
+
+        val totalHeal = processor[HealMultipleComponent.Key]?.totalHeal ?: return
+
+        entity.health = (entity.health + totalHeal).coerceAtMost(vanilla.maxHealth.value)
+    }
 
     private inline fun attributeOperation(
         operation: () -> CompletableFuture<AttributeEngineSnapshot>

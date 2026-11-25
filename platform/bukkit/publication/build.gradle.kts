@@ -3,6 +3,18 @@ plugins {
     `maven-publish`
 }
 
+repositories {
+    maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    maven {
+        name = "helpch"
+        url = uri("https://repo.helpch.at/releases")
+    }
+    maven("https://r.irepo.space/maven/")
+}
+
 val isJitPack = providers.environmentVariable("JITPACK").orNull == "true"
 group = if (isJitPack) providers.environmentVariable("GROUP").get() else rootProject.group
 version = if (isJitPack) providers.environmentVariable("VERSION").get() else rootProject.version
@@ -34,6 +46,10 @@ dependencies {
 
 java {
     withSourcesJar()
+}
+
+tasks.withType<GenerateModuleMetadata>().configureEach {
+    enabled = false
 }
 
 tasks.jar {

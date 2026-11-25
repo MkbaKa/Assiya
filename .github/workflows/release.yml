@@ -43,6 +43,13 @@ jobs:
             const before = context.payload.before;
             let previous;
             if (context.eventName === 'push' && before && !/^0+$/.test(before)) {
+              // A force-push can leave the previous tip outside the checked-out history.
+              try {
+                execFileSync('git', ['cat-file', '-e', `${before}^{commit}`], { stdio: 'pipe' });
+              } catch {
+                const remoteUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}.git`;
+                execFileSync('git', ['fetch', '--no-tags', remoteUrl, before], { stdio: 'pipe' });
+              }
               previous = readVersion(execFileSync('git', ['show', `${before}:gradle.properties`], { encoding: 'utf8' }));
             }
             const changed = context.eventName === 'workflow_dispatch' || version !== previous;
@@ -155,6 +162,10 @@ jobs:
             const { owner, repo } = context.repo;
             const tag = `assiya-v${process.env.VERSION}`;
             const coordinate = `com.github.${owner}:${repo}:${tag}`;
+            const tagRef = await github.rest.git.getRef({
+              owner, repo, ref: `tags/${tag}`,
+            });
+            core.info(`GitHub tag ${tag}: ${tagRef.data.object.sha}`);
             const base = `https://jitpack.io/com/github/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodeURIComponent(tag)}`;
             const logUrl = `${base}/build.log`;
             await core.summary
@@ -186,6 +197,25 @@ jobs:
                     throw new Error(`JitPack access denied (${response.status}). Check public repository access. ${logUrl}`);
                   }
                   core.info(`Waiting for ${artifact}: HTTP ${response.status}`);
+                  if (response.status === 404) {
+                    const statusUrl = `https://jitpack.io/api/builds/com.github.${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodeURIComponent(tag)}`;
+                    const statusResponse = await fetch(statusUrl, {
+                      signal: AbortSignal.timeout(15000),
+                    });
+                    if (statusResponse.ok) {
+                      const build = await statusResponse.json();
+                      core.info(`JitPack build status: ${build.status}. ${build.message || ''}`);
+                      if (['Error', 'error', 'No access token'].includes(build.status)) {
+                        core.setFailed(`JitPack cannot publish ${tag}: ${build.status}. ${build.message || ''} Inspect ${logUrl}.`);
+                        return;
+                      }
+                      if (build.status === 'tagNotFound') {
+                        core.info('The GitHub tag exists. Waiting for JitPack to discover it.');
+                      }
+                    } else if (statusResponse.body) {
+                      await statusResponse.body.cancel();
+                    }
+                  }
                 } catch (error) {
                   if (error.message.startsWith('JitPack access denied')) throw error;
                   core.info(`Waiting for ${artifact}: ${error.message}`);

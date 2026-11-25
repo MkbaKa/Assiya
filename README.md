@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/intro.html">项目介绍</a>&ensp;·&ensp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/quick-start.html">快速开始</a>&ensp;·&ensp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/mythicmobs/mob-attributes.html">MythicMobs</a>
+  <a href="https://mkbakaa.cn/content/guide/intro.html">项目介绍</a>&ensp;·&ensp;<a href="https://mkbakaa.cn/content/guide/quick-start.html">快速开始</a>&ensp;·&ensp;<a href="https://mkbakaa.cn/content/mythicmobs/mob-attributes.html">MythicMobs</a>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
 
 <p align="center">
   执行 <code>/assiya status &lt;玩家名&gt;</code> 查看当前属性，悬停查看读到的数值和计算结果。<br>
-  <sub>百分比、随机范围和自定义格式的写法，见<a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/quick-start.html">为物品添加属性</a>。</sub>
+  <sub>百分比、随机范围和自定义格式的写法，见<a href="https://mkbakaa.cn/content/guide/quick-start.html">为物品添加属性</a>。</sub>
 </p>
 
 <br>
@@ -49,7 +49,7 @@
 </p>
 
 <p align="center">
-  <a href="https://assiya-docs.mkbakaa3.workers.dev/content/config/readers.html">读取组与自定义格式</a>&emsp;·&emsp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/config/conditions.html">使用条件与生效范围</a>
+  <a href="https://mkbakaa.cn/content/config/readers.html">读取组与自定义格式</a>&emsp;·&emsp;<a href="https://mkbakaa.cn/content/config/conditions.html">使用条件与生效范围</a>
 </p>
 
 <br>
@@ -62,7 +62,7 @@
 </p>
 
 <p align="center">
-  <a href="https://assiya-docs.mkbakaa3.workers.dev/content/tutorial/attribute.html">编写一个增伤属性</a>&emsp;·&emsp;<a href="https://assiya-docs.mkbakaa3.workers.dev/content/mythicmobs/mob-attributes.html">为 MythicMobs 怪物添加属性</a>
+  <a href="https://mkbakaa.cn/content/tutorial/attribute.html">编写一个增伤属性</a>&emsp;·&emsp;<a href="https://mkbakaa.cn/content/mythicmobs/mob-attributes.html">为 MythicMobs 怪物添加属性</a>
 </p>
 
 <br>
@@ -81,7 +81,7 @@
 </p>
 
 <p align="center">
-  <sub>首次使用请先阅读<a href="https://assiya-docs.mkbakaa3.workers.dev/content/guide/quick-start.html">快速开始</a>，了解依赖插件与安装步骤。</sub>
+  <sub>首次使用请先阅读<a href="https://mkbakaa.cn/content/guide/quick-start.html">快速开始</a>，了解依赖插件与安装步骤。</sub>
 </p>
 
 <br>

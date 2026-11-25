@@ -1,0 +1,15 @@
+# 一些杂七杂八的 API
+
+- [冷却操作](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/CooldownAPI.kt)
+- [计数器操作](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/CounterAPI.kt)
+- [战斗状态操作](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/CombatStateAPI.kt)
+- [实体任务操作](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/EntityTaskAPI.kt)
+- [属性与伤害操作](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/AssiyaAPI.kt)
+- [物品读取接口](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/reader/ItemReader.kt)
+- [属性快照构建](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/attribute/AttributeSnapshotBuilder.kt)
+- [伤害元数据](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/damage/DamageMeta.kt)
+- [实体会话](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/session)
+- [事件](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/event)
+- [配置节点](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/config)
+- [处理器与组件](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/handler)
+- [原版属性操作](https://github.com/MkbaKa/Assiya/tree/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/vanilla)

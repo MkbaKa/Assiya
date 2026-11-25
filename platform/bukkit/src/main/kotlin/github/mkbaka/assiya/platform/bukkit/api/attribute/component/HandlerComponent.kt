@@ -8,6 +8,8 @@ class HandlerComponent(
     val handlers: Map<Trigger, TriggerHandler>
 ) : AttributeComponent {
 
+    constructor(vararg handlers: Pair<Trigger, TriggerHandler>) : this(handlers.toMap(HashMap()))
+
     override val key: AttributeComponent.Key<HandlerComponent> = Key
 
     companion object Key : AttributeComponent.Key<HandlerComponent>

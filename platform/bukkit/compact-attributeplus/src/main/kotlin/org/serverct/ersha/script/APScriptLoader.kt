@@ -6,10 +6,9 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.SimpleTriggerSettings
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerHandler
-import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
-import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
@@ -23,7 +22,6 @@ import org.serverct.ersha.attribute.ApAttributeOptionsComponent
 import org.serverct.ersha.attribute.ApWrappedAttribute
 import org.serverct.ersha.attribute.AttributeHandle
 import java.io.File
-import java.util.concurrent.Callable
 import java.util.function.Consumer
 import java.util.logging.Level
 import javax.script.Invocable
@@ -93,17 +91,11 @@ object APScriptLoader : ScriptDirectoryHandler {
 
             val trigger = TriggerRegistry[triggerId]?.trigger ?: Trigger.Base(triggerId, "run")
                 .also { TriggerRegistry.register(it) }
-            val settings = TriggerSettings.root(
-                requireNotNull(
-                    ConfigNode.of(
-                        mapOf(
-                            "priority" to order,
-                            "period" to 100L,
-                            "always-run" to true,
-                            "ignore-cancelled" to (attribute.options["ignore-cancelled"] == true)
-                        )
-                    )
-                )
+            val settings = SimpleTriggerSettings(
+                priority = order,
+                alwaysRun = true,
+                ignoreCancelled = attribute.options["ignore-cancelled"] == true,
+                periodTicks = 100L,
             )
 
             val callback = Consumer<BukkitProcessor> { processor ->
@@ -158,9 +150,9 @@ object APScriptLoader : ScriptDirectoryHandler {
                 val sync = (type == "RUNTIME" || type == "UPDATE") &&
                     (attribute.options["asynchronous"] == false || attribute.options["sync-update"] == true)
                 if (sync && !Bukkit.isPrimaryThread()) {
-                    Bukkit.getScheduler().callSyncMethod(AssiyaBukkitPlugin.INSTANCE, Callable {
+                    Bukkit.getScheduler().callSyncMethod(AssiyaBukkitPlugin.INSTANCE) {
                         callback.accept(processor)
-                    }).get()
+                    }.get()
                 } else {
                     callback.accept(processor)
                 }

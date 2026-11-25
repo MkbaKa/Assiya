@@ -1,11 +1,6 @@
 package github.mkbaka.assiya.platform.bukkit.api.attribute.trigger
 
-import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
-
-class TriggerSettings private constructor(
-    private val node: ConfigNode?,
-    private val parent: TriggerSettings?,
-) {
+interface TriggerSettings {
 
     val priority: Int
         get() = get<Int>("priority") ?: 0
@@ -23,19 +18,6 @@ class TriggerSettings private constructor(
         get() = get<Number>("period")?.toLong()
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> get(key: String): T? {
-        return node?.get(key) as? T ?: parent?.get(key)
-    }
-
-    fun child(node: ConfigNode?): TriggerSettings {
-        return TriggerSettings(node, this)
-    }
-
-    companion object {
-
-        fun root(node: ConfigNode): TriggerSettings {
-            return TriggerSettings(node, null)
-        }
-    }
+    operator fun <T> get(key: String): T?
 
 }

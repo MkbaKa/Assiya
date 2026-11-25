@@ -96,14 +96,27 @@ export default defineConfig({
         ]
       },
       {
-        text: '进阶知识',
-        collapsed: true,
+        text: '开发者 & 脚本编写',
         items: [
-          { text: '前言', link: '/content/advanced/readme' },
-          { text: 'Processor', link: '/content/advanced/processor' },
-          { text: '已实现的组件', link: '/content/advanced/components' },
-          { text: '属性管理', link: '/content/advanced/engine' },
+          { text: '属性 & 条件 & 读取组', link: '/content/dev/attribute-condition-reader' },
+          { text: '从 AttributePlus 迁移', link: '/content/dev/migrate-from-attributeplus' },
+          { text: '触发器', link: '/content/dev/new-trigger' },
+          { text: '对单个物品的解析', link: '/content/dev/item-reader' },
+          { text: '一些杂七杂八的 API', link: '/content/dev/misc-api' },
+          { text: '原版属性操作', link: '/content/dev/vanilla-attribute' },
+          {
+            text: 'Assiya 的一些设计',
+            collapsed: true,
+            items: [
+              { text: 'Processor', link: '/content/advanced/processor' },
+              { text: '已实现的组件', link: '/content/advanced/components' },
+              { text: '属性管理', link: '/content/advanced/engine' },
+            ]
+          },
         ]
+      },
+      {
+        text: '更新记录', link: '/content/update'
       },
     ],
     search: {

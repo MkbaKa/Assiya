@@ -9,6 +9,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderCompon
 import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
 import github.mkbaka.assiya.platform.bukkit.internal.feature.MapParserFactory
 import github.mkbaka.assiya.platform.bukkit.internal.feature.TextParserFactory
+import github.mkbaka.assiya.platform.bukkit.api.condition.component.ReaderComponent as ConditionReaderComponent
 
 object AttributeRegistry : NamedRegistry<Attribute>("属性"), AttributeParser {
 
@@ -77,11 +78,12 @@ object AttributeRegistry : NamedRegistry<Attribute>("属性"), AttributeParser {
             )
         }
         for (condition in conditions) {
-            val reader = ReaderRegistry[condition.reader] ?: continue
+            val component = condition[ConditionReaderComponent] ?: continue
+            val reader = ReaderRegistry[component.readerId] ?: continue
             conditionRules += Rule(
                 id = condition.id,
                 capture = reader.capture,
-                names = condition.names,
+                names = component.names,
                 patterns = reader.patterns
             )
         }

@@ -10,28 +10,59 @@ import java.util.function.Consumer
 
 object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
 
+    val ATTACK = register(Trigger.Base("attack", "onAttack", "damage")) { processor, id ->
+        processor[TriggerComponent]?.hasAttribute(id) ?: false
+    }
+
+    val DEFENSE = register(Trigger.Base("defense", "onDefense", "damage")) { processor, id ->
+        processor[TargetComponent]?.hasAttribute(id) ?: false
+    }
+
+    val KILL = register(Trigger.Base("kill", "onKill")) { processor, id ->
+        processor[TriggerComponent]?.hasAttribute(id) ?: false
+    }
+
+    val UPDATE = register(Trigger.Base("update", "onUpdate")) { processor, id ->
+        processor[TriggerComponent]?.hasAttribute(id) ?: false
+    }
+
+    val TIMER = register(
+        Trigger.Base("timer", "onTimer"),
+        { context ->
+            val period = context.periodTicks
+            require(period != null && period > 0) {
+                "timer trigger period must be a positive number"
+            }
+        },
+        { processor, id ->
+            processor[TriggerComponent]?.hasAttribute(id) ?: false
+        },
+    )
+
     private val NO_VALIDATION = Consumer<TriggerSettings> {}
 
-    fun register(trigger: Trigger) {
-        register(trigger, NO_VALIDATION, null)
+    fun register(trigger: Trigger): Trigger {
+        return register(trigger, NO_VALIDATION, null)
     }
 
     fun register(
         trigger: Trigger,
         hasAttribute: BiPredicate<BukkitProcessor, String>
-    ) {
-        register(trigger, NO_VALIDATION, hasAttribute)
+    ): Trigger {
+        return register(trigger, NO_VALIDATION, hasAttribute)
     }
 
     fun register(
         trigger: Trigger,
         validator: Consumer<TriggerSettings>,
         hasAttribute: BiPredicate<BukkitProcessor, String>?
-    ) {
+    ): Trigger {
         super.register(
             trigger.id,
             TriggerType(trigger, validator, hasAttribute)
         )
+
+        return trigger
     }
 
     data class TriggerType(
@@ -39,36 +70,5 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
         val validator: Consumer<TriggerSettings>,
         val hasAttribute: BiPredicate<BukkitProcessor, String>?
     )
-
-    init {
-        register(Trigger.Base("attack", "onAttack", "damage")) { processor, id ->
-            processor[TriggerComponent]?.hasAttribute(id) ?: false
-        }
-
-        register(Trigger.Base("defense", "onDefense", "damage")) { processor, id ->
-            processor[TargetComponent]?.hasAttribute(id) ?: false
-        }
-
-        register(Trigger.Base("kill", "onKill")) { processor, id ->
-            processor[TriggerComponent]?.hasAttribute(id) ?: false
-        }
-
-        register(Trigger.Base("update", "onUpdate")) { processor, id ->
-            processor[TriggerComponent]?.hasAttribute(id) ?: false
-        }
-
-        register(
-            Trigger.Base("timer", "onTimer"),
-            { context ->
-                val period = context.periodTicks
-                require(period != null && period > 0) {
-                    "timer trigger period must be a positive number"
-                }
-            },
-            { processor, id ->
-                processor[TriggerComponent]?.hasAttribute(id) ?: false
-            },
-        )
-    }
 
 }

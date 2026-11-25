@@ -10,16 +10,6 @@ interface Condition {
      */
     val id: String
 
-    /**
-     * 读取时判断的条件名
-     */
-    val names: List<String>
-
-    /**
-     * 读取规则
-     */
-    val reader: String
-
     val components: Map<ConditionComponent.Key<*>, ConditionComponent>
 
     @Suppress("UNCHECKED_CAST")

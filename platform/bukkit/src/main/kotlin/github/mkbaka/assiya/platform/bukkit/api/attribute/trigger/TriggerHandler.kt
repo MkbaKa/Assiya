@@ -4,7 +4,7 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 
 import java.util.function.Consumer
 
-class TriggerHandler(
-    val settings: TriggerSettings,
+class TriggerHandler @JvmOverloads constructor(
+    val settings: TriggerSettings = SimpleTriggerSettings(),
     val action: Consumer<BukkitProcessor>,
 )

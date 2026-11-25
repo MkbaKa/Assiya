@@ -3,8 +3,8 @@ package github.mkbaka.assiya.platform.bukkit.internal.config
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.ConfigTriggerSettings
 import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.Trigger
-import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSettings
 import github.mkbaka.assiya.platform.bukkit.api.config.ConfigNode
 import github.mkbaka.assiya.platform.bukkit.internal.config.loader.FileLoader
 import github.mkbaka.assiya.platform.bukkit.internal.config.obj.ConfigAttribute
@@ -106,7 +106,7 @@ object AttributeConfigManager {
     }
 
     private fun readTriggers(id: String, node: ConfigNode): Map<Trigger, ConfigAttribute.ConfigTrigger> {
-        val root = TriggerSettings.root(node)
+        val root = ConfigTriggerSettings.root(node)
         val result = hashMapOf<Trigger, ConfigAttribute.ConfigTrigger>()
 
         for ((name, childNode) in readTriggerNodes(id, node.get("triggers"))) {

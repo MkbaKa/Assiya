@@ -116,7 +116,7 @@ export default defineConfig({
         ]
       },
       {
-        text: '更新记录', link: '/content/update'
+        text: '更新记录', link: '/content/changelog'
       },
     ],
     search: {

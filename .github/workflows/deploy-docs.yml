@@ -1,0 +1,54 @@
+name: Deploy documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assiya-docs/**'
+      - '.github/workflows/deploy-docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-docs-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: assiya-docs
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Check deployment configuration
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+          EDGEONE_PROJECT_NAME: ${{ vars.EDGEONE_PROJECT_NAME }}
+        run: |
+          : "${EDGEONE_API_TOKEN:?Set the EDGEONE_API_TOKEN repository secret.}"
+          : "${EDGEONE_PROJECT_NAME:?Set the EDGEONE_PROJECT_NAME repository variable to the existing EdgeOne project name.}"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: assiya-docs/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build documentation
+        run: npm run docs:build
+      - name: Deploy to EdgeOne Pages
+        env:
+          EDGEONE_API_TOKEN: ${{ secrets.EDGEONE_API_TOKEN }}
+          EDGEONE_PROJECT_NAME: ${{ vars.EDGEONE_PROJECT_NAME }}
+        run: >-
+          npx --yes edgeone pages deploy .vitepress/dist
+          -n "$EDGEONE_PROJECT_NAME"
+          -t "$EDGEONE_API_TOKEN"
+          -e production

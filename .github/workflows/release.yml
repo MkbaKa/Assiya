@@ -135,3 +135,66 @@ jobs:
               make_latest: prerelease ? 'false' : 'true',
             });
             await core.summary.addLink(`Assiya ${VERSION}`, published.data.html_url).write();
+
+  jitpack:
+    needs: [version, release]
+    if: github.event.repository.private == false
+    name: Publish JitPack dependency
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: jitpack-assiya-v${{ needs.version.outputs.version }}
+      cancel-in-progress: false
+    steps:
+      - name: Build and verify JitPack artifacts
+        uses: actions/github-script@v8
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = `assiya-v${process.env.VERSION}`;
+            const coordinate = `com.github.${owner}:${repo}:${tag}`;
+            const base = `https://jitpack.io/com/github/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodeURIComponent(tag)}`;
+            const logUrl = `${base}/build.log`;
+            await core.summary
+              .addHeading('JitPack')
+              .addCodeBlock(coordinate, 'text')
+              .addLink('Build log', logUrl)
+              .write();
+            const deadline = Date.now() + 20 * 60 * 1000;
+            const artifacts = [
+              `${repo}-${tag}.pom`,
+              `${repo}-${tag}.jar`,
+              `${repo}-${tag}-sources.jar`,
+            ];
+            for (const artifact of artifacts) {
+              let ready = false;
+              while (Date.now() < deadline) {
+                const remaining = deadline - Date.now();
+                try {
+                  const response = await fetch(`${base}/${encodeURIComponent(artifact)}`, {
+                    signal: AbortSignal.timeout(Math.min(60000, remaining)),
+                  });
+                  if (response.body) await response.body.cancel();
+                  if (response.ok) {
+                    core.info(`Available: ${artifact}`);
+                    ready = true;
+                    break;
+                  }
+                  if (response.status === 401 || response.status === 403) {
+                    throw new Error(`JitPack access denied (${response.status}). Check public repository access. ${logUrl}`);
+                  }
+                  core.info(`Waiting for ${artifact}: HTTP ${response.status}`);
+                } catch (error) {
+                  if (error.message.startsWith('JitPack access denied')) throw error;
+                  core.info(`Waiting for ${artifact}: ${error.message}`);
+                }
+                await new Promise(resolve => setTimeout(resolve, Math.min(30000, Math.max(0, deadline - Date.now()))));
+              }
+              if (!ready) {
+                core.setFailed(`JitPack artifact unavailable within 20 minutes: ${artifact}. Inspect ${logUrl}. The GitHub Release remains published.`);
+                return;
+              }
+            }
+            await core.summary.addRaw('\nPOM, library jar, and sources jar are available.\n').write();

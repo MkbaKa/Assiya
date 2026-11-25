@@ -86,6 +86,63 @@
 
 <br>
 
+<h3 align="center">开发时依赖</h3>
+
+<details>
+<summary>Gradle Kotlin DSL</summary>
+
+```kotlin
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.MkbaKa:Assiya:assiya-v0.0.2") {
+        isTransitive = false
+    }
+}
+```
+
+动态选择最新版本
+
+```kotlin
+compileOnly("com.github.MkbaKa:Assiya:assiya-v+") { isTransitive = false }
+```
+
+
+</details>
+
+<details>
+<summary>Maven</summary>
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>com.github.MkbaKa</groupId>
+        <artifactId>Assiya</artifactId>
+        <version>assiya-v0.0.2</version>
+        <scope>provided</scope>
+        <exclusions>
+            <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+</dependencies>
+```
+
+</details>
+
+<br>
+
 <h3 align="center">鸣谢与许可证</h3>
 
 <p align="center">

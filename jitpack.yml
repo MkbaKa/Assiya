@@ -1,0 +1,4 @@
+jdk:
+  - openjdk21
+install:
+  - bash ./gradlew :platform:bukkit:publication:publishToMavenLocal --no-daemon --console=plain

@@ -10,6 +10,8 @@ import java.util.function.Consumer
 
 object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
 
+    private val NO_VALIDATION = Consumer<TriggerSettings> {}
+
     val ATTACK = register(Trigger.Base("attack", "onAttack", "damage")) { processor, id ->
         processor[TriggerComponent]?.hasAttribute(id) ?: false
     }
@@ -38,8 +40,6 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
             processor[TriggerComponent]?.hasAttribute(id) ?: false
         },
     )
-
-    private val NO_VALIDATION = Consumer<TriggerSettings> {}
 
     fun register(trigger: Trigger): Trigger {
         return register(trigger, NO_VALIDATION, null)

@@ -1,6 +1,5 @@
 package org.serverct.ersha.script
 
-import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.AttributeComponent
@@ -15,7 +14,6 @@ import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistrat
 import github.mkbaka.assiya.platform.bukkit.internal.registry.TriggerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.script.ScriptDirectoryHandler
 import github.mkbaka.assiya.platform.bukkit.internal.script.impl.NashornEngineAdapter
-import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import org.serverct.ersha.AttributePlus
 import org.serverct.ersha.attribute.ApAttributeOptionsComponent
@@ -147,15 +145,7 @@ object APScriptLoader : ScriptDirectoryHandler {
                 }
             }
             val action = TriggerHandler(settings) { processor ->
-                val sync = (type == "RUNTIME" || type == "UPDATE") &&
-                    (attribute.options["asynchronous"] == false || attribute.options["sync-update"] == true)
-                if (sync && !Bukkit.isPrimaryThread()) {
-                    Bukkit.getScheduler().callSyncMethod(AssiyaBukkitPlugin.INSTANCE) {
-                        callback.accept(processor)
-                    }.get()
-                } else {
-                    callback.accept(processor)
-                }
+                callback.accept(processor)
             }
             attribute.mutableComponents[HandlerComponent] = HandlerComponent(mapOf(trigger to action))
         }

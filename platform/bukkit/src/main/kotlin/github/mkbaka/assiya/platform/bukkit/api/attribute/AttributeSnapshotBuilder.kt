@@ -25,8 +25,8 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         value: Any,
         sourceId: String = "snapshot:temporary",
         priority: Int? = null
-    ) {
-        addAttribute(attributeId, Status(captureId to value), sourceId, priority)
+    ): AttributeSnapshotBuilder {
+        return addAttribute(attributeId, Status(captureId to value), sourceId, priority)
     }
 
     @JvmOverloads
@@ -35,9 +35,9 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         status: Status<Any>,
         sourceId: String = "snapshot:temporary",
         priority: Int? = null
-    ) {
-        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent)?.reader ?: return
-        addAttribute(attributeId, status, sourceId, priority, reader.capture)
+    ): AttributeSnapshotBuilder {
+        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent)?.reader ?: return this
+        return addAttribute(attributeId, status, sourceId, priority, reader.capture)
     }
 
     @JvmOverloads
@@ -46,13 +46,13 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         status: Status<Any>,
         sourceId: String = "snapshot:temporary",
         priority: Int? = null
-    ) {
-        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent)?.reader ?: return
+    ): AttributeSnapshotBuilder {
+        val reader = AttributeRegistry[attributeId]?.get(ReaderComponent)?.reader ?: return this
         val sourceIds = state.attributeIndex[attributeId]?.sourceIds().orEmpty()
         for (id in sourceIds) {
             state.removeAttributeContribution(id, attributeId)
         }
-        addAttribute(attributeId, status, sourceId, priority, reader.capture)
+        return addAttribute(attributeId, status, sourceId, priority, reader.capture)
     }
 
     private fun addAttribute(
@@ -61,10 +61,10 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         sourceId: String,
         priority: Int?,
         capture: Capture<Any>
-    ) {
+    ): AttributeSnapshotBuilder {
         val source = state.sourceIndex[sourceId]
         val attributes = mergeAttribute(source?.attributes.orEmpty(), attributeId, status, capture)
-        replaceSource(sourceId, attributes, priority)
+        return replaceSource(sourceId, attributes, priority)
     }
 
     @JvmOverloads
@@ -72,12 +72,14 @@ class AttributeSnapshotBuilder @JvmOverloads constructor(
         sourceId: String,
         attributes: Map<String, AttributeValue<*>>,
         priority: Int? = null
-    ) {
+    ): AttributeSnapshotBuilder {
         state.replace(sourceId, priority ?: state.sourceIndex[sourceId]?.priority ?: 0, attributes)
+        return this
     }
 
-    fun removeSource(sourceId: String) {
+    fun removeSource(sourceId: String): AttributeSnapshotBuilder {
         state.remove(sourceId)
+        return this
     }
 
     fun build(): AttributeEngineSnapshot {

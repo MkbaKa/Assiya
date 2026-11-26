@@ -38,9 +38,11 @@ class ApWrappedAttribute(attribute: Attribute, val attributeType: String) : Wrap
         get() = (mutableOptions()["maximum"] as? Number)?.toDouble() ?: -1.0
         set(value) { mutableOptions()["maximum"] = value }
 
-    fun setAsync(value: Boolean) { mutableOptions()["asynchronous"] = value }
+    fun setAsync(value: Boolean): Unit =
+        throw UnsupportedOperationException("AP asynchronous attributes are not supported")
 
-    fun setSyncUpdateState(value: Boolean) { mutableOptions()["sync-update"] = value }
+    fun setSyncUpdateState(value: Boolean): Unit =
+        throw UnsupportedOperationException("AP sync-update is not supported")
 
     fun setSkipFilter(value: Boolean) {
         mutableOptions()["skip-filter"] = value

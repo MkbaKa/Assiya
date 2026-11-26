@@ -29,6 +29,19 @@ health-regain:
 脚本中的判断逻辑为：
 
 ```groovy :line-numbers
+package scripts.attribute
+
+import github.mkbaka.assiya.platform.bukkit.api.CombatStateAPI
+import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
+import groovy.transform.CompileStatic
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+
 @CompileStatic
 static void onTimer(Attribute attribute, BukkitProcessor processor) {
     TriggerComponent trigger = processor.get(TriggerComponent.@Key)

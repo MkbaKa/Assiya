@@ -91,6 +91,8 @@ static void onHeal(Attribute attribute, BukkitProcessor processor) {
 注册触发器后，还需要在对应的业务过程中发布它。`heal` 已由 `HealProcessor` 实现，其 `process()` 中的发布入口是：
 
 ```kotlin
+import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
+
 HandlerRegistry.publish("heal", this)
 ```
 

@@ -7,6 +7,16 @@
 ## 属性
 
 ```kotlin [单属性注册] :line-numbers
+import github.mkbaka.assiya.platform.bukkit.api.attribute.SimpleAttribute
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.HandlerComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
+import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.SimpleTriggerSettings
+import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerHandler
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.internal.registry.TriggerRegistry
+
 fun registerExampleAttribute() {
     
     // 属性的 id  不能重复
@@ -56,6 +66,10 @@ fun registerExampleAttribute() {
 ## 条件
 
 ```kotlin :line-numbers
+import github.mkbaka.assiya.platform.bukkit.api.attribute.component.ReaderComponent
+import github.mkbaka.assiya.platform.bukkit.api.condition.SimpleCondition
+import org.bukkit.entity.Player
+
 fun registerExampleCondition() {
     // example-level 是条件 id
     val condition = SimpleCondition("example-level", { builder ->
@@ -85,6 +99,9 @@ fun registerExampleCondition() {
 
 ::: code-group
 ```kotlin [读取数值] :line-numbers
+import github.mkbaka.assiya.common.operation.NumberOperations
+import github.mkbaka.assiya.platform.bukkit.api.reader.SimpleReader
+
 fun registerExampleReader() {
     val reader = SimpleReader("example-number") { builder ->
         // 默认使用 Value.Number 读取数值
@@ -106,6 +123,10 @@ fun registerExampleReader() {
 }
 ```
 ```kotlin [读取文本] :line-numbers
+import github.mkbaka.assiya.common.base.Value
+import github.mkbaka.assiya.common.operation.TextOperations
+import github.mkbaka.assiya.platform.bukkit.api.reader.SimpleReader
+
 fun registerExampleReader() {
     val reader = SimpleReader("example-text") { builder ->
         // 基于文本类的 text 捕获组
@@ -121,6 +142,10 @@ fun registerExampleReader() {
 }
 ```
 ```kotlin [新建一种值类型] :line-numbers
+import github.mkbaka.assiya.common.base.Value
+import github.mkbaka.assiya.common.operation.Operation
+import github.mkbaka.assiya.platform.bukkit.api.reader.SimpleReader
+
 fun registerExampleReader() {
     // 新建一个 boolean 类型的值
     // 只读 true / false 两种文本
@@ -167,6 +192,11 @@ fun registerExampleReader() {
 对于这种情况，Assiya 提供了 `AttributeRegistration#batch` 批量注册操作：
 
 ```kotlin :line-numbers
+import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
+import github.mkbaka.assiya.platform.bukkit.api.condition.Condition
+import github.mkbaka.assiya.platform.bukkit.api.reader.Reader
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistration
+
 fun register(
     attributes: List<Attribute>,
     conditions: List<Condition>,

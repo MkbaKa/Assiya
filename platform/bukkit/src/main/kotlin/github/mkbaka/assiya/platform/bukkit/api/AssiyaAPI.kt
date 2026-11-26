@@ -368,6 +368,7 @@ object AssiyaAPI {
      * @param session 目标
      * @param snapshot 属性快照
      * @param lifeCycle 来源生命周期
+     * @param triggerEvent 是否触发属性更新事件
      * @return 计算后的结果
      */
     @JvmStatic
@@ -376,6 +377,7 @@ object AssiyaAPI {
         session: AssiyaSession,
         snapshot: AttributeEngineSnapshot,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
+        triggerEvent: Boolean = false
     ): CompletableFuture<AttributeEngineSnapshot> = attributeOperation {
         val patches = snapshot.sources.map { (sourceId, source) ->
             AttributeSourcePatch(
@@ -386,7 +388,7 @@ object AssiyaAPI {
             )
         }
 
-        addAttribute(session, *patches.toTypedArray())
+        addAttribute(session, triggerEvent = triggerEvent, *patches.toTypedArray())
     }
 
     /**

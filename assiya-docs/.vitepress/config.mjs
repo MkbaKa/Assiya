@@ -23,7 +23,8 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: '首页', link: '/' },
-      { text: '开始', link: '/content/guide/intro' }
+      { text: '开始', link: '/content/guide/intro' },
+      { text: 'GitHub', link: 'https://github.com/MkbaKa/Assiya' }
     ],
     sidebar: [
       {
@@ -102,8 +103,22 @@ export default defineConfig({
           { text: '从 AttributePlus 迁移', link: '/content/dev/migrate-from-attributeplus' },
           { text: '触发器', link: '/content/dev/new-trigger' },
           { text: '对单个物品的解析', link: '/content/dev/item-reader' },
-          { text: '一些杂七杂八的 API', link: '/content/dev/misc-api' },
           { text: '原版属性操作', link: '/content/dev/vanilla-attribute' },
+          {
+            text: '一些杂七杂八的 API',
+            collapsed: true,
+            items: [
+              { text: '冷却操作', link: '/content/dev/misc-api/cooldown' },
+              { text: '计数器', link: '/content/dev/misc-api/counter' },
+              { text: '战斗状态', link: '/content/dev/misc-api/combat-state' },
+              { text: '实体任务', link: '/content/dev/misc-api/entity-task' },
+              { text: '实体会话', link: '/content/dev/misc-api/session' },
+              { text: '属性与伤害', link: '/content/dev/misc-api/assiya-api' },
+              { text: '属性快照构建', link: '/content/dev/misc-api/attribute-snapshot-builder' },
+              { text: '伤害元数据', link: '/content/dev/misc-api/damage-meta' },
+              { text: '处理器与组件', link: '/content/dev/misc-api/handler' },
+            ]
+          },
           {
             text: 'Assiya 的一些设计',
             collapsed: true,

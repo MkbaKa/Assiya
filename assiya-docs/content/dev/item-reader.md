@@ -9,6 +9,12 @@ Assiya 提供了两种物品读取方式，一种是普通的 Lore 文本读取�
 下文是如何把 ItemStack#Lore 变成解析结果的实现
 
 ```kotlin
+import github.mkbaka.assiya.common.parser.part.AttributeSourcePart
+import github.mkbaka.assiya.common.parser.part.TextAttributeSourcePart
+import github.mkbaka.assiya.platform.bukkit.api.reader.ItemReader
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.uncolored
+import org.bukkit.inventory.ItemStack
+
 object LoreItemReader : ItemReader {
 
     override fun read(item: ItemStack): AttributeSourcePart? {

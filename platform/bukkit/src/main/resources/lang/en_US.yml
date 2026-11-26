@@ -3,6 +3,10 @@ plugin-enable:
   - '{prefix} &fPlugin has been enabled... &f{server-version}&f.'
   - ' '
 
+damage-indicator-enabled: '{prefix} &fDamage particle blocking &aenabled'
+damage-indicator-packet-events: '   Compatible PacketEvents plugin found'
+damage-indicator-protocol-lib: '   Compatible ProtocolLib plugin found'
+
 usage:
   - ' '
   - ' {name} &fv{version}'

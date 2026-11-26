@@ -11,6 +11,8 @@ class ConfigGlobal(
 
     val VANILLA_DAMAGE = section.getBoolean("settings.vanilla-damage", true)
 
+    val BLOCK_DAMAGE_INDICATOR = section.getBoolean("settings.block-damage-indicator", true)
+
     val HEALTH_SCALE = section.getBoolean("settings.health-scale", true)
 
     val HEALTH_SCALE_VALUE = section.getDouble("settings.health-scale-value", 40.0)

@@ -3,6 +3,10 @@ plugin-enable:
   - '{prefix} &f插件已启用... &f{server-version}&f.'
   - ' '
 
+damage-indicator-enabled: '{prefix} &f已&a启用&f伤害粒子拦截'
+damage-indicator-packet-events: '   已获取到可兼容的 PacketEvents 插件'
+damage-indicator-protocol-lib: '   已获取到可兼容的 ProtocolLib 插件'
+
 usage:
   - ' '
   - ' {name} &fv{version}'

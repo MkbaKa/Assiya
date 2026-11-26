@@ -1,6 +1,6 @@
 plugins {
     id("com.google.devtools.ksp") version "2.3.6"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "9.6.1"
 }
 
 repositories {
@@ -18,6 +18,8 @@ repositories {
     }
     // Colonel
     maven("https://r.irepo.space/maven/")
+    // PacketEvents
+    maven("https://repo.codemc.io/repository/maven-public/")
 }
 
 dependencies {
@@ -27,6 +29,12 @@ dependencies {
         }
     }
     compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("net.dmulloy2:ProtocolLib:5.4.0") {
+        attributes {
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+        }
+    }
+    compileOnly("com.github.retrooper:packetevents-spigot:2.14.0")
     compileOnly(fileTree("libs"))
     compileOnly(project(":fake-api"))
 
@@ -108,6 +116,11 @@ tasks {
         from({ compact.map { zipTree(it) } })
         archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
+        // KotlinModuleMetadataTransformer 需要看到所有 .kotlin_module 才能正确合并;
+        // 其余条目保持默认 EXCLUDE, 避免重复的 META-INF/LICENSE 让 Paper PluginRemapper 拒绝该 jar.
+        filesMatching("**/*.kotlin_module") {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
 
         exclude("org/intellij/lang/annotations/**")
         exclude("org/jetbrains/annotations/**")

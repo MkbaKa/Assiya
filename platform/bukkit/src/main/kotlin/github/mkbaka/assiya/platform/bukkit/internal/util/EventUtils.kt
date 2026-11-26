@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.internal.util
 
 import github.mkbaka.assiya.platform.bukkit.AssiyaBukkitPlugin
+import github.mkbaka.assiya.platform.bukkit.api.misc.Unregister
 import org.bukkit.Bukkit
 import org.bukkit.event.*
 import java.util.function.Consumer
@@ -58,12 +59,6 @@ object EventUtils {
     @JvmStatic
     fun unregister(listener: Listener) {
         HandlerList.unregisterAll(listener)
-    }
-
-    fun interface Unregister {
-
-        fun unregister()
-
     }
 
 }

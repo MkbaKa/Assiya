@@ -3,17 +3,7 @@ plugins {
     `maven-publish`
 }
 
-repositories {
-    maven {
-        name = "papermc"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-    maven {
-        name = "helpch"
-        url = uri("https://repo.helpch.at/releases")
-    }
-    maven("https://r.irepo.space/maven/")
-}
+// 不在此重复声明仓库: 下面直接复用 :platform:bukkit 已声明的仓库.
 
 val isJitPack = providers.environmentVariable("JITPACK").orNull == "true"
 group = if (isJitPack) providers.environmentVariable("GROUP").get() else rootProject.group
@@ -22,6 +12,10 @@ version = if (isJitPack) providers.environmentVariable("VERSION").get() else roo
 val includedProjects = listOf(project(":common"), project(":platform:bukkit"))
 for (includedProject in includedProjects) {
     evaluationDependsOn(includedProject.path)
+}
+
+repositories {
+    addAll(project(":platform:bukkit").repositories)
 }
 
 val includedMainSources = includedProjects.map {

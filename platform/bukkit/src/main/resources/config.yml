@@ -3,6 +3,8 @@ settings:
   combat-duration: 10
   # 是否将原版攻击伤害加入属性伤害计算
   vanilla-damage: true
+  # 是否拦截伤害指示粒子, 需要 PacketEvents 或 ProtocolLib
+  block-damage-indicator: true
   # 是否启用血量压缩
   health-scale: true
   # 当启用血量压缩时 压缩到多少血

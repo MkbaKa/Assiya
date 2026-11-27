@@ -11,6 +11,8 @@ dependencies {
     compileOnly(project(":platform:bukkit"))
     compileOnly(project(":common"))
     compileOnly(fileTree("libs"))
+
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }
 
 val isDev = rootProject.version.toString().endsWith("dev")

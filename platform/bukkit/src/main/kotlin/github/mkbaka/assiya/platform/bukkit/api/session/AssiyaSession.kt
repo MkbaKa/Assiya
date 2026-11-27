@@ -4,6 +4,7 @@ import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.platform.bukkit.api.cooldown.Cooldown
 import github.mkbaka.assiya.platform.bukkit.api.counter.CounterStore
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeSessionInitEvent
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
@@ -61,17 +62,23 @@ class AssiyaSession(
     }
 
     fun refresh() {
-        attribute.refreshDefaultAttributes()
+        if (hasAttribute) attribute.refreshDefaultAttributes()
     }
 
     fun close() {
+        val entity = owner
         ownerReference.clear()
         cooldown.clear()
         counter.clear()
-        combatState?.leave()
-        EquipmentPipeline.cancel(ownerUUID)
-        dirtyEquipmentSlots.clear()
-        parsedEquipment.clear()
+        if (entity != null) {
+            EquipmentPipeline.cancel(ownerUUID)
+            BukkitCoroutine.launch(entity) {
+                combatState?.leave()
+                clearEquipment()
+            }
+        } else {
+            clearEquipment()
+        }
         if (this::attribute.isInitialized) {
             attribute.close()
         }
@@ -86,6 +93,11 @@ class AssiyaSession(
         if (ownerReference.get() === entity) {
             ownerReference.clear()
         }
+    }
+
+    private fun clearEquipment() {
+        dirtyEquipmentSlots.clear()
+        parsedEquipment.clear()
     }
 
 }

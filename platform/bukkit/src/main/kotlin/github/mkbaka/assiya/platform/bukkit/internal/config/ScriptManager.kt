@@ -12,7 +12,9 @@ import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptSchedule
 import github.mkbaka.assiya.platform.bukkit.internal.util.FileUtils
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.assiya.platform.bukkit.internal.util.warning
+import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.CustomTask
+import github.mkbaka.bukkitksp.annotation.LifeCycle
 import org.bukkit.Bukkit
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -65,6 +67,12 @@ object ScriptManager {
     fun unload() {
         ScriptScheduler.unregister()
         ScriptListener.unregister()
+    }
+
+    @Awake(lifeCycle = LifeCycle.DISABLE, priority = -100)
+    fun stopSchedulers() {
+        invokeAll("onDisable")
+        ScriptScheduler.shutdown()
     }
 
     fun unloadHandlerDirectories() {

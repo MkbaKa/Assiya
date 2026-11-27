@@ -37,7 +37,13 @@ Assiya 用 `Processor`（处理器）表示一次任务的执行过程，用 `Co
 | `HealProcessor` | `of(entity, value, builder)` | 一次治疗处理 |
 | `KillProcessor` | `of(killer, victim, event)` | 一次击杀处理 |
 | `TimerProcessor` | `of(entity, snapshot, subscribers)` | 定时触发 |
-| `UpdateProcessor` | `of(entity, snapshot, context)` | 属性更新 |
+| `UpdateProcessor` | `of(session, context)` | 属性更新 |
+
+`UpdateProcessor` 提供所属 `session` 和本轮 `context`，并直接实现 `AttributeContainer`。使用 `processor.getValue(...)` 读取本轮属性，使用 `processor.context` 修改本轮来源；这些操作不要求实体在线。`processor.session.owner` 返回当前绑定的实体，可能为 null。工厂仅在 owner 存在时添加 `TriggerComponent`，它与处理器共享同一属性容器。
+
+`UpdateProcessor` 和 `TimerProcessor` 都提供 `launch(entity, action)`，将实体操作放到对应实体上下文执行。Java/Groovy 使用 `Consumer<E>`，Groovy 静态编译时可写成 `processor.<Player> launch(player) { Player entity -> ... }`；Kotlin 也可传入挂起代码块。后台逻辑应在调度前取得本轮属性数值，避免在异步执行的实体操作中继续修改本轮 `context`。
+
+`AttributeUpdateEvent.Pre/Post` 与 `AttributeSourceRemoveEvent.Pre/Post` 均提供 `session`，需要实体时读取 `event.session.owner`。事件沿后台引擎执行，取得实体引用后仍需在它的所属线程执行实时实体读写。
 
 `DamageProcessor` 还提供 `fork(builder)`，基于当前组件数据复制出一个新的处理器，仅复制实现了 `ForkableComponent` 的组件。
 

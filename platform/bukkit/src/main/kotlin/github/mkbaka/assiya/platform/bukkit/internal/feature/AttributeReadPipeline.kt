@@ -8,8 +8,6 @@ import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ItemReaderRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsync
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withSync
 import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.uncolored
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
@@ -55,21 +53,6 @@ object AttributeReadPipeline {
             ConditionRegistry.eval(entity, it, context)
         }
         return parsed.resolve(conditions)
-    }
-
-    suspend fun evaluateAsync(
-        entity: Entity,
-        parsed: AttributeParsedSource,
-        context: ConditionContextImpl
-    ): Map<String, AttributeValue<*>> {
-        val conditions = withSync {
-            parsed.evaluateConditions {
-                ConditionRegistry.eval(entity, it, context)
-            }
-        }
-        return withAsync {
-            parsed.resolve(conditions)
-        }
     }
 
 //    suspend fun patch(

@@ -1,6 +1,7 @@
 package github.mkbaka.assiya.platform.bukkit.api.damage
 
 import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
+import github.mkbaka.assiya.platform.bukkit.api.compat.FoliaCompat
 import github.mkbaka.assiya.platform.bukkit.api.event.DamageMetaEvent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.DamageMultipleComponent
@@ -52,12 +53,30 @@ class DamageMeta @JvmOverloads constructor(
     }
 
     private fun execute(prepare: () -> Unit) {
+        val trigger = processor.getComponent(TriggerComponent)
+        val target = processor.getComponent(TargetComponent).entity
+        if (FoliaCompat.isFolia()) {
+            /**
+             * 只处理双方均处于当前区域的伤害行为
+             *
+             * 截至 26.3 Folia 仍然保留这段同区域判断:
+             *   ServerGamePacketListenerImpl#handleAttack:
+             *
+             *   // 判断攻击目标和当前玩家是否处于同一区域
+             *   if (TickThread.isTickThreadFor(target) && target != null /// ...) {
+             *      // ... attack logic
+             *   }
+             *
+             * 本着祖宗之法不可变的原则 我们也不处理跨区域操作()
+             */
+            if (!FoliaCompat.isOwnedByCurrentRegion(trigger.entity) ||
+                !FoliaCompat.isOwnedByCurrentRegion(target)
+            ) return
+        }
+
         if (DamageMetaEvent.Start(this, processor).call()) {
             return
         }
-
-        val trigger = processor.getComponent(TriggerComponent)
-        val target = processor.getComponent(TargetComponent).entity
 
         val damageMetaStack = trigger.session?.damageMetaStack
         val damageProcessorStack = trigger.session?.damageProcessorStack
@@ -89,8 +108,11 @@ class DamageMeta @JvmOverloads constructor(
                     val knockbackResistance = VanillaAttributes.of(target).knockbackResistance
                     val source = "Assiya:damage-meta:prevent-knockback"
                     knockbackResistance.setTransient(source, 1.0, AttributeModifier.Operation.ADD_NUMBER)
-                    block()
-                    knockbackResistance.removeModifier(source)
+                    try {
+                        block()
+                    } finally {
+                        knockbackResistance.removeModifier(source)
+                    }
                 }
 
                 else -> block()

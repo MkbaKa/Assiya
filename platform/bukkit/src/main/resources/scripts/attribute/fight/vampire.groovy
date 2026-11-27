@@ -1,5 +1,6 @@
 package scripts.attribute.fight
 
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
@@ -38,9 +39,7 @@ static void onAttack(Attribute attribute, BukkitProcessor processor) {
 
     if (!attacker.entity.isDead() && heal > 0.0d) {
         LivingEntity entity = (LivingEntity) attacker.entity
-        double health = entity.health
-        double maxHealth = entity.maxHealth
-        entity.health = Math.min(maxHealth, health + heal)
+        AssiyaAPI.heal(entity, heal)
     }
 
     CustomDataComponent customData = processor.get(CustomDataComponent.@Key)

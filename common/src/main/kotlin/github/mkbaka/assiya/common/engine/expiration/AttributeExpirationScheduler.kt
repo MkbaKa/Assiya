@@ -18,6 +18,9 @@ class AttributeExpirationScheduler(
     // 属性源 -> 过期时间
     private val expireAts = linkedMapOf<String, Long>()
 
+    // 已尝试的到期来源保留到下一次其他来源到期检查, 不单独触发立即重试.
+    private val checkedExpiredSources = hashSetOf<String>()
+
     private var timerJob: Job? = null
     private var scheduledExpireAt: Long? = null
 
@@ -27,6 +30,7 @@ class AttributeExpirationScheduler(
     fun bind(patch: AttributeSourcePatch) {
         val lifecycle = patch.lifeCycle
         if (lifecycle is AttributeSourceLifecycle.Temporary) {
+            checkedExpiredSources.remove(patch.sourceId)
             expireAts[patch.sourceId] = System.currentTimeMillis() + lifecycle.duration.inWholeMilliseconds
             dirty = true
         } else {
@@ -35,6 +39,7 @@ class AttributeExpirationScheduler(
     }
 
     fun unbind(sourceId: String) {
+        checkedExpiredSources.remove(sourceId)
         if (expireAts.remove(sourceId) != null) {
             dirty = true
         }
@@ -51,6 +56,7 @@ class AttributeExpirationScheduler(
         for ((sourceId, expireAt) in expireAts) {
             if (expireAt <= now) {
                 expired += sourceId
+                checkedExpiredSources += sourceId
             }
         }
         return expired
@@ -60,19 +66,21 @@ class AttributeExpirationScheduler(
         if (!dirty) return
         dirty = false
 
-        val next = expireAts.values.minOrNull()
+        var next: Long? = null
+        for ((sourceId, expireAt) in expireAts) {
+            if (sourceId !in checkedExpiredSources && (next == null || expireAt < next)) {
+                next = expireAt
+            }
+        }
         // 符合条件说明没有持续时间更短的临时源
         // 等最短源过期自己发 expire 到队列
         if (next == scheduledExpireAt && timerJob?.isActive == true) {
             return
         }
 
-        // 走到这可能是 next 为 null   也就是不存在任何临时属性了
-        // 或者 timerJob 莫名其妙噶了
-
         timerJob?.cancel()
         scheduledExpireAt = next
-        // 如果没有其他临时属性就退出执行
+        // 没有尚待检查的来源时停止计时, 已取消删除的到期来源仍保留在表中.
         if (next == null) {
             timerJob = null
             return

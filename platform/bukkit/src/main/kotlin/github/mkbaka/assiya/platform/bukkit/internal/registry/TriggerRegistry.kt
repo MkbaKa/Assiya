@@ -5,6 +5,7 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSetting
 import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TargetComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.api.handler.processor.UpdateProcessor
 import java.util.function.BiPredicate
 import java.util.function.Consumer
 
@@ -25,7 +26,11 @@ object TriggerRegistry : NamedRegistry<TriggerRegistry.TriggerType>("trigger") {
     }
 
     val UPDATE = register(Trigger.Base("update", "onUpdate")) { processor, id ->
-        processor[TriggerComponent]?.hasAttribute(id) ?: false
+        if (processor is UpdateProcessor) {
+            processor.hasAttribute(id)
+        } else {
+            processor[TriggerComponent]?.hasAttribute(id) ?: false
+        }
     }
 
     val TIMER = register(

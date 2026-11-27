@@ -29,6 +29,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.future.asCompletableFuture
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -202,10 +203,11 @@ object AssiyaAPI {
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
         triggerEvent: Boolean = false,
         context: ConditionContextImpl = ConditionContextImpl(itemStack = itemStack, sourceId = sourceId)
-    ): CompletableFuture<AttributeEngineSnapshot> = attributeOperation {
+    ): CompletableFuture<AttributeEngineSnapshot> = attributeOnEntity(session) { entity ->
         val parts = AttributeReadPipeline.readItem(itemStack)
         val parsed = AttributeReadPipeline.parseParts(parts)
-        addAttribute(session, sourceId, parsed, priority, lifeCycle, triggerEvent, context)
+        val values = AttributeReadPipeline.evaluate(entity, parsed, context)
+        addAttribute(session, sourceId, values, priority, lifeCycle, triggerEvent)
     }
 
     /**
@@ -261,17 +263,13 @@ object AssiyaAPI {
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
         triggerEvent: Boolean = false,
         context: ConditionContextImpl = ConditionContextImpl(sourceId = sourceId)
-    ): CompletableFuture<AttributeEngineSnapshot> = attributeOperation {
-        val entity = session.owner
-            ?: return@attributeOperation CompletableFuture.completedFuture(session.attribute.snapshot)
-
+    ): CompletableFuture<AttributeEngineSnapshot> = attributeOnEntity(session) { entity ->
         val patch = AttributeSourcePatch(
             sourceId,
             priority,
             lifeCycle,
             AttributeReadPipeline.evaluate(entity, parsed, context)
         )
-
         addAttribute(session, triggerEvent = triggerEvent, patch)
     }
 
@@ -334,28 +332,19 @@ object AssiyaAPI {
         priority: Int,
         lifeCycle: AttributeSourceLifecycle = AttributeSourceLifecycle.Stable,
         triggerEvent: Boolean = false
-    ): CompletableFuture<AttributeEngineSnapshot> = attributeOperation {
-        val entity = session.owner
-            ?: return@attributeOperation CompletableFuture.completedFuture(session.attribute.snapshot)
-
+    ): CompletableFuture<AttributeEngineSnapshot> = attributeOnEntity(session) { entity ->
         val values = items.flatMap { item ->
             val parts = AttributeReadPipeline.readItem(item)
-
             val parsed = AttributeReadPipeline.parseParts(parts)
-
             val context = ConditionContextImpl(itemStack = item, sourceId = sourceId)
-            val result = AttributeReadPipeline.evaluate(entity, parsed, context)
-
-            result.values
+            AttributeReadPipeline.evaluate(entity, parsed, context).values
         }
-
         val patch = AttributeSourcePatch(
             sourceId,
             priority,
             lifeCycle,
             mergeAttributeValues(values)
         )
-
         addAttribute(session, triggerEvent = triggerEvent, patch)
     }
 
@@ -462,7 +451,42 @@ object AssiyaAPI {
 
         val totalHeal = processor[HealMultipleComponent.Key]?.totalHeal ?: return
 
-        entity.health = (entity.health + totalHeal).coerceAtMost(vanilla.maxHealth.value)
+        if (entity.isValid && entity.health > 0.0 && value > 0.0) {
+            entity.health = (entity.health + totalHeal).coerceAtMost(vanilla.maxHealth.value)
+        }
+    }
+
+    private fun attributeOnEntity(
+        session: AssiyaSession,
+        operation: (Entity) -> CompletableFuture<AttributeEngineSnapshot>
+    ): CompletableFuture<AttributeEngineSnapshot> {
+        val owner = session.owner
+            ?: return CompletableFuture.completedFuture(session.attribute.snapshot)
+
+        val future = CompletableFuture<AttributeEngineSnapshot>()
+        try {
+            val job = BukkitCoroutine.launch(owner) {
+                if (session.owner !== owner ||
+                    AssiyaSessionRegistry[session.ownerUUID] !== session || owner is Player && !owner.isOnline
+                ) {
+                    future.complete(session.attribute.snapshot)
+                } else {
+                    try {
+                        operation(owner).whenComplete { snapshot, cause ->
+                            if (cause == null) future.complete(snapshot) else future.completeExceptionally(cause)
+                        }
+                    } catch (cause: Exception) {
+                        future.completeExceptionally(cause)
+                    }
+                }
+            }
+            job.invokeOnCompletion { cause ->
+                if (cause != null) future.completeExceptionally(cause)
+            }
+        } catch (cause: Exception) {
+            future.completeExceptionally(cause)
+        }
+        return future
     }
 
     private inline fun attributeOperation(

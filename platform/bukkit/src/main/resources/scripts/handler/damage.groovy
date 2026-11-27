@@ -126,7 +126,12 @@ class Damage {
         // 这样就可以在 mm 的受伤触发技能里判断本次伤害的信息了
         // 因为他用的是 HIGHEST
         assiyaSession?.damageProcessorStack?.push(processor)
-        processor.process()
+        try {
+            processor.process()
+        } catch (Throwable exception) {
+            assiyaSession?.damageProcessorStack?.pop()
+            throw exception
+        }
 
         // 事件同步 processor 的取消状态
         CancellableComponent cancellable = processor.get(CancellableComponent.@Key)

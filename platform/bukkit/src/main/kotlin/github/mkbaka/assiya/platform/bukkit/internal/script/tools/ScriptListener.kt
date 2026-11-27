@@ -1,7 +1,9 @@
 package github.mkbaka.assiya.platform.bukkit.internal.script.tools
 
+import github.mkbaka.assiya.platform.bukkit.api.misc.Unregister
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.GlobalDispatcher
 import github.mkbaka.assiya.platform.bukkit.internal.util.EventUtils
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callSync
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -15,11 +17,11 @@ class ScriptListener<T : Event>(
 
     private var ignoreCancelled: Boolean = false
 
-    private lateinit var listener: Listener
+    private var listener: Listener = object : Listener {}
 
     private lateinit var handler: Consumer<T>
 
-    private lateinit var unregister: EventUtils.Unregister
+    private var unregister: Unregister? = null
 
     fun setEventPriority(eventPriority: EventPriority): ScriptListener<T> {
         this.eventPriority = eventPriority
@@ -42,20 +44,19 @@ class ScriptListener<T : Event>(
     }
 
     fun register() {
-        callSync {
-            if (!this::listener.isInitialized) {
-                listener = object : Listener {}
-            }
+        BukkitCoroutine.launch(GlobalDispatcher) {
+            unregister?.unregister()
 
             unregister = EventUtils.listen(eventClass, eventPriority, ignoreCancelled, listener, handler)
-            listeners.add(this)
+            listeners.add(this@ScriptListener)
         }
     }
 
     fun unregister() {
-        callSync {
-            unregister.unregister()
-            listeners.remove(this)
+        BukkitCoroutine.launch(GlobalDispatcher) {
+            unregister?.unregister()
+            unregister = null
+            listeners.remove(this@ScriptListener)
         }
     }
 
@@ -64,7 +65,7 @@ class ScriptListener<T : Event>(
         private val listeners = hashSetOf<ScriptListener<*>>()
 
         fun unregister() {
-            callSync {
+            BukkitCoroutine.launch(GlobalDispatcher) {
                 for (listener in listeners.toList()) {
                     listener.unregister()
                 }

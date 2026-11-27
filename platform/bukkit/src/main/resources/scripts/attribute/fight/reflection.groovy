@@ -2,6 +2,7 @@ package scripts.attribute.fight
 
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
+import github.mkbaka.assiya.platform.bukkit.api.compat.FoliaCompat
 import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.*
 import github.mkbaka.assiya.platform.bukkit.internal.script.tools.ScriptTools
@@ -18,6 +19,12 @@ static void onDefense(Attribute attribute, BukkitProcessor processor) {
 
     TargetComponent defender = processor.get(TargetComponent.@Key)
     if (defender == null) return
+
+    // 不处理跨区域的反伤逻辑
+    // 详细原因见 DamageMeta#execute
+    if (FoliaCompat.isFolia() && !FoliaCompat.isOwnedByCurrentRegion(attacker.entity)) {
+        return
+    }
 
     double chance = defender.getValue(attribute.id, 'total', 0.0d)
     if (!ScriptTools.chance(chance)) return

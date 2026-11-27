@@ -1,6 +1,5 @@
 package scripts.handler
 
-import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.event.AttributeUpdateEvent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.UpdateProcessor
@@ -26,10 +25,8 @@ class Update {
 
     private static void handle(AttributeUpdateEvent.Pre event) {
         try {
-            AssiyaSession session = AssiyaAPI.getSession(event.entity)
-            if (session == null) return
-
-            UpdateProcessor processor = UpdateProcessor.of(event.entity, session.attribute.snapshot, event.context)
+            AssiyaSession session = event.session
+            UpdateProcessor processor = UpdateProcessor.of(session, event.context)
             processor.process()
 
             CancellableComponent cancellable = processor.get(CancellableComponent.@Key)
@@ -37,7 +34,7 @@ class Update {
                 event.cancelled = true
             }
         } catch (Throwable e) {
-            logEx(e, "Failed to process attribute update for entity ${event.entity}".toString())
+            logEx(e, "Failed to process attribute update for session ${event.session.ownerUUID}".toString())
         }
     }
 

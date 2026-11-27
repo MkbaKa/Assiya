@@ -2,8 +2,8 @@ package github.mkbaka.assiya.platform.bukkit.api.event
 
 import github.mkbaka.assiya.common.source.AttributeSourceInfo
 import github.mkbaka.assiya.platform.bukkit.api.event.util.CancellableEvent
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import org.bukkit.Bukkit
-import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
@@ -14,10 +14,10 @@ import org.bukkit.event.HandlerList
  */
 sealed class AttributeSourceRemoveEvent : Event(!Bukkit.isPrimaryThread()) {
 
-    class Pre(val entity: Entity, val info: AttributeSourceInfo) : AttributeSourceRemoveEvent(),
+    class Pre(val session: AssiyaSession, val info: AttributeSourceInfo) : AttributeSourceRemoveEvent(),
         Cancellable by CancellableEvent()
 
-    class Post(val entity: Entity, val info: AttributeSourceInfo) : AttributeSourceRemoveEvent()
+    class Post(val session: AssiyaSession, val info: AttributeSourceInfo) : AttributeSourceRemoveEvent()
 
     override fun getHandlers(): HandlerList {
         return HANDLERS

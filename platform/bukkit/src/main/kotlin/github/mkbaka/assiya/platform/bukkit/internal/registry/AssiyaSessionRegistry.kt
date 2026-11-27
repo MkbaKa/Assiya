@@ -28,6 +28,9 @@ object AssiyaSessionRegistry : Registry<UUID, AssiyaSession>() {
     fun remove(ownerId: UUID): AssiyaSession? =
         elements.remove(ownerId)?.also { it.close() }
 
+    fun remove(session: AssiyaSession): Boolean =
+        elements.remove(session.ownerUUID, session)
+
     fun refresh() {
         for (session in sessions.values) {
             session.refresh()

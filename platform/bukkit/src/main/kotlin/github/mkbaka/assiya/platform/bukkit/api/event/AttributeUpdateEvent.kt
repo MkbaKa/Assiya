@@ -2,8 +2,8 @@ package github.mkbaka.assiya.platform.bukkit.api.event
 
 import github.mkbaka.assiya.common.engine.AttributeUpdateContext
 import github.mkbaka.assiya.platform.bukkit.api.event.util.CancellableEvent
+import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import org.bukkit.Bukkit
-import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
@@ -15,10 +15,10 @@ import org.bukkit.event.HandlerList
  */
 sealed class AttributeUpdateEvent : Event(!Bukkit.isPrimaryThread()) {
 
-    class Pre(val entity: Entity, val context: AttributeUpdateContext) : AttributeUpdateEvent(),
+    class Pre(val session: AssiyaSession, val context: AttributeUpdateContext) : AttributeUpdateEvent(),
         Cancellable by CancellableEvent()
 
-    class Post(val entity: Entity, val context: AttributeUpdateContext) : AttributeUpdateEvent()
+    class Post(val session: AssiyaSession, val context: AttributeUpdateContext) : AttributeUpdateEvent()
 
     override fun getHandlers(): HandlerList {
         return HANDLERS

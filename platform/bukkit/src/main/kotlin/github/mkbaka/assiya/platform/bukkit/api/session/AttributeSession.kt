@@ -8,7 +8,12 @@ import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
+import kotlinx.coroutines.CoroutineExceptionHandler
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
 class AttributeSession(
@@ -16,6 +21,7 @@ class AttributeSession(
     private val engine: AttributeEngine
 ) : AutoCloseable {
 
+    @Volatile
     var isClosed: Boolean = false
         private set
 
@@ -24,7 +30,18 @@ class AttributeSession(
 
     fun refreshDefaultAttributes() {
         val owner = assiyaSession.owner ?: return
+        BukkitCoroutine.launch(owner, context = CoroutineExceptionHandler { _, cause ->
+            logEx(cause, "Failed to refresh default attributes")
+        }) {
+            if (!isClosed && assiyaSession.owner === owner &&
+                AssiyaSessionRegistry[assiyaSession.ownerUUID] === assiyaSession
+            ) {
+                refreshDefaultAttributes0(owner)
+            }
+        }
+    }
 
+    private fun refreshDefaultAttributes0(owner: Entity) {
         val config = Config.global
         val parsed = if (owner is Player) config.DEFAULT_ATTRIBUTES_PLAYER else config.DEFAULT_ATTRIBUTES_ENTITY
         if (parsed == null) {

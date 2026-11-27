@@ -8,24 +8,23 @@ import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
 import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.withAsync
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.delayTicks
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.withAsync
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import kotlinx.coroutines.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
 object EquipmentPipeline {
 
-    private val pending = hashMapOf<UUID, Job>()
+    private val pending = ConcurrentHashMap<UUID, Job>()
 
     fun cancel(ownerId: UUID) {
         pending.remove(ownerId)?.cancel()
@@ -51,20 +50,17 @@ object EquipmentPipeline {
         }
 
         val result = CompletableFuture<AttributeEngineSnapshot>()
+        val requestedSlots = changedSlots.toSet()
 
-        // 追加受影响的槽位
-        session.dirtyEquipmentSlots.addAll(changedSlots)
-        pending.remove(ownerId)?.cancel()
-
-        val sync = BukkitCoroutine.coroutineContext[BukkitDispatchers]!!.sync
-
-        val job = launch(
-            context = sync,
+        val job = BukkitCoroutine.launch(
+            entity = entity,
             start = CoroutineStart.LAZY
         ) {
             val task = currentCoroutineContext().job
-
             try {
+                // 追加受影响的槽位
+                session.dirtyEquipmentSlots.addAll(requestedSlots)
+                pending.put(ownerId, task)?.cancel()
                 if (refreshDelay > 0) delayTicks(refreshDelay)
 
                 if (AssiyaSessionRegistry[ownerId] !== session || entity is Player && !entity.isOnline) {
@@ -86,7 +82,12 @@ object EquipmentPipeline {
             }
         }
 
-        pending[ownerId] = job
+        job.invokeOnCompletion { cause ->
+            if (cause != null) {
+                result.completeExceptionally(cause)
+            }
+            pending.remove(ownerId, job)
+        }
         job.start()
         return result
     }

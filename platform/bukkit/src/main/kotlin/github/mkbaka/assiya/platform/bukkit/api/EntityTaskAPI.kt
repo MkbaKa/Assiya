@@ -3,11 +3,11 @@ package github.mkbaka.assiya.platform.bukkit.api
 import github.mkbaka.assiya.platform.bukkit.api.task.EntityTask
 import github.mkbaka.assiya.platform.bukkit.api.task.EntityTaskBuilder
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitDispatchers
 import github.mkbaka.assiya.platform.bukkit.internal.registry.EntityTaskRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.delayTicks
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.launch
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.delayTicks
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.launch
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import org.bukkit.entity.Entity
 import java.util.*
@@ -66,11 +66,7 @@ object EntityTaskAPI {
         val async = options.async
         val params = options.params
 
-        val dispatchers = BukkitCoroutine.coroutineContext[BukkitDispatchers]!!
-        val job = launch(
-            context = if (async) dispatchers.async else dispatchers.sync,
-            start = CoroutineStart.LAZY
-        ) {
+        val execute: suspend CoroutineScope.() -> Unit = {
             if (delay > 0) {
                 delayTicks(delay)
             }
@@ -87,7 +83,13 @@ object EntityTaskAPI {
             }
         }
 
-        val entityTask = EntityTask(owner.uniqueId, taskId, job, key) {
+        val job = if (async) {
+            launch(start = CoroutineStart.LAZY, block = execute)
+        } else {
+            launch(owner, start = CoroutineStart.LAZY, block = execute)
+        }
+
+        val entityTask = EntityTask(owner, taskId, job, key) {
             task.onTerminate?.accept(owner, params)
         }
         EntityTaskRegistry.add(entityTask.ownerId, entityTask)

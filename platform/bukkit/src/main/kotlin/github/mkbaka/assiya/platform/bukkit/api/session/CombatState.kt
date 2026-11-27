@@ -13,6 +13,7 @@ class CombatState(private val session: AssiyaSession) {
 
     private var targetUUID: UUID? = null
 
+    @Volatile
     var inCombat: Boolean = false
         private set
 

@@ -6,7 +6,7 @@ import github.mkbaka.assiya.platform.bukkit.internal.command.argument.ReloadModu
 import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadModule
 import github.mkbaka.assiya.platform.bukkit.internal.config.reload.ReloadResult
 import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callAsync
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.bukkitksp.annotation.CustomField
 import org.bukkit.command.CommandSender
 import pers.neige.colonel.argument
@@ -22,7 +22,7 @@ object ReloadCommand {
                 val sender = context.source ?: return@setNullExecutor
                 val module = context.getArgument<ReloadModule>("module")
 
-                callAsync {
+                BukkitCoroutine.launch {
                     var result: ReloadResult
                     val elapsed = measureTime {
                         result = Config.reloadModule(module)

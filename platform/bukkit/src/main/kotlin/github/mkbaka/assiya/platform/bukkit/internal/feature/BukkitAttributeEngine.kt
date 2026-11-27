@@ -24,16 +24,14 @@ class BukkitAttributeEngine(
         action: AttributeEngineAction.Refresh,
         context: AttributeUpdateContext
     ): AttributeEngineSnapshot {
-        val entity = assiyaSession.owner ?: return snapshot()
-
-        if (action.triggerEvent && AttributeUpdateEvent.Pre(entity, context).call()) {
+        if (action.triggerEvent && AttributeUpdateEvent.Pre(assiyaSession, context).call()) {
             return snapshot()
         }
 
         val snapshot = super.refresh(action, context)
 
         if (action.triggerEvent) {
-            AttributeUpdateEvent.Post(entity, context).call()
+            AttributeUpdateEvent.Post(assiyaSession, context).call()
         }
         return snapshot
     }
@@ -45,8 +43,7 @@ class BukkitAttributeEngine(
     ) {
         val source = state.sourceIndex[sourceId] ?: return
 
-        val entity = assiyaSession.owner ?: return
-        if (AttributeSourceRemoveEvent.Pre(entity, source).call()) {
+        if (AttributeSourceRemoveEvent.Pre(assiyaSession, source).call()) {
             return
         }
 
@@ -56,7 +53,7 @@ class BukkitAttributeEngine(
             changedSources
         )
 
-        AttributeSourceRemoveEvent.Post(entity, source).call()
+        AttributeSourceRemoveEvent.Post(assiyaSession, source).call()
     }
 
 }

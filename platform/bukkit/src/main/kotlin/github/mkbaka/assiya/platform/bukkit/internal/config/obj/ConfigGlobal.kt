@@ -43,9 +43,11 @@ class ConfigGlobal(
 
     val DEFAULT_ATTRIBUTES_PRIORITY = section.getInt("default-attributes.priority", 80)
 
+    @Volatile
     var DEFAULT_ATTRIBUTES_PLAYER: AttributeParsedSource? = null
         private set
 
+    @Volatile
     var DEFAULT_ATTRIBUTES_ENTITY: AttributeParsedSource? = null
         private set
 

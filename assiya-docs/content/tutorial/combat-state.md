@@ -32,21 +32,22 @@ health-regain:
 package scripts.attribute
 
 import github.mkbaka.assiya.platform.bukkit.api.CombatStateAPI
+import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.attribute.component.OptionsComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
+import github.mkbaka.assiya.platform.bukkit.api.handler.processor.TimerProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
 import groovy.transform.CompileStatic
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 @CompileStatic
-static void onTimer(Attribute attribute, BukkitProcessor processor) {
+static void onTimer(Attribute attribute, TimerProcessor processor) {
     TriggerComponent trigger = processor.get(TriggerComponent.@Key)
     if (trigger == null) return
-    if (!(trigger.entity instanceof LivingEntity)) return
+    if (!(trigger.entity instanceof Player)) return
+
+    Player owner = (Player) trigger.entity
 
     boolean regainInCombat = attribute.get(OptionsComponent.@Key)?.getBoolean('regain-in-combat', false)
 
@@ -54,15 +55,14 @@ static void onTimer(Attribute attribute, BukkitProcessor processor) {
         double amount = trigger.getValue(attribute.id, 'total', 0.0d)
         if (amount <= 0.0d) return
 
-        SchedulerUtils.callSync {
-            Player entity = (Player) trigger.entity
+        processor.<Player> launch(owner) { Player entity ->
             if (!entity.isValid() || entity.isDead()) return
             // [!code focus:3]
             // 若 options 内的 regain-in-combat 为 false
             // 且该玩家处于战斗状态中 则不回复生命
             if (!regainInCombat && CombatStateAPI.inCombat(entity)) return
 
-            entity.health = Math.min(entity.maxHealth, entity.health + amount)
+            AssiyaAPI.heal(entity, amount)
         }
     }
 }

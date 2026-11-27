@@ -27,7 +27,7 @@ class AttributeHandle(processor: BukkitProcessor) : WrappedProcessor(processor) 
 
     var damageIntensity: Double
         get() = (processor[CustomDataComponent]?.get("attributeplus:damage-intensity") as? Number)?.toDouble()
-            ?: TODO("AP damage intensity mapping")
+            ?: TODO("Unsupported method: damageIntensity")
         set(value) { processor[CustomDataComponent]?.set("attributeplus:damage-intensity", value) }
 
     var replaceAttackMessage: Boolean

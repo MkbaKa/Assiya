@@ -7,8 +7,6 @@ import github.mkbaka.assiya.platform.bukkit.api.attribute.trigger.TriggerSetting
 import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAttributeComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableComponent
-import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.begin
-import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.complete
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.BiPredicate
 import java.util.function.Consumer
@@ -20,7 +18,8 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
      * 根据 priority 排序后的 subscriber 列表
      * 方便触发的时候直接遍历
      */
-    private val indexes = hashMapOf<String, MutableList<Subscriber>>()
+    @Volatile
+    private var indexes: Map<String, List<Subscriber>> = emptyMap()
 
     /**
      * 属性持有的 subscriber
@@ -56,9 +55,7 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
         registrations[id.lowercase()] = subscribers
 
         if (index.get()) {
-            for (subscriber in subscribers) {
-                addIndex(subscriber)
-            }
+            addIndexes(subscribers)
         }
     }
 
@@ -69,9 +66,7 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
 
         val subscribers = registrations.remove(id.lowercase()) ?: return true
         if (index.get()) {
-            for (subscriber in subscribers) {
-                removeIndex(subscriber)
-            }
+            removeIndexes(subscribers)
         }
         return true
     }
@@ -89,18 +84,11 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
      */
     @JvmStatic
     fun complete() {
-        indexes.clear()
-
-        // 塞进实际触发类型对应的 list
-        registrations.values.asSequence()
+        val rebuilt = registrations.values.asSequence()
             .flatten()
-            .groupByTo(indexes) { it.indexId }
-
-        // 挨个类型重排
-        for (subscribers in indexes.values) {
-            subscribers.sortWith(SUBSCRIBER_COMPARATOR)
-        }
-
+            .groupBy { it.indexId }
+            .mapValues { (_, subscribers) -> subscribers.sortedWith(SUBSCRIBER_COMPARATOR) }
+        indexes = rebuilt
         index.set(true)
     }
 
@@ -163,23 +151,38 @@ object HandlerRegistry : NamedRegistry<HandlerComponent>("handler") {
         }
     }
 
-    private fun addIndex(subscriber: Subscriber) {
-        val subscribers = indexes.getOrPut(subscriber.indexId) { arrayListOf() }
-        // 二分永远找不到即将新增的元素 所以这里一定会返回负数
-        // 取绝对值再 -1 就能得出正确的下标位置
-        val index = -subscribers.binarySearch(subscriber, SUBSCRIBER_COMPARATOR) - 1
-        subscribers.add(index, subscriber)
+    private fun addIndexes(subscribers: List<Subscriber>) {
+        if (subscribers.isEmpty()) return
+        val updated = indexes.toMutableMap()
+        for ((indexId, additions) in subscribers.groupBy { it.indexId }) {
+            val indexed = updated[indexId]?.toMutableList() ?: arrayListOf()
+            for (subscriber in additions) {
+                val position = -indexed.binarySearch(subscriber, SUBSCRIBER_COMPARATOR) - 1
+                indexed.add(position, subscriber)
+            }
+            updated[indexId] = indexed
+        }
+        indexes = updated
     }
 
-    private fun removeIndex(subscriber: Subscriber) {
-        val subscribers = indexes[subscriber.indexId] ?: return
-        val position = subscribers.binarySearch(subscriber, SUBSCRIBER_COMPARATOR)
-        if (position >= 0) {
-            subscribers.removeAt(position)
+    private fun removeIndexes(subscribers: List<Subscriber>) {
+        if (subscribers.isEmpty()) return
+        val updated = indexes.toMutableMap()
+        for ((indexId, removals) in subscribers.groupBy { it.indexId }) {
+            val indexed = updated[indexId]?.toMutableList() ?: continue
+            for (subscriber in removals) {
+                val position = indexed.binarySearch(subscriber, SUBSCRIBER_COMPARATOR)
+                if (position >= 0) {
+                    indexed.removeAt(position)
+                }
+            }
+            if (indexed.isEmpty()) {
+                updated.remove(indexId)
+            } else {
+                updated[indexId] = indexed
+            }
         }
-        if (subscribers.isEmpty()) {
-            indexes.remove(subscriber.indexId)
-        }
+        indexes = updated
     }
 
     class Subscriber(

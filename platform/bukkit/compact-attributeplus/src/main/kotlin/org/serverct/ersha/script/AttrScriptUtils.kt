@@ -3,8 +3,9 @@ package org.serverct.ersha.script
 import github.mkbaka.assiya.common.formula.FormulaCompiler
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.CooldownAPI
+import github.mkbaka.assiya.platform.bukkit.api.compat.FoliaCompat
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.hook.placeholderapi.AssiyaPlaceholderAPIHook.parsePAPI
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callSync
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
@@ -49,8 +50,10 @@ object AttrScriptUtils {
 
     @JvmStatic
     fun damageEntity(damage: Double, entity: LivingEntity, killer: LivingEntity) {
-        if (entity.isValid) {
-            callSync {
+        BukkitCoroutine.launch(entity) {
+            if (entity.isValid) {
+                // 带来源伤害仍要求双方同区域, 不在这里重放跨区域伤害.
+                if (FoliaCompat.isFolia() && !FoliaCompat.isOwnedByCurrentRegion(killer)) return@launch
                 AssiyaAPI.attackTo(killer, entity, damage)
             }
         }
@@ -58,8 +61,8 @@ object AttrScriptUtils {
 
     @JvmStatic
     fun damageEntity(damage: Double, entity: LivingEntity) {
-        if (entity.isValid) {
-            callSync {
+        BukkitCoroutine.launch(entity) {
+            if (entity.isValid) {
                 entity.damage(damage)
             }
         }
@@ -84,17 +87,18 @@ object AttrScriptUtils {
     @JvmStatic
     fun calculatorPlaceholder(player: LivingEntity, expr: String): Double {
         if (player !is Player) return 0.0
-
         return calculator(player, expr.parsePAPI(player))
     }
 
     @JvmStatic
-    fun placeholder(player: LivingEntity, context: String): String =
-        if (player is Player) context.parsePAPI(player) else context
+    fun placeholder(player: LivingEntity, context: String): String {
+        if (player !is Player) return context
+        return context.parsePAPI(player)
+    }
 
     @JvmStatic
     fun placeholderToDouble(player: LivingEntity, context: String, default: Double): Double =
-        if (player is Player) context.parsePAPI(player).toDoubleOrNull() ?: default else default
+        if (player is Player) placeholder(player, context).toDoubleOrNull() ?: default else default
 
     @JvmStatic
     fun attributeCooling(key: String, time: Int, entity: LivingEntity): Boolean {
@@ -160,14 +164,16 @@ object AttrScriptUtils {
 
     @JvmStatic
     fun safeHeal(entity: LivingEntity, heal: Double) {
-        if (entity.health < entity.maxHealth && heal != 0.0) {
-            entity.health = (entity.health + heal).coerceAtMost(entity.maxHealth).coerceAtLeast(1.0)
+        BukkitCoroutine.launch(entity) {
+            AssiyaAPI.heal(entity, heal)
         }
     }
 
     @JvmStatic
     fun addPotionEffect(entity: LivingEntity, type: PotionEffectType, level: Int, time: Int) {
-        entity.addPotionEffect(PotionEffect(type, time, level), false)
+        BukkitCoroutine.launch(entity) {
+            entity.addPotionEffect(PotionEffect(type, time, level))
+        }
     }
 
 }

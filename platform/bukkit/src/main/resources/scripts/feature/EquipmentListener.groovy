@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack
 import static github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot.MAIN_HAND
 import static github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot.OFF_HAND
 import static github.mkbaka.assiya.platform.bukkit.internal.util.ItemUtilsKt.isAir
-import static github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils.callSyncLater
+import static github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.callEntityLater
 
 @CompileStatic
 class EquipmentListener {
@@ -77,7 +77,7 @@ class EquipmentListener {
                     if (!(event.player instanceof Player)) return
                     Player player = (Player) event.player
 
-                    callSyncLater(1L, {
+                    callEntityLater(player, 1L, {
                         // 玩家离线也会触发一次 InventoryCloseEvent
                         if (!player.isOnline()) return
 
@@ -115,7 +115,7 @@ class EquipmentListener {
 
                     BukkitEquipmentSlot sourceHand = event.hand == EquipmentSlot.HAND ? MAIN_HAND : OFF_HAND
 
-                    callSyncLater(1L, {
+                    callEntityLater(player, 1L, {
                         if (!player.isOnline()) return
                         EquipmentPipeline.INSTANCE.refresh(player, sourceHand, targetSlot)
                     })
@@ -155,7 +155,7 @@ class EquipmentListener {
                     if (session == null || !session.getHasAttribute()) return
 
                     // 将掉落物捡到手上
-                    callSyncLater(1L, {
+                    callEntityLater(player, 1L, {
                         if (player.isOnline() && !isAir(player.inventory.itemInMainHand)) {
                             EquipmentPipeline.INSTANCE.refresh(player, MAIN_HAND)
                         }
@@ -180,7 +180,7 @@ class EquipmentListener {
                     Player player = event.player
 
                     // 吃完手上的物品
-                    callSyncLater(1L, {
+                    callEntityLater(player, 1L, {
                         if (player.isOnline()) {
                             EquipmentPipeline.INSTANCE.refresh(player, MAIN_HAND, OFF_HAND)
                         }
@@ -195,7 +195,7 @@ class EquipmentListener {
                     if (event.getKeepInventory()) return
 
                     // 死亡掉落的装备不会触发 PlayerDropItemEvent
-                    callSyncLater(1L, {
+                    callEntityLater(player, 1L, {
                         if (!player.isOnline()) return
                         EquipmentPipeline.INSTANCE.refresh(player, BukkitEquipmentSlot.values())
                     })
@@ -226,7 +226,7 @@ class EquipmentListener {
                     BukkitEquipmentSlot slot = WearableSlotResolver.resolve(item)
                     if (slot == null) return
                     // 事件派发前原版已筛选可被装备的目标, 这里只解析槽位.
-                    callSyncLater(1L, {
+                    callEntityLater(player, 1L, {
                         if (!player.isOnline()) return
                         EquipmentPipeline.INSTANCE.refresh(player, slot)
                     })

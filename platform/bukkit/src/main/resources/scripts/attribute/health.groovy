@@ -2,13 +2,12 @@ package scripts.attribute
 
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.UpdateProcessor
 import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributeView
 import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributes
-import github.mkbaka.assiya.platform.bukkit.internal.util.SchedulerUtils
 import groovy.transform.CompileStatic
 import org.bukkit.attribute.AttributeModifier
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 
 @CompileStatic
@@ -18,15 +17,14 @@ class Health {
     private static final String MODIFIER_NAME = 'assiya:max-health'
 
     static void onUpdate(Attribute attribute, UpdateProcessor processor) {
-        TriggerComponent trigger = processor.get(TriggerComponent.@Key)
-        if (trigger == null) return
-        if (!(trigger.entity instanceof LivingEntity)) return
+        Entity entity = processor.session.owner
+        if (!(entity instanceof LivingEntity)) return
 
         processor.get(CallbackComponent.@Key)?.callback {
-            Double value = trigger.getValue('max-health', 'total')
+            Double value = processor.getValue('max-health', 'total')
 
-            SchedulerUtils.callSync {
-                apply((LivingEntity) trigger.entity, value)
+            processor.<LivingEntity> launch((LivingEntity) entity) { LivingEntity target ->
+                apply(target, value)
             }
         }
     }

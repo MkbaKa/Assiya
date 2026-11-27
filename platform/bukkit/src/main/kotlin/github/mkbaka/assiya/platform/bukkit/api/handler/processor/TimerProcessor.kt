@@ -6,8 +6,10 @@ import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.platform.bukkit.api.handler.BukkitProcessor
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.CallbackComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry.Subscriber
+import kotlinx.coroutines.CoroutineScope
 import org.bukkit.entity.Entity
 import java.util.function.Consumer
 
@@ -25,6 +27,12 @@ class TimerProcessor(
         HandlerRegistry.publish(subscribers, this)
         this[CallbackComponent]?.invoke(this)
     }
+
+    fun <E : Entity> launch(entity: E, action: Consumer<E>) = BukkitCoroutine.launch(entity) {
+        action.accept(entity)
+    }
+
+    fun launch(entity: Entity, block: suspend CoroutineScope.() -> Unit) = BukkitCoroutine.launch(entity, block = block)
 
     companion object {
 

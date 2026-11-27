@@ -5,16 +5,15 @@ import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.internal.command.AttributeMessage
 import github.mkbaka.assiya.platform.bukkit.internal.command.argument.SourceArgument
+import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.message.MessageType
+import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import github.mkbaka.bukkitksp.annotation.CustomField
+import kotlinx.coroutines.CoroutineExceptionHandler
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import pers.neige.colonel.argument
-import pers.neige.colonel.arguments.impl.BooleanArgument
-import pers.neige.colonel.arguments.impl.IntegerArgument
-import pers.neige.colonel.arguments.impl.LongArgument
-import pers.neige.colonel.arguments.impl.PlayerArgument
-import pers.neige.colonel.arguments.impl.StringArgument
+import pers.neige.colonel.arguments.impl.*
 import pers.neige.colonel.literal
 import kotlin.time.Duration.Companion.seconds
 
@@ -144,39 +143,48 @@ object SourceCommand {
         duration: Long,
         silent: Boolean
     ) {
-        val session = AssiyaAPI.getSession(player)
-        if (session == null) {
-            MessageType.SOURCE_DATA_NOT_LOADED.sendTo(sender, mapOf("player" to player.name))
-            return
-        }
-
         val lifeCycle = when {
             duration > 0 -> AttributeSourceLifecycle.Temporary(duration.seconds)
 
             else -> AttributeSourceLifecycle.Stable
         }
 
-        val attributes = AssiyaAPI.parse(player, attributesText.split(','))
+        BukkitCoroutine.launch(player, context = CoroutineExceptionHandler { _, cause ->
+            logEx(cause, "Failed to give attribute source $source")
+        }) {
+            val name = player.name
+            val session = AssiyaAPI.getSession(player)
+            if (!player.isOnline || session == null || !session.hasAttribute ||
+                session.owner !== player
+            ) {
+                MessageType.SOURCE_DATA_NOT_LOADED.sendTo(sender, mapOf("player" to name))
+                return@launch
+            }
+            val attributes = AssiyaAPI.parse(player, attributesText.split(','))
+            if (attributes.isEmpty()) {
+                MessageType.SOURCE_EMPTY.sendTo(sender)
+                return@launch
+            }
 
-        if (attributes.isEmpty()) {
-            MessageType.SOURCE_EMPTY.sendTo(sender)
-            return
+            AssiyaAPI.addAttribute(session, source, attributes, priority, lifeCycle)
+            if (silent) return@launch
+
+            reportGive(sender, name, attributes, source, duration, lifeCycle)
         }
+    }
 
-        AssiyaAPI.addAttribute(
-            session,
-            source,
-            attributes,
-            priority,
-            lifeCycle
-        )
-
-        if (silent) return
-
+    private fun reportGive(
+        sender: CommandSender,
+        name: String,
+        attributes: Map<String, AttributeValue<*>>,
+        source: String,
+        duration: Long,
+        lifeCycle: AttributeSourceLifecycle
+    ) {
         if (lifeCycle == AttributeSourceLifecycle.Stable) {
             MessageType.SOURCE_GIVE_SUBMITTED_STABLE.sendTo(
                 sender, mapOf(
-                    "player" to player.name,
+                    "player" to name,
                     "source" to source,
                     "count" to attributes.size.toString()
                 )
@@ -184,14 +192,14 @@ object SourceCommand {
         } else {
             MessageType.SOURCE_GIVE_SUBMITTED.sendTo(
                 sender, mapOf(
-                    "player" to player.name,
+                    "player" to name,
                     "source" to source,
                     "duration" to duration.toString(),
                     "count" to attributes.size.toString()
                 )
             )
         }
-        sendAttributes(sender, attributes, mapOf("player" to player.name, "source" to source))
+        sendAttributes(sender, attributes, mapOf("player" to name, "source" to source))
         MessageType.SOURCE_INFO_FOOTER.sendTo(sender)
     }
 

@@ -22,12 +22,12 @@ strength:
 package scripts.attribute
 
 import github.mkbaka.assiya.common.engine.AttributeUpdateContext
+import github.mkbaka.assiya.common.parser.AttributeParsedSource
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
 import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.attribute.Attribute
-import github.mkbaka.assiya.platform.bukkit.api.handler.component.TriggerComponent
 import github.mkbaka.assiya.platform.bukkit.api.handler.processor.UpdateProcessor
 import groovy.transform.CompileStatic
 
@@ -37,11 +37,8 @@ class Strength {
     private static final String SOURCE_ID = 'derived:strength'
 
     static void onUpdate(Attribute attribute, UpdateProcessor processor) {
-        TriggerComponent trigger = processor.get(TriggerComponent.@Key)
-        if (trigger == null) return
-
         AttributeUpdateContext context = processor.context
-        double strength = trigger.getValue(attribute.id, 'total', 0.0d)
+        double strength = processor.getValue(attribute.id, 'total', 0.0d)
 
         // 不再满足加成条件时, 移除之前生成的属性源
         if (strength <= 0.0d) {
@@ -49,10 +46,11 @@ class Strength {
             return
         }
 
-        Map<String, AttributeValue<?>> attributes = AssiyaAPI.parse(
-                trigger.entity,
+        AttributeParsedSource parsed = AssiyaAPI.parse(
                 Arrays.asList("物理伤害: ${strength * 2.0d}")
         )
+        // 本例文本不含条件, 无需取得实体判断条件
+        Map<String, AttributeValue<?>> attributes = parsed.resolve(new boolean[0])
 
         if (context.get(SOURCE_ID) == null) {
             // 来源不存在时, 提交一份新的属性源

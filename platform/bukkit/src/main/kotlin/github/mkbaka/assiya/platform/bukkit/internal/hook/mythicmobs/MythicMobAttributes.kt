@@ -10,11 +10,14 @@ import github.mkbaka.bukkitksp.annotation.Awake
 import github.mkbaka.bukkitksp.annotation.CustomTask
 import github.mkbaka.bukkitksp.annotation.LifeCycle
 import org.bukkit.entity.Entity
+import java.util.concurrent.ConcurrentHashMap
 
 object MythicMobAttributes {
 
     private const val SOURCE_ID = "assiya:mythic-mobs:attributes"
-    private val levelAttributes = hashMapOf<String, LevelAttribute>()
+
+    @Volatile
+    private var levelAttributes = ConcurrentHashMap<String, LevelAttribute>()
 
     fun apply(entity: Entity, mobId: String, level: Double, attributes: List<String>, calculator: Boolean) {
         val session = AssiyaAPI.getSessionOrCreate(entity)
@@ -41,12 +44,12 @@ object MythicMobAttributes {
     @Awake(lifeCycle = LifeCycle.DISABLE)
     @CustomTask(taskId = "reload", priority = 114514)
     fun clear() {
-        levelAttributes.clear()
+        levelAttributes = ConcurrentHashMap()
     }
 
     private class LevelAttribute(val template: MobAttributeTemplate) {
 
-        val parsedByLevel = hashMapOf<Double, AttributeParsedSource>()
+        val parsedByLevel = ConcurrentHashMap<Double, AttributeParsedSource>()
 
     }
 

@@ -1,6 +1,6 @@
 # 处理器与组件
 
-Assiya 用 `Processor`（处理器）表示一次任务的执行过程，用 `Component`（组件）承载具体能力与数据。处理器本身不固定任何字段，所有信息都放在组件里，因此可以通过组合组件扩展行为，而不必改动 Assiya 源码。设计动机详见 [Processor](../advanced/processor.md)，组件清单另见[已实现的组件](../advanced/components.md)。
+Assiya 用 `Processor`（处理器）表示一次任务的执行过程，用 `Component`（组件）承载具体能力与数据。处理器本身不固定任何字段，所有信息都放在组件里，因此可以通过组合组件扩展行为，而不必改动 Assiya 源码。设计动机详见 [Processor](../../advanced/processor.md)，组件清单另见[已实现的组件](../../advanced/components.md)。
 
 ## BukkitProcessor
 

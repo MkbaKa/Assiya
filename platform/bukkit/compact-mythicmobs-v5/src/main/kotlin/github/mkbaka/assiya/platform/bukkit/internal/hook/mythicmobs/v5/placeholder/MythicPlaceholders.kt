@@ -2,14 +2,15 @@ package github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v5.placeho
 
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.MythicPlaceholderValues
 import github.mkbaka.assiya.platform.bukkit.internal.hook.mythicmobs.v5.util.ProcessorDataSnapshots
-import io.lumine.mythic.bukkit.MythicBukkit
 import io.lumine.mythic.api.adapters.AbstractEntity
+import io.lumine.mythic.bukkit.MythicBukkit
+import io.lumine.mythic.bukkit.utils.serialize.Optl
 import io.lumine.mythic.core.mobs.ActiveMob
 import io.lumine.mythic.core.skills.placeholders.PlaceholderMeta
 import io.lumine.mythic.core.skills.placeholders.types.MetaPlaceholder
 import io.lumine.mythic.core.skills.placeholders.types.TargetPlaceholder
 import org.bukkit.Bukkit
-import java.util.UUID
+import java.util.*
 
 object MythicPlaceholders {
 
@@ -67,11 +68,16 @@ object MythicPlaceholders {
         val caster = meta.caster ?: return null
         val active = MythicBukkit.inst().mobManager.getActiveMob(caster.entity.uniqueId)
         if (!active.isPresent) return null
-        val owner = active.get().owner
+        /**
+         * 5.6.2   返回的是 Optl<UUID>
+         * 5.13.0  返回 Optl<AbstractEntity>
+         */
+        val owner: Optl<*> = active.get().owner
         if (!owner.isPresent) return null
         return when (val value: Any = owner.get() ?: return null) {
-            is UUID -> value
+            is ActiveMob -> value.uniqueId
             is AbstractEntity -> value.uniqueId
+            is UUID -> value
             else -> error("Unsupported owner type: ${value.javaClass.name}")
         }
     }

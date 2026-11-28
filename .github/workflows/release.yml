@@ -123,6 +123,7 @@ jobs:
                 target_commitish: context.sha,
                 name: `Assiya ${VERSION}`,
                 body: `Assiya ${VERSION}\nAttributePlus compatibility plugin ${AP_VERSION}\n\nSource commit: ${context.sha}`,
+                generate_release_notes: true,
                 draft: true,
                 prerelease,
               })).data;

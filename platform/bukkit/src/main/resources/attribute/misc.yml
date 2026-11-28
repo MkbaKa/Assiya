@@ -109,3 +109,11 @@ remote-immune:
   options:
     attacker: '{entity} 免疫了你的远程伤害.'
     entity: '你免疫了 {attacker} 的远程伤害.'
+
+attack-range:
+  names: ["攻击距离", "攻击范围"]
+  reader: default
+  handler: 'attribute/fight/attack-range'
+  priority: 60
+  always-run: true
+  triggers: update

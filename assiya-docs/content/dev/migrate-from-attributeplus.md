@@ -1,6 +1,6 @@
 # 从 AttributePlus 迁移
 
-在安装 [Release](https://github.com/MkbaKa/Assiya/releases) 里提供的 `Assiya-AttributePlus` 插件后，它会提供一系列降低迁移难度的功能。
+在安装 [Release](https://github.com/MkbaKa/Assiya/releases) 里提供的 `Assiya-AttributePlus` 插件后(无需安装 AP 本体)，它会提供一系列降低迁移难度的功能。
 
 比如，它将一些能够复用的 API 转接到了 Assiya 实现，这样可以避免一些附属开发者要针对 Assiya 重复编写兼容代码。
 

@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-<p align="center">面向 RPG 玩法的 Minecraft 属性插件，运行于 Paper 服务端。</p>
+<p align="center">面向 RPG 玩法的 Minecraft 属性插件，运行于 Paper 系服务端(包括 Folia)</p>
 
 <p align="center">
   <img alt="Paper" src="https://img.shields.io/badge/平台-Paper-527AAB?style=flat-square&labelColor=29354D">
@@ -15,6 +15,10 @@
 
 <p align="center">
   <a href="https://mkbakaa.cn/content/guide/intro.html">项目介绍</a>&ensp;·&ensp;<a href="https://mkbakaa.cn/content/guide/quick-start.html">快速开始</a>&ensp;·&ensp;<a href="https://mkbakaa.cn/content/mythicmobs/mob-attributes.html">MythicMobs</a>
+</p>
+
+<p align="center">
+  <a href="https://qm.qq.com/q/ipJqBPMpji">点击加入交流群</a>
 </p>
 
 <p align="center">
@@ -97,18 +101,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.github.MkbaKa:Assiya:assiya-v0.0.2") {
+    compileOnly("com.github.MkbaKa:Assiya:assiya-v0.0.4") {
         isTransitive = false
     }
 }
 ```
-
-动态选择最新版本
-
-```kotlin
-compileOnly("com.github.MkbaKa:Assiya:assiya-v+") { isTransitive = false }
-```
-
 
 </details>
 
@@ -127,7 +124,7 @@ compileOnly("com.github.MkbaKa:Assiya:assiya-v+") { isTransitive = false }
     <dependency>
         <groupId>com.github.MkbaKa</groupId>
         <artifactId>Assiya</artifactId>
-        <version>assiya-v0.0.2</version>
+        <version>assiya-v0.0.4</version>
         <scope>provided</scope>
         <exclusions>
             <exclusion>

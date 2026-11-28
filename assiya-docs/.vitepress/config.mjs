@@ -24,7 +24,8 @@ export default defineConfig({
     nav: [
       { text: '首页', link: '/' },
       { text: '开始', link: '/content/guide/intro' },
-      { text: 'GitHub', link: 'https://github.com/MkbaKa/Assiya' }
+      { text: 'GitHub', link: 'https://github.com/MkbaKa/Assiya' },
+      { text: 'QQ 群', link: 'https://qm.qq.com/q/ipJqBPMpji' }
     ],
     sidebar: [
       {

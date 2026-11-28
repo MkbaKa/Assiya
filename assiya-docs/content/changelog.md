@@ -1,5 +1,10 @@
 # 更新记录
 
+## 0.0.5  -  2026/11/28
+
+- [TriggerByEventComponent](https://github.com/MkbaKa/Assiya/blob/main/platform/bukkit/src/main/kotlin/github/mkbaka/assiya/platform/bukkit/api/handler/component/TriggerByEventComponent.kt) 增加用于获取攻击进度的字段 `force`
+- 部分代码优化
+
 ## 0.0.4  -  2026/11/27
 
 - 增加 **Folia** 兼容

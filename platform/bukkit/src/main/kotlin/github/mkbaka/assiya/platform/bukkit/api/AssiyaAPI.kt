@@ -5,6 +5,8 @@ import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublisherBase
 import github.mkbaka.assiya.common.handler.ProcessorComponentBuilder
 import github.mkbaka.assiya.common.parser.AttributeParsedSource
+import github.mkbaka.assiya.common.parser.part.AttributeSourcePart
+import github.mkbaka.assiya.common.parser.part.TextAttributeSourcePart
 import github.mkbaka.assiya.common.source.AttributeSourceLifecycle
 import github.mkbaka.assiya.common.source.AttributeSourcePatch
 import github.mkbaka.assiya.common.source.AttributeValue
@@ -21,10 +23,12 @@ import github.mkbaka.assiya.platform.bukkit.api.vanilla.VanillaAttributes
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.EquipmentPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
-import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.feature.BukkitAttributeEngine
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AttributeRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.ItemReaderRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.util.StringUtils.uncolored
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.future.asCompletableFuture
 import org.bukkit.entity.Entity
@@ -138,7 +142,29 @@ object AssiyaAPI {
      * @return 可供 [evaluate] 使用的解析结果
      */
     @JvmStatic
-    fun parse(lines: List<String>): AttributeParsedSource = AttributeReadPipeline.parse(lines)
+    fun parse(lines: List<String>): AttributeParsedSource =
+        AttributeRegistry.parse(listOf(TextAttributeSourcePart(lines.uncolored())))
+
+    /**
+     * 把基于物品等来源解析除的结果解析为属性
+     *
+     * @param parts 来源
+     * @return 可供 [evaluate] 使用的解析结果
+     */
+    @JvmStatic
+    fun parseParts(parts: List<AttributeSourcePart>): AttributeParsedSource =
+        AttributeRegistry.parse(parts)
+
+    /**
+     * 忽略解析结果中的条件限制 直接取所有属性结果.
+     *
+     * @param parsed 已解析的属性来源
+     * @return 解析结果
+     */
+    @JvmStatic
+    fun evaluate(
+        parsed: AttributeParsedSource
+    ): Map<String, AttributeValue<*>> = parsed.resolve()
 
     /**
      * 对解析结果执行条件判断与属性值求值.
@@ -153,8 +179,9 @@ object AssiyaAPI {
         entity: Entity,
         parsed: AttributeParsedSource,
         context: ConditionContextImpl
-    ): Map<String, AttributeValue<*>> =
-        AttributeReadPipeline.evaluate(entity, parsed, context)
+    ): Map<String, AttributeValue<*>> = parsed.resolve {
+        ConditionRegistry.eval(entity, it, context)
+    }
 
     /**
      * 增加属性
@@ -204,9 +231,9 @@ object AssiyaAPI {
         triggerEvent: Boolean = false,
         context: ConditionContextImpl = ConditionContextImpl(itemStack = itemStack, sourceId = sourceId)
     ): CompletableFuture<AttributeEngineSnapshot> = attributeOnEntity(session) { entity ->
-        val parts = AttributeReadPipeline.readItem(itemStack)
-        val parsed = AttributeReadPipeline.parseParts(parts)
-        val values = AttributeReadPipeline.evaluate(entity, parsed, context)
+        val parts = ItemReaderRegistry.read(itemStack)
+        val parsed = parseParts(parts)
+        val values = evaluate(entity, parsed, context)
         addAttribute(session, sourceId, values, priority, lifeCycle, triggerEvent)
     }
 
@@ -268,7 +295,7 @@ object AssiyaAPI {
             sourceId,
             priority,
             lifeCycle,
-            AttributeReadPipeline.evaluate(entity, parsed, context)
+            evaluate(entity, parsed, context)
         )
         addAttribute(session, triggerEvent = triggerEvent, patch)
     }
@@ -334,10 +361,10 @@ object AssiyaAPI {
         triggerEvent: Boolean = false
     ): CompletableFuture<AttributeEngineSnapshot> = attributeOnEntity(session) { entity ->
         val values = items.flatMap { item ->
-            val parts = AttributeReadPipeline.readItem(item)
-            val parsed = AttributeReadPipeline.parseParts(parts)
+            val parts = ItemReaderRegistry.read(item)
+            val parsed = parseParts(parts)
             val context = ConditionContextImpl(itemStack = item, sourceId = sourceId)
-            AttributeReadPipeline.evaluate(entity, parsed, context).values
+            evaluate(entity, parsed, context).values
         }
         val patch = AttributeSourcePatch(
             sourceId,

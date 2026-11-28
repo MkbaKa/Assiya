@@ -15,6 +15,8 @@ open class WrappedProcessor(val processor: BukkitProcessor) : BukkitProcessor by
 
     val isSkillDamage: Boolean get() = processor[TriggerByMythicSkillComponent] != null
 
+    val force: Float get() = (processor[ProjectileComponent]?.force ?: processor[TriggerByEventComponent]?.force) ?: 1.0f
+
     fun getDamage(): Double =
         processor[DamageMultipleComponent]?.totalDamage ?: processor[DamageComponent]?.value ?: 0.0
 

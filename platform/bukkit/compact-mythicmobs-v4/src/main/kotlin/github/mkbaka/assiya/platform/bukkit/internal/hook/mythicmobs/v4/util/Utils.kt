@@ -12,12 +12,12 @@ import github.mkbaka.assiya.platform.bukkit.api.handler.component.CancellableAtt
 import github.mkbaka.assiya.platform.bukkit.internal.registry.HandlerRegistry
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity
 import io.lumine.xikage.mythicmobs.skills.SkillCondition
-import io.lumine.xikage.mythicmobs.skills.conditions.ConditionAction
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata
+import io.lumine.xikage.mythicmobs.skills.conditions.ConditionAction
 import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString
 import org.bukkit.entity.Entity
-import java.math.BigDecimal
 import java.lang.invoke.MethodHandles
+import java.math.BigDecimal
 
 object Utils {
 
@@ -55,24 +55,37 @@ object Utils {
             }
         }
 
-        // 解析后的属性结果
-        val attributes = hashMapOf<String, Status<Any>>()
-        // 解析后条件通过才可用
-        if (lines.isNotEmpty()) {
-            val parsed = AssiyaAPI.parse(entity, lines)
+        val attributes = parseTextAttributes(entity, lines)
+        applyCaptures(attributes, captures)
+        return attributes.mapValues { (_, values) -> Status.of(values) }
+    }
 
-            for ((attributeId, attribute) in parsed) {
-                @Suppress("UNCHECKED_CAST")
-                attributes[attributeId] = attribute.status as Status<Any>
+    private fun parseTextAttributes(
+        entity: Entity,
+        lines: List<String>
+    ): MutableMap<String, MutableMap<String, Any>> {
+        val attributes = hashMapOf<String, MutableMap<String, Any>>()
+        if (lines.isEmpty()) return attributes
+
+        for ((attributeId, attribute) in AssiyaAPI.parse(entity, lines)) {
+            val values = hashMapOf<String, Any>()
+            for ((id, value) in attribute.status.entries) {
+                values[id] = value
             }
+            attributes[attributeId] = values
         }
+        return attributes
+    }
 
+    private fun applyCaptures(
+        attributes: MutableMap<String, MutableMap<String, Any>>,
+        captures: Map<String, String>
+    ) {
         for ((name, raw) in captures) {
             // "attack|min"  ->  "attack" , "min"
             val attributeKey = name.substringBefore("|")
             val captureId = name.substringAfter("|")
 
-            // TODO 待优化
             val attribute = AssiyaAPI.getAttribute(attributeKey) ?: error("Unknown attribute: $attributeKey")
             val attributeId = attribute.id
             val reader = attribute[ReaderComponent]?.reader ?: error("$attributeId has no reader")
@@ -80,17 +93,8 @@ object Utils {
             val text = if (capture.value == Value.Number) calculate(name, raw) else raw
             val value = capture.value.parse(text) ?: error("$attributeId#${reader.id} parsed invalid value: $raw")
 
-            val previous = attributes[attributeId]
-            val values = hashMapOf<String, Any>()
-
-            if (previous != null) {
-                for ((id, previousValue) in previous.entries) values[id] = previousValue
-            }
-            values[captureId] = value
-            attributes[attribute.id] = Status.of(values)
+            attributes.computeIfAbsent(attributeId) { hashMapOf() }[captureId] = value
         }
-
-        return attributes
     }
 
     private fun calculate(name: String, expression: String): String {

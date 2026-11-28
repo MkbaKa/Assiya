@@ -8,12 +8,12 @@ import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.api.session.AssiyaSession
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
-import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
-import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
-import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.delayTicks
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine.withAsync
+import github.mkbaka.assiya.platform.bukkit.internal.equipment.slot.BukkitEquipmentSlot
+import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.ConditionRegistry
+import github.mkbaka.assiya.platform.bukkit.internal.registry.ItemReaderRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import kotlinx.coroutines.*
 import org.bukkit.entity.LivingEntity
@@ -106,8 +106,8 @@ object EquipmentPipeline {
         // 重新解析变动槽位里的新物品
         val updates = withAsync {
             changedSlots.associateWith { slot ->
-                val parts = AttributeReadPipeline.readItem(items.getValue(slot))
-                AttributeReadPipeline.parseParts(parts)
+                val parts = ItemReaderRegistry.read(items.getValue(slot))
+                AssiyaAPI.parseParts(parts)
             }
         }
 

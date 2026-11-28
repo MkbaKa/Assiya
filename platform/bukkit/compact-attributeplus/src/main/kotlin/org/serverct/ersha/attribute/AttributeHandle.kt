@@ -25,14 +25,14 @@ class AttributeHandle(processor: BukkitProcessor) : WrappedProcessor(processor) 
         requireNotNull(processor[CustomDataComponent]) { "Processor has no custom data component" }
     )
 
-    var damageIntensity: Double
-        get() = (processor[CustomDataComponent]?.get("attributeplus:damage-intensity") as? Number)?.toDouble()
-            ?: TODO("Unsupported method: damageIntensity")
-        set(value) { processor[CustomDataComponent]?.set("attributeplus:damage-intensity", value) }
+    val damageIntensity: Double
+        get() = force.toDouble()
 
     var replaceAttackMessage: Boolean
         get() = processor[CustomDataComponent]?.get("attributeplus:replace-attack-message") == true
-        set(value) { processor[CustomDataComponent]?.set("attributeplus:replace-attack-message", value) }
+        set(value) {
+            processor[CustomDataComponent]?.set("attributeplus:replace-attack-message", value)
+        }
 
     fun updateTempValue(init: Boolean, attribute: String, value: Number): Number {
         tempValue[attribute] = if (init) value else getAttrTriggerValue(attribute) + value.toDouble()

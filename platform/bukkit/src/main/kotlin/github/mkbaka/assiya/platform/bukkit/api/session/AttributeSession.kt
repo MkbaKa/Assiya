@@ -9,7 +9,6 @@ import github.mkbaka.assiya.platform.bukkit.api.AssiyaAPI
 import github.mkbaka.assiya.platform.bukkit.api.condition.ConditionContextImpl
 import github.mkbaka.assiya.platform.bukkit.internal.config.Config
 import github.mkbaka.assiya.platform.bukkit.internal.coroutine.BukkitCoroutine
-import github.mkbaka.assiya.platform.bukkit.internal.feature.AttributeReadPipeline
 import github.mkbaka.assiya.platform.bukkit.internal.registry.AssiyaSessionRegistry
 import github.mkbaka.assiya.platform.bukkit.internal.util.logEx
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -49,7 +48,7 @@ class AttributeSession(
             return
         }
         val context = ConditionContextImpl(sourceId = DEFAULT_SOURCE)
-        val attributes = AttributeReadPipeline.evaluate(owner, parsed, context)
+        val attributes = AssiyaAPI.evaluate(owner, parsed, context)
         val patch = AttributeSourcePatch(
             sourceId = DEFAULT_SOURCE,
             priority = config.DEFAULT_ATTRIBUTES_PRIORITY,

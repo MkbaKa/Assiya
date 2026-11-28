@@ -49,9 +49,10 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:2.9.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-    implementation("pers.neige.colonel:colonel-common:+")
-    implementation("pers.neige.colonel:colonel-kotlin:+")
-    implementation("pers.neige.colonel:colonel-bukkit:+")
+    val colonelVersion = "1.0.13"
+    implementation("pers.neige.colonel:colonel-common:$colonelVersion")
+    implementation("pers.neige.colonel:colonel-kotlin:$colonelVersion")
+    implementation("pers.neige.colonel:colonel-bukkit:$colonelVersion")
 }
 
 val compact by configurations.creating {

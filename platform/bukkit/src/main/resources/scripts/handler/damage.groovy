@@ -108,7 +108,7 @@ class Damage {
             processor = DamageProcessor.ofProjectile(
                     projectile, defender, shooter as LivingEntity, force
             ) { ProcessorComponentBuilder builder ->
-                builder.add(new TriggerByEventComponent(event))
+                builder.add(new TriggerByEventComponent(event, force))
                 builder.get(DamageMultipleComponent.@Key).setDamage('vanilla', vanillaDamage)
             }
         } else {

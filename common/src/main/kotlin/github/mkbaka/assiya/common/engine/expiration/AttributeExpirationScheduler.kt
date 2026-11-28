@@ -90,7 +90,7 @@ class AttributeExpirationScheduler(
         // timerJob 只管持续时间最短的源
         timerJob = scope.launch {
             delay(delayMillis)
-            channel.trySend(AttributeEngineAction.CheckExpiration)
+            channel.send(AttributeEngineAction.CheckExpiration)
         }
     }
 

@@ -42,6 +42,10 @@ tasks {
         exclude("org/jspecify/annotations/**")
         exclude("org/checkerframework/**")
 
+        filesMatching("**/*.kotlin_module") {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        }
+
         providers.gradleProperty("assiyaOutputDir").orNull?.let {
             destinationDirectory.set(file(it))
         }

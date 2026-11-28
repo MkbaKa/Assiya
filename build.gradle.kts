@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.invoke
-import org.gradle.kotlin.dsl.kotlin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -31,8 +29,7 @@ subprojects {
             jvmToolchain(21)
             compilerOptions {
                 freeCompilerArgs.addAll(
-                    "-Xintrinsic-const-evaluation",
-                    "-Xexplicit-backing-fields"
+                    "-Xintrinsic-const-evaluation"
                 )
                 jvmTarget.set(JvmTarget.JVM_1_8)
             }
@@ -42,6 +39,7 @@ subprojects {
             options.encoding = "UTF-8"
             sourceCompatibility = "1.8"
             targetCompatibility = "1.8"
+            options.compilerArgs.add("-Xlint:-options")
         }
     }
 

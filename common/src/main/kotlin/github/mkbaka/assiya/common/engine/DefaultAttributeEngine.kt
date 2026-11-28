@@ -1,5 +1,6 @@
 package github.mkbaka.assiya.common.engine
 
+import github.mkbaka.assiya.common.engine.exception.AttributeEngineOverloadedException
 import github.mkbaka.assiya.common.engine.expiration.AttributeExpirationScheduler
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshot
 import github.mkbaka.assiya.common.engine.snapshot.AttributeEngineSnapshotPublisher
@@ -42,11 +43,7 @@ open class DefaultAttributeEngine(
 
     private val replies = ConcurrentHashMap.newKeySet<CompletableDeferred<AttributeEngineSnapshot>>()
 
-    /**
-     * 在不存在弱智附属代码库库改属性的前提下
-     * MC 的使用场景应该做不到撑爆消息队列
-     */
-    protected val channel = Channel<AttributeEngineAction>(Channel.UNLIMITED)
+    protected val channel = Channel<AttributeEngineAction>(CAPACITY)
 
     /**
      * 临时属性源
@@ -96,7 +93,17 @@ open class DefaultAttributeEngine(
     }
 
     protected fun send(action: AttributeEngineAction) {
-        check(channel.trySend(action).isSuccess) { "The engine is closed and cannot process more tasks" }
+        val result = channel.trySend(action)
+        if (result.isSuccess) return
+
+        if (result.isClosed) {
+            throw IllegalStateException(
+                "The engine is closed and cannot process more tasks",
+                result.exceptionOrNull()
+            )
+        }
+
+        throw AttributeEngineOverloadedException()
     }
 
     override fun push(vararg action: AttributeEngineAction) {
@@ -263,6 +270,12 @@ open class DefaultAttributeEngine(
         } finally {
             expiration.reschedule()
         }
+    }
+
+    companion object {
+
+        private const val CAPACITY = 2048
+
     }
     
 }

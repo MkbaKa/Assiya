@@ -28,6 +28,18 @@ class AttributeParsedSource(val parts: List<Part>) {
         return results
     }
 
+    fun resolve(evaluator: Predicate<ParsedCondition>): Map<String, AttributeValue<*>> {
+        val conditions = evaluateConditions(evaluator)
+        return resolve(conditions)
+    }
+
+    /**
+     * 忽略条件限制
+     */
+    fun resolve(): Map<String, AttributeValue<*>> {
+        return resolve(BooleanArray(parts.sumOf { it.conditions.size }) { true })
+    }
+
     fun resolve(conditions: BooleanArray): Map<String, AttributeValue<*>> {
         val accepted = arrayListOf<AttributeValue<*>>()
         var index = 0
